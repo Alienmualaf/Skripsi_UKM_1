@@ -1,0 +1,131 @@
+@extends('layouts.app')
+
+@section('title', 'Inventaris UKM')
+@section('header', 'Monitoring Inventaris UKM')
+
+@section('content')
+<div style="margin-bottom: 1.5rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Monitoring Inventaris UKM</h3>
+    <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Super Admin mengawasi kepemilikan aset dan kondisi sarana prasarana seluruh UKM.</p>
+</div>
+
+<!-- Filter Card -->
+<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 1.5rem;">
+    <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Filter berdasarkan UKM</label>
+            <select name="ukm_id" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
+                <option value="">Semua UKM</option>
+                @foreach($ukms as $u)
+                    <option value="{{ $u->id }}" {{ request('ukm_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        @if(request()->filled('ukm_id'))
+            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-x-circle"></i> Reset</a>
+        @endif
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card" style="padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+            <i class="ph ph-package" style="color: var(--accent-color);"></i> Daftar Inventaris & Aset
+        </h4>
+        <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
+            Total: {{ count($inventories) }} Barang
+        </span>
+    </div>
+
+    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>UKM</th>
+                    <th>Jumlah</th>
+                    <th>Kondisi</th>
+                    <th>Tanggal Masuk</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($inventories as $i)
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);">{{ $i->name }}</td>
+                    <td style="font-weight: 600; color: var(--accent-color);">{{ $i->ukm->name }}</td>
+                    <td style="font-weight: 700;">{{ $i->quantity }}</td>
+                    <td>
+                        @if($i->condition === 'good')
+                            <span class="badge badge-approved">Baik</span>
+                        @elseif($i->condition === 'damaged')
+                            <span class="badge badge-danger">Rusak</span>
+                        @else
+                            <span class="badge badge-warning">Hilang</span>
+                        @endif
+                    </td>
+                    <td>{{ \Carbon\Carbon::parse($i->created_at)->format('d M Y') }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="editInventory({{ json_encode($i) }})" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; background: var(--bg-color); color: var(--accent-color); border: 1px solid var(--border-color);">
+                                <i class="ph ph-pencil"></i> Edit
+                            </button>
+                            <form action="/admin/inventories/{{ $i->id }}" method="POST" onsubmit="return confirm('Hapus barang ini?')" style="display: inline;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;">
+                                    <i class="ph ph-trash"></i> Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+                @if($inventories->isEmpty())
+                <tr><td colspan="6" class="text-secondary text-center py-8">Tidak ada data inventaris.</td></tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Edit -->
+<div id="modal-edit-inventory" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+    <div class="card" style="width: 100%; max-width: 500px; margin: 1rem;">
+        <h3 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--text-primary);">Edit Barang Inventaris</h3>
+        <form id="edit-form-inventory" method="POST">
+            @csrf @method('PUT')
+            <div style="margin-bottom: 1rem;">
+                <label class="form-label mb-2">Nama Barang</label>
+                <input type="text" name="name" id="edit-name" class="form-control" required>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label class="form-label mb-2">Jumlah</label>
+                <input type="number" name="quantity" id="edit-quantity" class="form-control" required min="0">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label class="form-label mb-2">Kondisi</label>
+                <select name="condition" id="edit-condition" class="form-control" required>
+                    <option value="good">Baik</option>
+                    <option value="damaged">Rusak</option>
+                    <option value="lost">Hilang</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" onclick="document.getElementById('modal-edit-inventory').style.display='none'" class="btn" style="background: var(--bg-color);">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function editInventory(i) {
+    document.getElementById('edit-form-inventory').action = '/admin/inventories/' + i.id;
+    document.getElementById('edit-name').value = i.name;
+    document.getElementById('edit-quantity').value = i.quantity;
+    document.getElementById('edit-condition').value = i.condition;
+    document.getElementById('modal-edit-inventory').style.display = 'flex';
+}
+</script>
+@endsection
