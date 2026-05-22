@@ -43,13 +43,6 @@
         <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Total kegiatan UKM</div>
     </div>
 
-    <div class="card stat-card" style="border-top: 3px solid var(--success-color); padding: 1.25rem; margin-bottom: 0 !important;">
-        <div class="stat-label" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph ph-coins"></i> Kas Konsolidasi
-        </div>
-        <div class="stat-value" style="font-size: 1.25rem; font-weight: 800; color: var(--success-color); margin-top: 0.5rem;">Rp {{ number_format($globalBalance, 0, ',', '.') }}</div>
-        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Saldo bersih universitas</div>
-    </div>
 </div>
 
 <!-- Graphs Panel -->
