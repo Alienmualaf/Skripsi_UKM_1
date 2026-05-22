@@ -12,7 +12,14 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        .swal2-custom-popup {
+            border-radius: 24px !important;
+            font-family: 'Outfit', sans-serif !important;
+            padding: 2rem !important;
+        }
         .nav-section-title {
             margin-top: 1.5rem; 
             margin-bottom: 0.5rem;
@@ -695,6 +702,96 @@
                 });
             }
         });
+
+        // Global listeners to replace standard browser confirm dialogs with SweetAlert2
+        document.addEventListener('submit', function(e) {
+            if (e.target.dataset.swalConfirmed) {
+                return;
+            }
+
+            const onsubmitAttr = e.target.getAttribute('onsubmit');
+            if (onsubmitAttr && onsubmitAttr.includes('confirm(')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const match = onsubmitAttr.match(/confirm\(['"](.*?)['"]\)/);
+                const message = match ? match[1] : 'Apakah Anda yakin ingin melakukan tindakan ini?';
+
+                const isDelete = onsubmitAttr.toLowerCase().includes('hapus') || 
+                                 onsubmitAttr.toLowerCase().includes('delete') || 
+                                 onsubmitAttr.toLowerCase().includes('menolak') ||
+                                 (e.target.querySelector('button[type="submit"]') && e.target.querySelector('button[type="submit"]').classList.contains('btn-danger')) ||
+                                 (e.target.querySelector('input[name="_method"]') && e.target.querySelector('input[name="_method"]').value === 'DELETE');
+
+                Swal.fire({
+                    title: isDelete ? 'Konfirmasi Hapus' : 'Konfirmasi Tindakan',
+                    html: `<div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">${message}</div>`,
+                    icon: isDelete ? 'error' : 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: isDelete ? '#ef4444' : '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: isDelete ? 'Ya, Hapus!' : 'Ya, Lanjutkan!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'swal2-custom-popup'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.target.dataset.swalConfirmed = 'true';
+                        e.target.submit();
+                    }
+                });
+            }
+        }, true);
+
+        document.addEventListener('click', function(e) {
+            const element = e.target.closest('[onclick*="confirm("]');
+            if (!element) return;
+            
+            if (element.dataset.swalConfirmed) {
+                return;
+            }
+
+            const onclickAttr = element.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes('confirm(')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const match = onclickAttr.match(/confirm\(['"](.*?)['"]\)/);
+                const message = match ? match[1] : 'Apakah Anda yakin?';
+
+                const isDanger = onclickAttr.toLowerCase().includes('hapus') || 
+                                 onclickAttr.toLowerCase().includes('delete') || 
+                                 onclickAttr.toLowerCase().includes('pulihkan') ||
+                                 onclickAttr.toLowerCase().includes('backup') ||
+                                 onclickAttr.toLowerCase().includes('ganti');
+
+                Swal.fire({
+                    title: 'Konfirmasi Tindakan',
+                    html: `<div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">${message}</div>`,
+                    icon: isDanger ? 'warning' : 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: isDanger ? '#ef4444' : '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Lanjutkan!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'swal2-custom-popup'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        element.dataset.swalConfirmed = 'true';
+                        if (element.tagName === 'A') {
+                            window.location.href = element.href;
+                        } else if (element.type === 'submit' && element.form) {
+                            element.form.submit();
+                        } else {
+                            element.click();
+                        }
+                    }
+                });
+            }
+        }, true);
     </script>
     @auth
     <!-- Mobile Sidebar Backdrop Overlay -->

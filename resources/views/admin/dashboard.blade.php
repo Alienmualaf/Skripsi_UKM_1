@@ -53,24 +53,14 @@
 </div>
 
 <!-- Graphs Panel -->
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
     <!-- Doughnut Chart: Membership Distribution -->
     <div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem; margin-bottom: 0 !important;">
-        <h3 class="mb-4" style="font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+        <h3 class="mb-4" style="font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
             <i class="ph ph-chart-pie-slice" style="color: var(--accent-color);"></i> Distribusi Anggota
         </h3>
-        <div style="height: 250px; position: relative;">
+        <div style="height: 280px; position: relative; max-width: 480px; margin: 0 auto; width: 100%;">
             <canvas id="memberDistributionChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Bar Chart: Financial Comparison -->
-    <div class="card" style="border-top: 3px solid var(--success-color); padding: 1.5rem; margin-bottom: 0 !important;">
-        <h3 class="mb-4" style="font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="ph ph-chart-bar" style="color: var(--success-color);"></i> Neraca Arus Kas & Saldo UKM
-        </h3>
-        <div style="height: 250px; position: relative;">
-            <canvas id="financeComparisonChart"></canvas>
         </div>
     </div>
 </div>
@@ -169,9 +159,6 @@
         // Data pluck
         const ukmNames = {!! json_encode(collect($ukmData)->pluck('name')) !!};
         const ukmMembers = {!! json_encode(collect($ukmData)->pluck('members_count')) !!};
-        const ukmIncomes = {!! json_encode(collect($ukmData)->pluck('income')) !!};
-        const ukmExpenses = {!! json_encode(collect($ukmData)->pluck('expense')) !!};
-        const ukmBalances = {!! json_encode(collect($ukmData)->pluck('balance')) !!};
 
         // 1. Doughnut Chart: Member Distribution
         const memberCtx = document.getElementById('memberDistributionChart').getContext('2d');
@@ -200,61 +187,6 @@
                     legend: {
                         position: 'bottom',
                         labels: { boxWidth: 10, color: '#94a3b8', font: { size: 10 } }
-                    }
-                }
-            }
-        });
-
-        // 2. Bar Chart: Financial Comparison
-        const financeCtx = document.getElementById('financeComparisonChart').getContext('2d');
-        new Chart(financeCtx, {
-            type: 'bar',
-            data: {
-                labels: ukmNames,
-                datasets: [
-                    {
-                        label: 'Pemasukan',
-                        data: ukmIncomes,
-                        backgroundColor: successColor + 'cc',
-                        borderRadius: 3
-                    },
-                    {
-                        label: 'Pengeluaran',
-                        data: ukmExpenses,
-                        backgroundColor: dangerColor + 'cc',
-                        borderRadius: 3
-                    },
-                    {
-                        label: 'Kas Bersih',
-                        data: ukmBalances,
-                        backgroundColor: accentColor + 'cc',
-                        borderRadius: 3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: { boxWidth: 12, color: '#94a3b8', font: { size: 11 } }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: '#94a3b8',
-                            callback: function(val) {
-                                return 'Rp ' + val.toLocaleString('id-ID');
-                            }
-                        },
-                        grid: { color: '#f1f5f9' }
-                    },
-                    x: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { display: false }
                     }
                 }
             }
