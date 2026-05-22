@@ -199,7 +199,7 @@
             </button>
             
             <div class="sidebar-header" style="display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem;">
-                <img src="{{ asset('images/logo-up.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                <img src="{{ asset('images/logoup.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
                 <span style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.025em; color: var(--text-primary);">{{ \App\Services\SettingService::get('app_name', 'Sistem UKM') }}</span>
             </div>
             

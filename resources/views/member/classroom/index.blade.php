@@ -6,7 +6,7 @@
 @section('content')
 <div class="card animate-fade-in">
     <div style="margin-bottom: 2rem;">
-        <h3 style="font-weight: 700; font-size: 1.5rem;">Pusat Pembelajaran & Informasi</h3>
+        <h3 style="font-weight: 700; font-size: 1.5rem;">Pusat Kegiatann</h3>
         <p style="color: var(--text-secondary);">Silakan pilih agenda yang Anda ikuti untuk mengakses materi dan pengumuman.</p>
     </div>
 

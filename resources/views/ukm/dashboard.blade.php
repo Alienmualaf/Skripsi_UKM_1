@@ -193,7 +193,7 @@
             @if($ukm->logo)
                 <img src="{{ filter_var($ukm->logo, FILTER_VALIDATE_URL) ? $ukm->logo : asset('storage/' . $ukm->logo) }}" style="width: 100%; height: 100%; object-fit: cover;">
             @else
-                <img src="{{ asset('images/logo-up.png') }}" style="width: 70%; height: 70%; object-fit: contain; filter: brightness(0) invert(1);">
+                <img src="{{ asset('images/logoup.png') }}" style="width: 70%; height: 70%; object-fit: contain; filter: brightness(0) invert(1);">
             @endif
         </div>
         

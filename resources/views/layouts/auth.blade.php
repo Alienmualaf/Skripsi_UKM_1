@@ -251,7 +251,7 @@
     <div class="auth-wrapper">
         <div class="auth-header">
             <a href="/">
-                <img src="{{ asset('images/logo-up.png') }}" alt="Logo" class="auth-logo">
+                <img src="{{ asset('images/logoup.png') }}" alt="Logo" class="auth-logo">
             </a>
             <h1 class="auth-title">UniUKM</h1>
             <p class="auth-subtitle">@yield('subtitle')</p>
