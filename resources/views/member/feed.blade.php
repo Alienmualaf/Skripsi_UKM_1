@@ -724,7 +724,7 @@
                     <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">UKM Diikuti</div>
                 </div>
                 <div>
-                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">{{ auth()->user()->attendances()->where('status', 'present')->count() }}</div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">{{ \App\Models\Attendance::where('user_id', auth()->id())->where('status', 'present')->count() }}</div>
                     <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Hadir Sesi</div>
                 </div>
             </div>
