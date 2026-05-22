@@ -33,6 +33,27 @@
             <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Gunakan file gambar format PNG/JPG maksimal 2MB.</small>
         </div>
 
+        <!-- Section: Akun Admin UKM -->
+        <hr style="border-top: 1px solid var(--border-color); margin: 2rem 0;">
+        <h4 style="margin: 0 0 1.5rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+            <i class="ph ph-user-plus" style="color: var(--accent-color);"></i> Akun Admin Utama UKM
+        </h4>
+        
+        <div class="form-group mb-4">
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Nama Lengkap Admin</label>
+            <input type="text" name="admin_name" class="form-control" required value="{{ old('admin_name') }}" placeholder="Contoh: Admin Basket" style="padding: 0.65rem;">
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Email Admin</label>
+            <input type="email" name="admin_email" class="form-control" required value="{{ old('admin_email') }}" placeholder="admin.basket@example.com" style="padding: 0.65rem;" autocomplete="off">
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Password Admin</label>
+            <input type="password" name="admin_password" class="form-control" required placeholder="Minimal 8 karakter" style="padding: 0.65rem;" autocomplete="new-password">
+        </div>
+
         <div class="flex gap-2 mt-6">
             <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700;">Simpan UKM</button>
             <a href="{{ route('ukm.index') }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.65rem 1.25rem; font-weight: 700;">Batal</a>

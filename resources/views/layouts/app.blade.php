@@ -362,6 +362,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="/member/feed" class="{{ request()->is('member/feed') ? 'active' : '' }}">
+                                    <i class="ph ph-rss"></i> Feed UKM
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="/member/join" class="{{ request()->is('member/join') ? 'active' : '' }}">
                                     <i class="ph ph-user-plus"></i> Daftar UKM
                                 </a>

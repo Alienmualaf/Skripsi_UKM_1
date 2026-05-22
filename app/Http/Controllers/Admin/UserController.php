@@ -19,8 +19,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $ukms = UKM::all();
-        return view('admin.users.create', compact('ukms'));
+        return view('admin.users.create');
     }
 
     public function store(Request $request)
@@ -30,25 +29,14 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role' => 'required|in:super_admin,user',
-            'assign_admin_ukm_id' => 'nullable|exists:ukms,id'
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
-
-        // Assign as Admin UKM if role is user and ukm is selected
-        if ($request->role === 'user' && $request->assign_admin_ukm_id) {
-            Membership::create([
-                'user_id' => $user->id,
-                'ukm_id' => $request->assign_admin_ukm_id,
-                'role_in_ukm' => 'admin',
-                'status' => 'approved'
-            ]);
-        }
 
         return redirect('/admin/users')->with('success', 'User berhasil dibuat');
     }
@@ -72,45 +60,16 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'role' => 'required|in:super_admin,user',
-            'assign_admin_ukm_id' => 'nullable|exists:ukms,id'
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->role = $request->role;
         
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }
         
         $user->save();
-
-        // Update Admin UKM status:
-        // 1. Delete any existing "admin" role memberships for this user
-        Membership::where('user_id', $user->id)
-            ->where('role_in_ukm', 'admin')
-            ->delete();
-
-        // 2. If user is a user (or admin ukm) and a UKM is selected, assign as Admin
-        if ($request->role === 'user' && $request->assign_admin_ukm_id) {
-            $existing = Membership::where('user_id', $user->id)
-                ->where('ukm_id', $request->assign_admin_ukm_id)
-                ->first();
-            if ($existing) {
-                $existing->update([
-                    'role_in_ukm' => 'admin',
-                    'status' => 'approved'
-                ]);
-            } else {
-                Membership::create([
-                    'user_id' => $user->id,
-                    'ukm_id' => $request->assign_admin_ukm_id,
-                    'role_in_ukm' => 'admin',
-                    'status' => 'approved'
-                ]);
-            }
-        }
 
         return redirect('/admin/users')->with('success', 'User berhasil diupdate');
     }

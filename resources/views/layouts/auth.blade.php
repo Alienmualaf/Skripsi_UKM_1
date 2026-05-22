@@ -45,10 +45,10 @@
             background-size: 20px 20px;
             background-position: 0 0;
             
-            padding: 1.5rem;
+            padding: 2.5rem 1.5rem;
             color: var(--text-main);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         /* Ambient Animated Backdrop Blobs */

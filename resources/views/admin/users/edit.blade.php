@@ -35,24 +35,16 @@
         
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Role Pengguna</label>
-            <select name="role_type" class="form-control" required id="role-type-select" onchange="toggleUkmSelect()" style="padding: 0.65rem;">
-                <option value="user_biasa" {{ ($user->role === 'user' && !$currentAdminUkmId) ? 'selected' : '' }}>User Biasa / Anggota</option>
-                <option value="admin_ukm" {{ ($user->role === 'user' && $currentAdminUkmId) ? 'selected' : '' }}>Admin UKM</option>
-                <option value="super_admin" {{ $user->role === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-            </select>
-            <!-- Hidden input to bind actual role parameter (user vs super_admin) to Backend validation -->
-            <input type="hidden" name="role" id="role-hidden" value="{{ $user->role }}">
-        </div>
-        
-        <div class="form-group mb-4" id="ukm-assign-group" style="{{ $currentAdminUkmId ? '' : 'display: none;' }}">
-            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Ditugaskan Sebagai Admin UKM</label>
-            <select name="assign_admin_ukm_id" id="ukm-select" class="form-control" style="padding: 0.65rem;">
-                <option value="">-- Pilih UKM --</option>
-                @foreach($ukms as $ukm)
-                    <option value="{{ $ukm->id }}" {{ $currentAdminUkmId == $ukm->id ? 'selected' : '' }}>{{ $ukm->name }}</option>
-                @endforeach
-            </select>
-            <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">User ini akan langsung terdaftar sebagai admin utama untuk UKM yang dipilih.</small>
+            <div style="padding: 0.65rem; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: 700; color: var(--text-primary); display: inline-block;">
+                @if($user->role === 'super_admin')
+                    Super Admin
+                @elseif($user->role === 'user' && $currentAdminUkmId)
+                    Admin UKM ({{ $ukms->firstWhere('id', $currentAdminUkmId)->name ?? '-' }})
+                @else
+                    User Biasa / Anggota
+                @endif
+            </div>
+            <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Role pengguna bersifat tetap dan tidak dapat diubah.</small>
         </div>
 
         <div class="flex gap-2 mt-6">
@@ -61,29 +53,4 @@
         </div>
     </form>
 </div>
-
-<script>
-    function toggleUkmSelect() {
-        const type = document.getElementById('role-type-select').value;
-        const ukmGroup = document.getElementById('ukm-assign-group');
-        const roleHidden = document.getElementById('role-hidden');
-        const ukmSelect = document.getElementById('ukm-select');
-
-        if (type === 'admin_ukm') {
-            ukmGroup.style.display = 'block';
-            ukmSelect.required = true;
-            roleHidden.value = 'user';
-        } else if (type === 'super_admin') {
-            ukmGroup.style.display = 'none';
-            ukmSelect.required = false;
-            roleHidden.value = 'super_admin';
-        } else {
-            ukmGroup.style.display = 'none';
-            ukmSelect.required = false;
-            roleHidden.value = 'user';
-        }
-    }
-    // Initialize on page load
-    toggleUkmSelect();
-</script>
 @endsection

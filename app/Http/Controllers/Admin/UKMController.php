@@ -26,15 +26,38 @@ class UKMController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'admin_name' => 'required|string|max:255',
+            'admin_email' => 'required|string|email|max:255|unique:users,email',
+            'admin_password' => 'required|string|min:8',
         ]);
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
-        UKM::create($data);
+        $ukm = UKM::create([
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'logo' => $data['logo'] ?? null,
+        ]);
 
-        return redirect('/admin/ukm')->with('success', 'UKM berhasil dibuat');
+        // Create Admin User for this UKM
+        $user = \App\Models\User::create([
+            'name' => $data['admin_name'],
+            'email' => $data['admin_email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($data['admin_password']),
+            'role' => 'user',
+        ]);
+
+        // Link User as Admin of this UKM
+        \App\Models\Membership::create([
+            'user_id' => $user->id,
+            'ukm_id' => $ukm->id,
+            'role_in_ukm' => 'admin',
+            'status' => 'approved'
+        ]);
+
+        return redirect('/admin/ukm')->with('success', 'UKM dan Akun Admin berhasil dibuat');
     }
 
     public function edit($id)

@@ -10,12 +10,12 @@
 
         <div class="form-group">
             <label class="form-label">Nama Lengkap</label>
-            <input type="text" name="name" placeholder="John Doe" class="form-control" required value="{{ old('name') }}">
+            <input type="text" name="name" placeholder="Dimas Ganteng" class="form-control" required value="{{ old('name') }}">
         </div>
 
         <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" name="email" placeholder="contoh@mahasiswa.ac.id" class="form-control" required value="{{ old('email') }}">
+            <input type="email" name="email" placeholder="contoh@mahasiswa.ac.id" class="form-control" required value="{{ old('email') }}" autocomplete="off">
             @error('email')
                 <div class="error-message">{{ $message }}</div>
             @enderror
@@ -40,12 +40,12 @@
 
         <div class="form-group">
             <label class="form-label">Password</label>
-            <input type="password" name="password" placeholder="••••••••" class="form-control" required>
+            <input type="password" name="password" placeholder="••••••••" class="form-control" required autocomplete="new-password">
         </div>
 
         <div class="form-group">
             <label class="form-label">Konfirmasi Password</label>
-            <input type="password" name="password_confirmation" placeholder="••••••••" class="form-control" required>
+            <input type="password" name="password_confirmation" placeholder="••••••••" class="form-control" required autocomplete="new-password">
         </div>
 
         <button type="submit" class="btn-submit">
