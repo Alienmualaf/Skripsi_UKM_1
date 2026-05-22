@@ -17,9 +17,10 @@ class ClassroomAdminController extends Controller
     {
         $ukmId = session('managed_ukm_id');
         $ukm = UKM::findOrFail($ukmId);
-        $events = Event::where('ukm_id', $ukmId)->latest()->get();
+        $events = Event::where('ukm_id', $ukmId)->where('is_archived', false)->latest()->get();
+        $archivedEvents = Event::where('ukm_id', $ukmId)->where('is_archived', true)->latest()->get();
 
-        return view('ukm.classroom.index', compact('ukm', 'events'));
+        return view('ukm.classroom.index', compact('ukm', 'events', 'archivedEvents'));
     }
 
     public function classroom($eventId, Request $request)

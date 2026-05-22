@@ -23,7 +23,7 @@ class FeedController extends Controller
 
         // 1. Build queries restricting to followed UKMs
         $announcementQuery = Announcement::with(['ukm', 'creator'])->whereIn('ukm_id', $joinedUkmIds);
-        $eventQuery = Event::with('ukm')->whereIn('ukm_id', $joinedUkmIds);
+        $eventQuery = Event::with('ukm')->whereIn('ukm_id', $joinedUkmIds)->where('is_archived', false);
         $galleryQuery = Gallery::with(['ukm', 'creator'])->whereIn('ukm_id', $joinedUkmIds);
 
         // UKM filter

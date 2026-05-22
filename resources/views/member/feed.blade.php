@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Feed UKM')
-@section('header', 'Feed Aktivitas UKM')
+@section('header', 'Feed UKM')
 
 @section('content')
 <style>
@@ -495,10 +495,10 @@
     <div class="feed-main">
         <!-- Banner -->
         <div class="feed-header-banner">
-            <h3 style="margin: 0 0 0.25rem 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="ph ph-newspaper"></i> Feed UKM Saya
+            <h3 style="color: white; margin: 0 0 0.25rem 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ph ph-newspaper"></i> Feed UKM
             </h3>
-            <p style="margin: 0; font-size: 0.875rem; opacity: 0.9; font-weight: 500;">
+            <p style="color: rgba(255, 255, 255, 0.95); margin: 0; font-size: 0.875rem; font-weight: 500;">
                 Melihat update pengumuman, agenda latihan, dan galeri foto terbaru khusus dari UKM yang Anda ikuti.
             </p>
         </div>
@@ -565,15 +565,7 @@
                         <h4 class="social-title">{{ $item->title }}</h4>
                         <div class="social-body">{{ $item->content }}</div>
 
-                        <div class="social-footer">
-                            <div class="social-footer-left">
-                                <button class="social-interaction-btn" onclick="alert('Anda menyukai postingan ini!')">
-                                    <i class="ph ph-heart"></i> Like
-                                </button>
-                                <button class="social-interaction-btn" onclick="alert('Fitur komentar segera hadir!')">
-                                    <i class="ph ph-chat-circle"></i> Comment
-                                </button>
-                            </div>
+                        <div class="social-footer" style="justify-content: flex-end;">
                             <a href="/room/{{ $item->ukm_id }}/classroom" style="font-size: 0.75rem; font-weight: 800; color: var(--accent-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
                                 Buka Kelas <i class="ph ph-arrow-right"></i>
                             </a>
@@ -622,12 +614,7 @@
                             @endif
                         </div>
 
-                        <div class="social-footer">
-                            <div class="social-footer-left">
-                                <button class="social-interaction-btn" onclick="alert('Anda menyukai postingan ini!')">
-                                    <i class="ph ph-heart"></i> Like
-                                </button>
-                            </div>
+                        <div class="social-footer" style="justify-content: flex-end;">
                             <a href="/room/{{ $item->ukm_id }}/classroom" style="font-size: 0.75rem; font-weight: 800; color: var(--success-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
                                 Detail Agenda <i class="ph ph-arrow-right"></i>
                             </a>
@@ -668,15 +655,7 @@
                             </div>
                         @endif
 
-                        <div class="social-footer">
-                            <div class="social-footer-left">
-                                <button class="social-interaction-btn" onclick="alert('Anda menyukai postingan ini!')">
-                                    <i class="ph ph-heart"></i> Like
-                                </button>
-                                <button class="social-interaction-btn" onclick="alert('Fitur komentar segera hadir!')">
-                                    <i class="ph ph-chat-circle"></i> Comment
-                                </button>
-                            </div>
+                        <div class="social-footer" style="justify-content: flex-end;">
                             <span style="font-size: 0.725rem; color: var(--text-secondary); font-weight: 500;">
                                 Oleh {{ $item->creator->name ?? 'Pengurus' }}
                             </span>

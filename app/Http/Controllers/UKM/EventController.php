@@ -61,6 +61,26 @@ class EventController extends Controller
         return back()->with('success', 'Agenda berhasil dihapus');
     }
 
+    public function archive($id)
+    {
+        $ukmId = session('managed_ukm_id');
+        $event = Event::where('id', $id)->where('ukm_id', $ukmId)->firstOrFail();
+        $event->is_archived = true;
+        $event->save();
+
+        return back()->with('success', 'Agenda berhasil diarsipkan');
+    }
+
+    public function unarchive($id)
+    {
+        $ukmId = session('managed_ukm_id');
+        $event = Event::where('id', $id)->where('ukm_id', $ukmId)->firstOrFail();
+        $event->is_archived = false;
+        $event->save();
+
+        return back()->with('success', 'Agenda berhasil dikembalikan dari arsip');
+    }
+
     public function showParticipants($id)
     {
         $ukmId = session('managed_ukm_id');

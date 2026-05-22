@@ -23,6 +23,7 @@ class Event extends Model
         'status',
         'validation_status',
         'validation_notes',
+        'is_archived',
     ];
 
     /**

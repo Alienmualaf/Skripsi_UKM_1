@@ -186,6 +186,8 @@ Route::prefix('ukm')->middleware(['auth', 'admin_ukm'])->group(function () {
     Route::get('/events', [EventController::class, 'index']);
     Route::post('/events', [EventController::class, 'store']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
+    Route::post('/events/{id}/archive', [EventController::class, 'archive']);
+    Route::post('/events/{id}/unarchive', [EventController::class, 'unarchive']);
     Route::get('/events/{id}/participants', [EventController::class, 'showParticipants']);
     Route::post('/events/{id}/participants', [EventController::class, 'updateParticipants']);
     Route::post('/events/{id}/coaches', [EventController::class, 'updateCoaches']);
