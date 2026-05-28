@@ -15,6 +15,7 @@ class Material extends Model
         'title',
         'type',
         'file_path',
+        'link',
         'description',
         'event_id',
     ];

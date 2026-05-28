@@ -258,8 +258,6 @@ Route::prefix('member')->middleware(['auth'])->group(function () {
     Route::post('/join', [JoinUKMController::class, 'join']);
     Route::get('/ukm/{id}', [JoinUKMController::class, 'show']);
 
-    Route::get('/feed', [App\Http\Controllers\Member\FeedController::class, 'index'])->name('member.feed');
-
     // MEMBER ATTENDANCE (SELF CHECK-IN)
     Route::get('/sessions/{id}/attendance', [App\Http\Controllers\UKM\ActivitySessionController::class, 'showAttendance'])->name('member.sessions.attendance');
     Route::post('/sessions/{id}/attendance', [App\Http\Controllers\UKM\ActivitySessionController::class, 'storeAttendance']);

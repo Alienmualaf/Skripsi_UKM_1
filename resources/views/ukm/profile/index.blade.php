@@ -7,7 +7,7 @@
 @extends('layouts.app')
 
 @section('title', 'Profil UKM')
-@section('header', 'Pengaturan Profil UKM')
+@section('header', 'Profil UKM')
 
 @section('content')
 @if(session('success'))
@@ -23,8 +23,13 @@
         @method('PUT')
 
         <div class="form-group">
-            <label class="form-label">Deskripsi / Sejarah UKM</label>
+            <label class="form-label">Deskripsi UKM</label>
             <textarea name="description" class="form-control" rows="4">{{ old('description', $ukm->description) }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Sejarah UKM</label>
+            <textarea name="history" class="form-control" rows="4">{{ old('history', $ukm->history) }}</textarea>
         </div>
 
         <div class="form-group">

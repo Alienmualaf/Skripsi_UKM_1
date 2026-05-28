@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tambah UKM')
-@section('header', 'Tambah UKM Baru')
+@section('header', 'Tambah UKM')
 
 @section('content')
 <div style="margin-bottom: 1.5rem;">

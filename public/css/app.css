@@ -1463,3 +1463,64 @@ h6 {
 .pb-6 {
   padding-bottom: 1.5rem !important;
 }
+
+/* Custom Pagination Styles */
+.custom-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.custom-pagination-info {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.custom-pagination-nav {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.custom-pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.custom-pagination-btn:hover:not(.disabled) {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  background-color: var(--accent-light);
+}
+
+.custom-pagination-btn.active {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white !important;
+}
+
+.custom-pagination-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-color);
+  color: var(--text-secondary);
+}

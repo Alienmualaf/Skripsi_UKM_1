@@ -20,11 +20,26 @@ class FinanceController extends Controller
         return view('ukm.finances.index', compact('finances', 'events', 'totalFinances'));
     }
 
-    public function all()
+    public function all(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        // Ambil seluruh riwayat transaksi keuangan
-        $finances = Finance::with('event')->where('ukm_id', $ukmId)->orderBy('transaction_date', 'desc')->get();
+        $search = $request->input('search');
+        $type = $request->input('type');
+
+        $query = Finance::with('event')->where('ukm_id', $ukmId)->orderBy('transaction_date', 'desc');
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        $finances = $query->paginate(15)->withQueryString();
         
         return view('ukm.finances.all', compact('finances'));
     }

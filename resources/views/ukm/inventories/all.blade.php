@@ -6,8 +6,8 @@
 
 @extends('layouts.app')
 
-@section('title', 'Seluruh Inventaris Barang')
-@section('header', 'Semua Inventaris Barang UKM')
+@section('title', 'Inventaris Barang')
+@section('header', 'Inventaris Barang')
 
 @section('content')
 <div class="mb-6">
@@ -16,9 +16,44 @@
     </a>
 </div>
 
-<div class="card">
-    <h3 class="mb-4">Daftar Lengkap Inventaris Organisasi ({{ count($inventories) }} Barang)</h3>
-    <div class="table-wrapper">
+<!-- Filter Card -->
+<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 1.5rem;">
+    <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="width: 180px;">
+            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Kondisi Barang</label>
+            <select name="condition" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
+                <option value="">Semua Kondisi</option>
+                <option value="good" {{ request('condition') == 'good' ? 'selected' : '' }}>Baik</option>
+                <option value="damaged" {{ request('condition') == 'damaged' ? 'selected' : '' }}>Rusak</option>
+                <option value="lost" {{ request('condition') == 'lost' ? 'selected' : '' }}>Hilang</option>
+            </select>
+        </div>
+        
+        <div style="flex: 2; min-width: 250px; display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div style="position: relative; flex: 1;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Barang</label>
+                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama barang, lokasi..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
+        </div>
+
+        @if(request()->anyFilled(['condition', 'search']))
+            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
+        @endif
+    </form>
+</div>
+
+<div class="card" style="padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+            <i class="ph ph-package" style="color: var(--accent-color);"></i> Daftar Lengkap Inventaris Organisasi
+        </h4>
+        <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
+            Total: {{ $inventories->total() }} Barang
+        </span>
+    </div>
+    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
         <table class="table">
             <thead>
                 <tr>
@@ -73,6 +108,9 @@
                 @endif
             </tbody>
         </table>
+    </div>
+    <div style="margin-top: 1.25rem;">
+        {{ $inventories->links('shared.pagination') }}
     </div>
 </div>
 @endsection

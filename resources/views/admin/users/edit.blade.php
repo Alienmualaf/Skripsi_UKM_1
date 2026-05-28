@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit User')
+@section('title', 'Edit Pengguna')
 @section('header', 'Edit Pengguna')
 
 @section('content')
@@ -41,7 +41,7 @@
                 @elseif($user->role === 'user' && $currentAdminUkmId)
                     Admin UKM ({{ $ukms->firstWhere('id', $currentAdminUkmId)->name ?? '-' }})
                 @else
-                    User Biasa / Anggota
+                    Mahasiswa / Umum
                 @endif
             </div>
             <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Role pengguna bersifat tetap dan tidak dapat diubah.</small>

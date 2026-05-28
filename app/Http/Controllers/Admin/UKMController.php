@@ -8,11 +8,21 @@ use Illuminate\Http\Request;
 
 class UKMController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ukms = UKM::latest()->get();
+        $search = $request->input('search');
+        $query = UKM::latest();
 
-        return view('admin.ukm.index', compact('ukms'));
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $ukms = $query->paginate(15)->withQueryString();
+
+        return view('admin.ukm.index', compact('ukms', 'search'));
     }
 
     public function create()

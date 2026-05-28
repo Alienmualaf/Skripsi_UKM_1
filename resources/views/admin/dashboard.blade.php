@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Super Admin Dashboard')
-@section('header', 'Super Admin Control Center')
+@section('title', 'Dashboard')
+@section('header', 'Dashboard')
 
 @section('content')
 <div style="margin-bottom: 1.5rem;">

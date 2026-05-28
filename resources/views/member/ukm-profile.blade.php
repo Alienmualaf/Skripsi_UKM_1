@@ -264,6 +264,19 @@
     <!-- Left Column (Main content) -->
     <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 100%;">
         
+        <!-- Sejarah UKM Card -->
+        @if($ukm->history)
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">
+            <h3 style="font-weight: 800; font-size: 1.35rem; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); letter-spacing: -0.02em;">
+                <i class="ph-fill ph-book-open" style="color: var(--accent-color); font-size: 1.6rem;"></i> Sejarah UKM
+            </h3>
+            
+            <div style="white-space: pre-line; line-height: 1.7; font-size: 1rem; color: var(--text-primary); font-weight: 500;">
+                {{ $ukm->history }}
+            </div>
+        </div>
+        @endif
+
         <!-- Visi & Misi Card -->
         @if($ukm->vision || $ukm->mission)
         <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">

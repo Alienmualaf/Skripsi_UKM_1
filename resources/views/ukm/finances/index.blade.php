@@ -7,7 +7,7 @@
 @extends('layouts.app')
 
 @section('title', 'Kelola Keuangan')
-@section('header', 'Keuangan UKM')
+@section('header', 'Kelola Keuangan')
 
 @section('content')
 @if(session('success'))

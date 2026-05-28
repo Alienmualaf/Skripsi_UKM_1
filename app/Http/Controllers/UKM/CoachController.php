@@ -9,10 +9,27 @@ use Illuminate\Support\Facades\Storage;
 
 class CoachController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        $coaches = Coach::where('ukm_id', $ukmId)->get();
+        $search = $request->input('search');
+        $category = $request->input('category');
+
+        $query = Coach::where('ukm_id', $ukmId)->latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('skills', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        $coaches = $query->paginate(15)->withQueryString();
         return view('ukm.coaches.index', compact('coaches'));
     }
 

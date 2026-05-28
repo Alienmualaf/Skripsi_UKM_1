@@ -1,5 +1,10 @@
+@php
+    $ukms = \App\Models\UKM::withCount(['memberships' => function ($query) {
+        $query->where('status', 'approved');
+    }])->get();
+@endphp
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id" class="scroll-smooth overflow-x-hidden">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,6 +105,18 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(241, 245, 249, 0.8);
         }
+
+        /* Grid Background Pattern */
+        .bg-grid-lines {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+        }
+        .bg-grid-mask {
+            mask-image: radial-gradient(circle at 60% 50%, black 10%, transparent 85%);
+            -webkit-mask-image: radial-gradient(circle at 60% 50%, black 10%, transparent 85%);
+        }
     </style>
 </head>
 
@@ -128,9 +145,9 @@
 
             <!-- Menu Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#fitur" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Fitur Utama</a>
+                <a href="#fitur" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Fitur Layanan</a>
                 <a href="#alur-kerja" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Alur Kerja</a>
-                <a href="#studi-kasus" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Perbandingan</a>
+                <a href="#daftar-ukm" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Daftar UKM</a>
             </div>
 
             <!-- Auth Actions -->
@@ -140,7 +157,7 @@
                 </a>
                 <a href="/register" 
                    class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black tracking-wider uppercase shadow-md transition-all duration-200 hover:-translate-y-0.5">
-                    Daftar Akun
+                     Daftar Akun
                 </a>
             </div>
 
@@ -149,212 +166,81 @@
 </div>
 
 <!-- 🌟 HERO SECTION -->
-<main class="relative pt-44 pb-20 flex flex-col justify-center items-center text-center">
-    <div class="max-w-[1200px] mx-auto px-6 w-full relative z-10">
+<main class="relative pt-48 pb-20 overflow-hidden bg-gradient-to-b from-blue-50/60 via-slate-50/40 to-[#fafbfd]">
+    <!-- Grid Overlay -->
+    <div class="absolute inset-0 bg-grid-lines bg-grid-mask pointer-events-none z-0"></div>
+
+    <div class="max-w-[1000px] mx-auto px-6 relative z-10 text-center space-y-8">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-100/80 px-4 py-1.5 rounded-full text-blue-700 font-extrabold text-[10px] uppercase tracking-wider shadow-sm mx-auto">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            Portal Layanan Resmi Kemahasiswaan
+        </div>
         
-        <!-- Status Pill -->
-        <div class="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 px-4.5 py-1.5 rounded-full text-slate-600 font-bold text-[10px] uppercase tracking-widest mb-8">
-            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-            TRANSFORMASI DIGITAL UKM KAMPUS
-        </div>
-
-        <!-- Hero Title -->
-        <h2 class="font-outfit text-4xl sm:text-6xl md:text-[4rem] font-extrabold tracking-tight mb-8 leading-[1.1] text-slate-900">
-            Kelola Organisasi UKM Lebih <br>
-            <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-amber-600">Terstruktur & Akuntabel</span>
+        <!-- Main Headings -->
+        <h2 class="font-outfit text-4xl sm:text-5xl lg:text-[4rem] font-black text-slate-900 tracking-tight leading-[1.08] max-w-3xl mx-auto">
+            Sistem Layanan Kegiatan Mahasiswa <br>
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-indigo-650 to-amber-600">Universitas Pancasila</span>
         </h2>
-
-        <!-- Subtitle Description -->
-        <p class="text-slate-500 mb-12 max-w-3xl mx-auto text-base sm:text-lg leading-relaxed font-medium">
-            Platform all-in-one terintegrasi untuk Unit Kegiatan Mahasiswa Universitas Pancasila. 
-            Permudah pencatatan kas, absensi sesi latihan, distribusi berkas materi, 
-            hingga verifikasi dan ekspor berkas LPJ digital instan.
+        
+        <!-- Description -->
+        <p class="text-slate-500 text-base sm:text-lg leading-relaxed font-medium max-w-2xl mx-auto">
+            Portal resmi untuk digitalisasi administrasi, transparansi keuangan kas, absensi kehadiran, dan otomatisasi Laporan Pertanggungjawaban (LPJ) seluruh Unit Kegiatan Mahasiswa (UKM) di lingkungan Universitas Pancasila.
         </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20 w-full sm:w-auto">
-            <a href="/register" 
-               class="w-full sm:w-auto bg-blue-700 hover:bg-blue-600 text-white px-8 py-4 rounded-xl text-sm font-bold tracking-wide shadow-lg transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                <i class="ph ph-rocket-launch text-lg"></i> Mulai Sekarang
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-2 justify-center items-center">
+            <a href="/login" 
+               class="group bg-blue-700 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl text-xs font-black tracking-wider uppercase shadow-lg shadow-blue-700/10 hover:shadow-blue-700/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2.5">
+                Akses Portal Mahasiswa <i class="ph ph-arrow-right text-sm transition-transform group-hover:translate-x-1"></i>
             </a>
-            <a href="#fitur" 
-               class="w-full sm:w-auto bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-8 py-4 rounded-xl text-sm font-bold tracking-wide shadow-sm transition-all duration-200">
-                Eksplor Fitur
+            <a href="#daftar-ukm" 
+               class="bg-white border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-2xl text-xs font-black tracking-wider uppercase shadow-sm transition-all duration-300 text-center">
+                Direktori UKM UP
             </a>
         </div>
-
-        <!-- 🌟 PREMIUM LIGHT DASHBOARD MOCKUP -->
-        <div class="relative w-full max-w-5xl mx-auto rounded-3xl border border-slate-200 shadow-xl bg-white overflow-hidden text-left mb-24">
-            <!-- Mockup Header Bar -->
-            <div class="h-14 bg-slate-50 border-b border-slate-200/80 px-6 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 rounded-full bg-slate-200"></span>
-                    <span class="w-3 h-3 rounded-full bg-slate-200"></span>
-                    <span class="w-3 h-3 rounded-full bg-slate-200"></span>
-                </div>
-                <div class="text-xs text-slate-400 font-bold font-mono">ukm-pancasila.ac.id/dashboard</div>
-                <div class="w-12"></div>
-            </div>
-            
-            <!-- Mockup Workspace Area -->
-            <div class="flex h-[420px] bg-slate-50/50">
-                <!-- Sidebar Mockup -->
-                <div class="w-56 bg-white border-r border-slate-200/85 p-6 flex flex-col justify-between hidden sm:flex shrink-0">
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-3 px-1">
-                            <img src="{{ asset('images/logoup.png') }}" class="w-6 h-6 object-contain">
-                            <span class="text-xs font-black text-slate-800 tracking-wider font-outfit uppercase">Portal UKM</span>
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <div class="text-[10px] px-3.5 py-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 font-bold flex items-center gap-3">
-                                <i class="ph-fill ph-squares-four text-sm"></i> Dashboard
-                            </div>
-                            <div class="text-[10px] px-3.5 py-2.5 text-slate-500 font-bold flex items-center gap-3">
-                                <i class="ph ph-identification-card text-sm"></i> Profil UKM
-                            </div>
-                            <div class="text-[10px] px-3.5 py-2.5 text-slate-500 font-bold flex items-center gap-3">
-                                <i class="ph ph-users text-sm"></i> Anggota
-                            </div>
-                            <div class="text-[10px] px-3.5 py-2.5 text-slate-500 font-bold flex items-center gap-3">
-                                <i class="ph ph-books text-sm"></i> Materi Belajar
-                            </div>
-                            <div class="text-[10px] px-3.5 py-2.5 text-slate-500 font-bold flex items-center gap-3">
-                                <i class="ph ph-money text-sm"></i> Kas Keuangan
-                            </div>
-                            <div class="text-[10px] px-3.5 py-2.5 text-slate-500 font-bold flex items-center gap-3">
-                                <i class="ph ph-file-pdf text-sm"></i> Unduh LPJ
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div class="w-7 h-7 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center font-outfit">A</div>
-                        <div class="leading-none">
-                            <div class="text-[10px] font-bold text-slate-700">Admin BPH</div>
-                            <span class="text-[8px] text-amber-600 font-bold mt-0.5 inline-block">Pengurus UKM</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Grid Mockup -->
-                <div class="flex-1 p-6 space-y-6 overflow-y-auto">
-                    <div class="flex justify-between items-center pb-4 border-b border-slate-200">
-                        <div>
-                            <h3 class="text-xs font-black text-slate-800">UKM Basketball Club</h3>
-                            <p class="text-[9px] text-slate-400 font-bold mt-0.5">Universitas Pancasila</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full text-[9px] font-bold text-emerald-600">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sesi Aktif
-                        </div>
-                    </div>
-
-                    <!-- Mini Stat Boxes -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between h-20 shadow-sm">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Anggota Aktif</span>
-                            <span class="text-xs font-extrabold text-slate-800">124 Mahasiswa</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between h-20 shadow-sm">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Presensi Latihan</span>
-                            <span class="text-xs font-extrabold text-blue-600">92% Kehadiran</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between h-20 shadow-sm">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Kas Terkumpul</span>
-                            <span class="text-xs font-extrabold text-emerald-600">Rp 5.250.000</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between h-20 shadow-sm">
-                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Draf LPJ</span>
-                            <span class="text-xs font-extrabold text-amber-600">Siap Cetak</span>
-                        </div>
-                    </div>
-
-                    <!-- Agenda Table Block -->
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-widest">Sesi Kegiatan Terdekat</h4>
-                            <span class="text-[8px] bg-slate-50 border border-slate-200 text-slate-500 px-2 py-0.5 rounded-lg font-bold">Agenda Terjadwal</span>
-                        </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-[10px]">
-                                <thead>
-                                    <tr class="border-b border-slate-200 text-slate-400 font-bold">
-                                        <th class="pb-2">Nama Agenda</th>
-                                        <th class="pb-2">Waktu Sesi</th>
-                                        <th class="pb-2">Lokasi</th>
-                                        <th class="pb-2 text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 text-slate-600">
-                                    <tr>
-                                        <td class="py-3 font-bold text-slate-800">Latihan Strategi Pertahanan</td>
-                                        <td class="py-3 font-medium">Jumat, 16.00 WIB</td>
-                                        <td class="py-3 font-medium">Hall Serbaguna UP</td>
-                                        <td class="py-3 text-right"><span class="bg-blue-50 border border-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[8px]">Mendatang</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3 font-bold text-slate-800">Fokus Fisik & Stamina</td>
-                                        <td class="py-3 font-medium">Minggu, 08.00 WIB</td>
-                                        <td class="py-3 font-medium">Lapangan Outdoor UP</td>
-                                        <td class="py-3 text-right"><span class="bg-blue-50 border border-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[8px]">Mendatang</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3 font-bold text-slate-800">Rapat Pleno LPJ Proker</td>
-                                        <td class="py-3 font-medium">12 Mei 2026</td>
-                                        <td class="py-3 font-medium">Sekretariat UKM</td>
-                                        <td class="py-3 text-right"><span class="bg-emerald-50 border border-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-bold text-[8px]">Selesai</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </main>
 
 <!-- 🌟 STATS METRIC BENTO SECTION -->
-<section class="py-16 bg-white border-t border-b border-slate-100 relative z-10">
+<section class="py-12 bg-transparent relative z-10 -mt-10">
     <div class="max-w-[1200px] mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="statistik">
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
                 <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-650 text-2xl shrink-0">
                     <i class="ph ph-buildings"></i>
                 </div>
-                <div>
+                <div class="text-left">
                     <div class="text-2xl font-black text-slate-800 font-outfit">12+</div>
                     <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">UKM Terdaftar</div>
                 </div>
             </div>
             
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
                 <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-2xl shrink-0">
                     <i class="ph ph-users"></i>
                 </div>
-                <div>
+                <div class="text-left">
                     <div class="text-2xl font-black text-slate-800 font-outfit">1,500+</div>
                     <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Mahasiswa Aktif</div>
                 </div>
             </div>
             
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-2xl shrink-0">
                     <i class="ph ph-trend-up"></i>
                 </div>
-                <div>
+                <div class="text-left">
                     <div class="text-2xl font-black text-slate-800 font-outfit">98%</div>
                     <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Akurasi Uang Kas</div>
                 </div>
             </div>
             
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-2xl shrink-0">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-650 text-2xl shrink-0">
                     <i class="ph ph-clock"></i>
                 </div>
-                <div>
+                <div class="text-left">
                     <div class="text-2xl font-black text-slate-800 font-outfit">Real-time</div>
                     <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Sinkronisasi LPJ</div>
                 </div>
@@ -553,72 +439,57 @@
     </div>
 </section>
 
-<!-- 🌟 COMPARATIVE CARD SECTION (STUDI KASUS) -->
-<section id="studi-kasus" class="py-24 bg-[#fafbfd] relative z-10">
+<!-- 🌟 DAFTAR UNIT KEGIATAN MAHASISWA (UKM) SECTION -->
+<section id="daftar-ukm" class="py-24 bg-[#fafbfd] relative z-10">
     <div class="max-w-[1200px] mx-auto px-6">
         
         <!-- Header -->
         <div class="text-center max-w-xl mx-auto mb-20">
-            <span class="text-xs font-bold uppercase tracking-widest text-blue-700">KOMPARASI SISTEM</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-blue-700">DIREKTORI ORGANISASI</span>
             <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-                Sebelum vs Sesudah Menggunakan UniUKM
+                Unit Kegiatan Mahasiswa Universitas Pancasila
             </h2>
             <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-                Bandingkan efisiensi operasional organisasi dengan sistem digital baru.
+                Temukan dan bergabunglah dengan organisasi kemahasiswaan yang sesuai dengan minat dan bakat Anda.
             </p>
         </div>
 
-        <!-- Split Grid Bento Comparison -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
-            <!-- Left Side: Manual Method (Kuno) -->
-            <div class="bg-red-50/50 border border-red-200/60 p-8 rounded-3xl shadow-sm space-y-6 relative overflow-hidden">
-                <div class="absolute right-[-20px] bottom-[-20px] w-36 h-36 bg-red-100/30 rounded-full filter blur-2xl"></div>
-                <div class="flex items-center gap-3">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                    <h3 class="font-outfit font-extrabold text-lg text-slate-800 uppercase tracking-wider">Operasional Manual Kuno</h3>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-warning-circle text-red-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-655 font-semibold">Buku uang kas dari kertas manual rawan hilang dan sulit dipantau berkala oleh anggota secara transparan.</p>
+        <!-- UKM Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            @forelse($ukms as $ukm)
+                <div class="bg-white p-6.5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center p-2 overflow-hidden flex-shrink-0">
+                                @if($ukm->logo)
+                                    <img src="{{ filter_var($ukm->logo, FILTER_VALIDATE_URL) ? $ukm->logo : asset('storage/' . $ukm->logo) }}" alt="{{ $ukm->name }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" class="w-full h-full object-contain opacity-50">
+                                @endif
+                            </div>
+                            <div>
+                                <h3 class="font-outfit font-extrabold text-base text-slate-800 leading-tight">{{ $ukm->name }}</h3>
+                                <span class="text-[10px] bg-amber-50 border border-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full mt-1.5 inline-block uppercase tracking-wider">
+                                    {{ $ukm->memberships_count }} Anggota Aktif
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">
+                            {{ Str::limit($ukm->description, 120, '...') }}
+                        </p>
                     </div>
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-warning-circle text-red-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-655 font-semibold">Absensi fisik di lembaran kertas sering rusak, hilang, serta sangat rawan kecurangan titip tanda tangan.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-warning-circle text-red-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-655 font-semibold">Pengurus harus menyusun ulang rekap kas & rekap absen dari nol untuk format draf LPJ di akhir kepengurusan.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Side: Digital System (Modern) -->
-            <div class="bg-emerald-50/50 border border-emerald-200/50 p-8 rounded-3xl shadow-sm space-y-6 relative overflow-hidden">
-                <div class="absolute right-[-20px] bottom-[-20px] w-36 h-36 bg-emerald-100/30 rounded-full filter blur-2xl"></div>
-                <div class="flex items-center gap-3">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h3 class="font-outfit font-extrabold text-lg text-slate-800 uppercase tracking-wider">Sistem Digital Modern</h3>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-check-circle text-emerald-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-700 font-semibold">Keuangan kas tercatat otomatis, saldo terhitung seketika dan dapat diakses transparan oleh anggota di dasbor.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-check-circle text-emerald-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-700 font-semibold">Presensi digital terintegrasi aman. Member melakukan check-in mandiri di HP dan datanya terekam aman.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="ph ph-check-circle text-emerald-500 text-xl shrink-0 mt-0.5"></i>
-                        <p class="text-xs sm:text-sm text-slate-700 font-semibold">Tidak ada proses manual. Cukup klik tombol Cetak LPJ untuk mendapatkan draf berkas PDF siap cetak instan.</p>
+                    <div>
+                        <a href="/login" class="w-full py-3 bg-blue-50 hover:bg-blue-100 border border-blue-100 text-blue-700 rounded-xl text-xs font-black tracking-wider uppercase text-center block transition-all">
+                            Gabung UKM
+                        </a>
                     </div>
                 </div>
-            </div>
-
+            @empty
+                <div class="col-span-full bg-white py-16 px-6 rounded-3xl border border-slate-200 text-center shadow-sm">
+                    <i class="ph ph-buildings text-slate-300 text-5xl mb-4 block"></i>
+                    <p class="text-slate-500 font-bold text-sm">Belum ada Unit Kegiatan Mahasiswa yang terdaftar di sistem.</p>
+                </div>
+            @endforelse
         </div>
 
     </div>
@@ -627,20 +498,20 @@
 <!-- 🌟 GRAND PRESTIGIOUS CALL TO ACTION (CTA) -->
 <section class="py-24 bg-white relative z-10 overflow-hidden border-t border-slate-100">
     <div class="max-w-[1000px] mx-auto px-6 relative z-10">
-        <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-3xl p-8 sm:p-14 text-center space-y-8 relative overflow-hidden shadow-xl text-white">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),transparent_50%)]"></div>
+        <div class="bg-gradient-to-br from-blue-900 to-slate-950 rounded-3xl p-8 sm:p-14 text-center space-y-8 relative overflow-hidden shadow-xl text-white border border-blue-950">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(245,158,11,0.05),transparent_50%)]"></div>
             
             <h2 class="font-outfit text-3xl sm:text-5xl font-black text-white leading-tight">
-                Digitalisasi Administrasi & <br>Kegiatan UKM Anda Sekarang
+                Mulai Langkah Kontribusi Anda <br>di Universitas Pancasila
             </h2>
             
-            <p class="text-blue-100 max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed font-semibold">
-                Daftarkan UKM Anda hari ini untuk mempermudah presensi mandiri, klasifikasi divisi anggota secara dinamis, serta kelola aktivitas kegiatan dan kas dalam satu portal terpadu!
+            <p class="text-slate-300 max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed font-semibold">
+                Daftar sebagai anggota atau kelola kepengurusan UKM Anda secara digital hari ini. Bersama SIM-UKM, wujudkan kegiatan mahasiswa yang lebih aktif, berprestasi, dan transparan.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <a href="/register" 
-                   class="w-full sm:w-auto bg-gradient-to-r from-ambergold-500 to-amber-600 hover:from-ambergold-400 hover:to-amber-500 text-slate-950 px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md transition-transform hover:-translate-y-0.5">
+                   class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md transition-transform hover:-translate-y-0.5">
                     Daftar Akun Baru
                 </a>
                 <a href="/login" 
@@ -653,12 +524,12 @@
 </section>
 
 <!-- 🌟 MINIMALIST LIGHT FOOTER -->
-<footer class="bg-slate-900 text-slate-400 text-[11px] py-16 relative z-10">
+<footer class="bg-slate-950 text-slate-400 text-[11px] py-16 relative z-10 border-t border-slate-900">
     <div class="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
         
         <!-- Left Logo -->
         <div class="flex items-center space-x-3">
-            <div class="w-7 h-7 bg-white/10 border border-white/10 rounded p-1">
+            <div class="w-8 h-8 bg-white border border-slate-800 rounded p-1 flex items-center justify-center">
                 <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" class="w-full h-full object-contain">
             </div>
             <div>
@@ -669,14 +540,14 @@
 
         <!-- Center Text -->
         <div class="text-center md:text-left leading-normal font-semibold">
-            <p class="text-slate-200">Sistem Informasi Manajemen Unit Kegiatan Mahasiswa (UKM)</p>
-            <p class="text-slate-400 mt-1 text-[9px]">Studi Kasus: Multi-Organisasi Unit Kegiatan Mahasiswa (UKM) Universitas Pancasila</p>
+            <p class="text-slate-200">Sistem Informasi Manajemen Unit Kegiatan Mahasiswa (SIM-UKM)</p>
+            <p class="text-slate-500 mt-1 text-[9px]">Portal Resmi Biro Kemahasiswaan & Alumni Universitas Pancasila</p>
         </div>
 
         <!-- Right Copyright -->
         <div class="text-center md:text-right font-bold text-[10px] space-y-1">
             <p>© {{ date('Y') }} All Rights Reserved.</p>
-            <p class="text-slate-400">Portal Resmi Layanan Kegiatan Mahasiswa Universitas Pancasila</p>
+            <p class="text-slate-500">Membina Kreativitas, Prestasi, dan Karakter Mahasiswa Pancasila</p>
         </div>
 
     </div>

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Classroom Admin: ' . $event->title)
+@section('title', 'Pusat Kegiatan: ' . $event->title)
+@section('header', 'Pusat Kegiatan: ' . $event->title)
 
 @section('content')
 @if(session('success'))
@@ -21,7 +22,7 @@
     <div style="background: linear-gradient(135deg, var(--accent-color), #2563eb); color: white; border-radius: var(--radius-md); padding: 2.5rem 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.15); border-top: 4px solid var(--warning-color);">
         <div style="position: relative; z-index: 2;">
             <span class="badge" style="background: rgba(255, 255, 255, 0.15); color: white; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.725rem; border: 1px solid rgba(255, 255, 255, 0.25); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.75rem;">
-                Classroom Admin (Agenda)
+                Pusat Kegiatan (Admin)
             </span>
             <h1 style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; color: #ffffff; font-family: 'Outfit', sans-serif;">{{ $event->title }}</h1>
             <p style="font-size: 1rem; opacity: 0.85; margin: 0.5rem 0 0 0; font-weight: 500; display: flex; align-items: center; gap: 0.4rem;">
@@ -35,16 +36,16 @@
     <!-- Navigation Tabs (Vercel-Style Segmented Pills) -->
     <div style="display: flex; gap: 0.35rem; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px; margin-bottom: 2.25rem; width: max-content; font-family: 'Outfit', sans-serif;">
         <button onclick="switchClassroomTab('stream')" class="classroom-tab-btn {{ $tab === 'stream' ? 'active' : '' }}" data-tab="stream">
-            <i class="ph ph-megaphone" style="font-size: 1rem;"></i> Informasi & Forum
+            <i class="ph ph-megaphone" style="font-size: 1rem;"></i> Informasi
         </button>
         <button onclick="switchClassroomTab('materials')" class="classroom-tab-btn {{ $tab === 'materials' ? 'active' : '' }}" data-tab="materials">
-            <i class="ph ph-notebook" style="font-size: 1rem;"></i> Kelola Materi
+            <i class="ph ph-notebook" style="font-size: 1rem;"></i> Materi
         </button>
         <button onclick="switchClassroomTab('attendances')" class="classroom-tab-btn {{ $tab === 'attendances' ? 'active' : '' }}" data-tab="attendances">
             <i class="ph ph-list-checks" style="font-size: 1rem;"></i> Presensi & Sesi
         </button>
         <button onclick="switchClassroomTab('members')" class="classroom-tab-btn {{ $tab === 'members' ? 'active' : '' }}" data-tab="members">
-            <i class="ph ph-users-three" style="font-size: 1rem;"></i> Anggota & Orang
+            <i class="ph ph-users-three" style="font-size: 1rem;"></i> Peserta Anggota
         </button>
     </div>
 
@@ -67,26 +68,15 @@
 
             <!-- Feed Thread -->
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <!-- Post Announcement Card -->
-                <div class="card" style="padding: 1.5rem; margin-bottom: 0;">
-                    <h4 style="font-weight: 800; font-size: 1.1rem; margin-top: 0; margin-bottom: 1rem; color: var(--text-primary);">Buat Pengumuman Baru</h4>
-                    <form action="/ukm/announcements" method="POST">
-                        @csrf
-                        <input type="hidden" name="event_id" value="{{ $event->id }}">
-                        <div class="form-group mb-3">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Pengumuman</label>
-                            <input type="text" name="title" class="form-control" required placeholder="Contoh: Pengumuman Pertemuan Minggu Ini" style="border-radius: 10px;">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Isi Pengumuman</label>
-                            <textarea name="content" class="form-control" rows="3" required placeholder="Tulis rincian pengumuman di sini..." style="border-radius: 10px;"></textarea>
-                        </div>
-                        <div style="display: flex; justify-content: flex-end;">
-                            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.75rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
-                                <i class="ph ph-paper-plane-tilt"></i> Terbitkan
-                            </button>
-                        </div>
-                    </form>
+                <!-- Post Announcement Trigger Card -->
+                <div onclick="document.getElementById('modal-add-announcement-classroom').style.display='flex'" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; border: 2px dashed var(--border-color); background: var(--bg-color); border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease-in-out; margin-bottom: 0.5rem;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.background='var(--accent-light)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='var(--bg-color)';">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                        <i class="ph ph-megaphone"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <span style="color: var(--text-secondary); font-size: 0.925rem; font-weight: 600;">Bagikan pengumuman atau informasi baru dengan kelas...</span>
+                    </div>
+                    <span class="btn btn-secondary btn-sm" style="font-weight: 700; border-radius: 8px; pointer-events: none;">Buat Pengumuman</span>
                 </div>
 
                 <!-- Announcements Timeline -->
@@ -130,50 +120,15 @@
         <!-- Tab: Materials (Kelola Materi) -->
         <div id="tab-content-materials" class="classroom-tab-content" style="max-width: 850px; margin: 0 auto; display: {{ $tab === 'materials' ? 'flex' : 'none' }}; flex-direction: column; gap: 1.5rem;">
             
-            <!-- Upload Material Form -->
-            <div class="card" style="padding: 1.5rem; margin-bottom: 0;">
-                <h4 style="font-weight: 800; font-size: 1.1rem; margin-top: 0; margin-bottom: 1.25rem; color: var(--text-primary);">Unggah Materi Pembelajaran Baru</h4>
-                <form action="/ukm/materials" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="event_id" value="{{ $event->id }}">
-                    
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Materi</label>
-                            <input type="text" name="title" class="form-control" required placeholder="Contoh: Slide Presentasi Teori Dasar" style="border-radius: 10px;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Jenis</label>
-                            <select name="type" class="form-control" required style="border-radius: 10px;">
-                                <option value="dokumen">Dokumen</option>
-                                <option value="audio">Audio</option>
-                                <option value="video">Video</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Unggah File (Max 10MB)</label>
-                            <input type="file" name="file" class="form-control" style="border-radius: 10px;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Atau Tautan Eksternal (Opsional)</label>
-                            <input type="url" name="link" class="form-control" placeholder="https://youtube.com/..." style="border-radius: 10px;">
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-4">
-                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Deskripsi / Instruksi</label>
-                        <textarea name="description" class="form-control" rows="2" placeholder="Tulis instruksi atau keterangan materi di sini..." style="border-radius: 10px;"></textarea>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
-                            <i class="ph ph-upload-simple"></i> Simpan Materi
-                        </button>
-                    </div>
-                </form>
+            <!-- Trigger Card (Simple Upload) -->
+            <div onclick="document.getElementById('modal-upload-material').style.display='flex'" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; border: 2px dashed var(--border-color); background: var(--bg-color); border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease-in-out; margin-bottom: 0.5rem;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.background='var(--accent-light)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='var(--bg-color)';">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                    <i class="ph ph-plus-circle"></i>
+                </div>
+                <div style="flex: 1;">
+                    <span style="color: var(--text-secondary); font-size: 0.925rem; font-weight: 600;">Bagikan materi atau modul baru dengan kelas...</span>
+                </div>
+                <span class="btn btn-secondary btn-sm" style="font-weight: 700; border-radius: 8px; pointer-events: none;">Buat Materi</span>
             </div>
 
             <!-- Materials List -->
@@ -227,31 +182,15 @@
 
         <!-- Tab: Attendances (Presensi & Sesi) -->
         <div id="tab-content-attendances" class="classroom-tab-content" style="max-width: 850px; margin: 0 auto; display: {{ $tab === 'attendances' ? 'flex' : 'none' }}; flex-direction: column; gap: 1.5rem;">
-            <!-- Create Session Card -->
-            <div class="card" style="padding: 1.5rem; margin-bottom: 0;">
-                <h4 style="font-weight: 800; font-size: 1.1rem; margin-top: 0; margin-bottom: 1.25rem; color: var(--text-primary);">Buat Pertemuan / Sesi Absensi Baru</h4>
-                <form action="/ukm/events/{{ $event->id }}/sessions" method="POST">
-                    @csrf
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Nama Pertemuan</label>
-                            <input type="text" name="title" class="form-control" required placeholder="Contoh: Pertemuan 1 - Pengenalan Dasar" style="border-radius: 10px;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Tanggal</label>
-                            <input type="date" name="date" class="form-control" required value="{{ date('Y-m-d') }}" style="border-radius: 10px;">
-                        </div>
-                    </div>
-                    <div class="form-group mb-4">
-                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Deskripsi Pertemuan (Opsional)</label>
-                        <textarea name="description" class="form-control" rows="2" placeholder="Tulis instruksi atau catatan khusus untuk pertemuan ini..." style="border-radius: 10px;"></textarea>
-                    </div>
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
-                            <i class="ph ph-plus-circle"></i> Tambah Pertemuan
-                        </button>
-                    </div>
-                </form>
+            <!-- Trigger Card (Create Session) -->
+            <div onclick="document.getElementById('modal-add-session-classroom').style.display='flex'" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; border: 2px dashed var(--border-color); background: var(--bg-color); border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease-in-out; margin-bottom: 0.5rem;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.background='var(--accent-light)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='var(--bg-color)';">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                    <i class="ph ph-calendar-plus"></i>
+                </div>
+                <div style="flex: 1;">
+                    <span style="color: var(--text-secondary); font-size: 0.925rem; font-weight: 600;">Buat sesi pertemuan atau absensi kelas baru...</span>
+                </div>
+                <span class="btn btn-secondary btn-sm" style="font-weight: 700; border-radius: 8px; pointer-events: none;">Tambah Sesi</span>
             </div>
 
             <!-- Sessions List -->
@@ -448,4 +387,138 @@
         window.history.replaceState({ tab: tabId }, '', newUrl);
     }
 </script>
+
+<!-- Modal Upload Material -->
+<div id="modal-upload-material" class="modal" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); padding: 1rem;">
+    <div class="card animate-fade-in" style="width: 100%; max-width: 600px; margin: auto; padding: 2rem; border-radius: 20px; box-shadow: var(--shadow-lg); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-weight: 800; font-size: 1.25rem; margin: 0; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Unggah Materi Pembelajaran Baru</h3>
+            <button type="button" onclick="document.getElementById('modal-upload-material').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Tutup">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        
+        <form action="/ukm/materials" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="event_id" value="{{ $event->id }}">
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Materi <span style="color: var(--danger-color);">*</span></label>
+                    <input type="text" name="title" class="form-control" required placeholder="Contoh: Slide Presentasi Teori Dasar" style="border-radius: 10px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Jenis <span style="color: var(--danger-color);">*</span></label>
+                    <select name="type" class="form-control" required style="border-radius: 10px;">
+                        <option value="dokumen">Dokumen</option>
+                        <option value="audio">Audio</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Unggah File (Max 10MB)</label>
+                    <input type="file" name="file" class="form-control" style="border-radius: 10px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Atau Tautan Eksternal (Opsional)</label>
+                    <input type="url" name="link" class="form-control" placeholder="https://youtube.com/..." style="border-radius: 10px;">
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Deskripsi / Instruksi</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Tulis instruksi atau keterangan materi di sini..." style="border-radius: 10px;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1rem;">
+                <button type="button" onclick="document.getElementById('modal-upload-material').style.display='none'" class="btn btn-secondary" style="padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 700;">
+                    Batal
+                </button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="ph ph-upload-simple"></i> Simpan Materi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Add Announcement Classroom -->
+<div id="modal-add-announcement-classroom" class="modal" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); padding: 1rem;">
+    <div class="card animate-fade-in" style="width: 100%; max-width: 600px; margin: auto; padding: 2rem; border-radius: 20px; box-shadow: var(--shadow-lg); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-weight: 800; font-size: 1.25rem; margin: 0; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Buat Pengumuman Kelas Baru</h3>
+            <button type="button" onclick="document.getElementById('modal-add-announcement-classroom').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Tutup">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        
+        <form action="/ukm/announcements" method="POST">
+            @csrf
+            <input type="hidden" name="event_id" value="{{ $event->id }}">
+            
+            <div class="form-group mb-3">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Pengumuman <span style="color: var(--danger-color);">*</span></label>
+                <input type="text" name="title" class="form-control" required placeholder="Contoh: Pengumuman Pertemuan Minggu Ini" style="border-radius: 10px;">
+            </div>
+            
+            <div class="form-group mb-4">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Isi Pengumuman <span style="color: var(--danger-color);">*</span></label>
+                <textarea name="content" class="form-control" rows="6" required placeholder="Tulis rincian pengumuman di sini..." style="border-radius: 10px;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1rem;">
+                <button type="button" onclick="document.getElementById('modal-add-announcement-classroom').style.display='none'" class="btn btn-secondary" style="padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 700;">
+                    Batal
+                </button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="ph ph-paper-plane-tilt"></i> Terbitkan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Add Session Classroom -->
+<div id="modal-add-session-classroom" class="modal" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); padding: 1rem;">
+    <div class="card animate-fade-in" style="width: 100%; max-width: 650px; margin: auto; padding: 2rem; border-radius: 20px; box-shadow: var(--shadow-lg); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-weight: 800; font-size: 1.25rem; margin: 0; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Buat Sesi Pertemuan / Absensi Baru</h3>
+            <button type="button" onclick="document.getElementById('modal-add-session-classroom').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Tutup">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        
+        <form action="/ukm/events/{{ $event->id }}/sessions" method="POST">
+            @csrf
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Nama Pertemuan <span style="color: var(--danger-color);">*</span></label>
+                    <input type="text" name="title" class="form-control" required placeholder="Contoh: Pertemuan 1 - Pengenalan Dasar" style="border-radius: 10px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Tanggal <span style="color: var(--danger-color);">*</span></label>
+                    <input type="date" name="date" class="form-control" required value="{{ date('Y-m-d') }}" style="border-radius: 10px;">
+                </div>
+            </div>
+            
+            <div class="form-group mb-4">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Deskripsi Pertemuan (Opsional)</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Tulis instruksi atau catatan khusus untuk pertemuan ini..." style="border-radius: 10px;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1rem;">
+                <button type="button" onclick="document.getElementById('modal-add-session-classroom').style.display='none'" class="btn btn-secondary" style="padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 700;">
+                    Batal
+                </button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; border-radius: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="ph ph-plus-circle"></i> Tambah Pertemuan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

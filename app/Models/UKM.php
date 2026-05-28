@@ -24,6 +24,7 @@ class UKM extends Model
         'phone',
         'vision',
         'mission',
+        'history',
         'structure_image',
         'is_recruitment_open',
     ];

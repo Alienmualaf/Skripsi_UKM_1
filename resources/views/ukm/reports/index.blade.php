@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan & LPJ')
-@section('header', 'Cetak Laporan UKM')
+@section('title', 'Cetak Laporan')
+@section('header', 'Cetak Laporan')
 
 @section('content')
 <style>

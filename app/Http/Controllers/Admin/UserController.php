@@ -11,10 +11,21 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->get();
-        return view('admin.users.index', compact('users'));
+        $search = $request->input('search');
+        $query = User::latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate(15)->withQueryString();
+
+        return view('admin.users.index', compact('users', 'search'));
     }
 
     public function create()

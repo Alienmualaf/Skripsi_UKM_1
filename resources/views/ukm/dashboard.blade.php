@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Admin UKM Dashboard')
-@section('header', 'Pusat Manajemen UKM: ' . $ukm->name)
+@section('title', 'Dashboard UKM')
+@section('header', 'Dashboard UKM: ' . $ukm->name)
 
 @section('content')
 @php

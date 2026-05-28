@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Agenda & Jadwal')
-@section('header', 'Kalender Kegiatan UKM')
+@section('title', 'Kalender & Agenda')
+@section('header', 'Kalender & Agenda')
 
 @section('content')
 <div class="flex justify-between items-center mb-6">

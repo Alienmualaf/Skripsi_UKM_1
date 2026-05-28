@@ -9,10 +9,22 @@ use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        $events = Event::where('ukm_id', $ukmId)->latest()->get();
+        $search = $request->input('search');
+
+        $query = Event::where('ukm_id', $ukmId)->latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        $events = $query->paginate(15)->withQueryString();
 
         return view('ukm.attendances.index', compact('events'));
     }

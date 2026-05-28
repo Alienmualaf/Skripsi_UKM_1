@@ -7,7 +7,7 @@
 @extends('layouts.app')
 
 @section('title', 'Kelola Inventaris')
-@section('header', 'Inventaris Barang UKM')
+@section('header', 'Kelola Inventaris')
 
 @section('content')
 @if(session('success'))

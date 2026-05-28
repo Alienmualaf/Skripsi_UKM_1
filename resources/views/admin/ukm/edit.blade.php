@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Edit UKM')
-@section('header', 'Edit UKM: ' . $ukm->name)
+@section('header', 'Edit UKM')
 
 @section('content')
 <div style="margin-bottom: 1.5rem;">

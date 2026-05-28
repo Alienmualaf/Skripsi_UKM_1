@@ -16,13 +16,22 @@ class AnnouncementController extends Controller
         $events = Event::where('ukm_id', $ukmId)->orderBy('start_date', 'desc')->get();
         
         $eventId = $request->query('event_id');
-        $query = Announcement::with('event', 'creator')->where('ukm_id', $ukmId);
+        $search = $request->query('search');
+        
+        $query = Announcement::with('event', 'creator')->where('ukm_id', $ukmId)->orderBy('created_at', 'desc');
         
         if ($eventId) {
             $query->where('event_id', $eventId);
         }
 
-        $announcements = $query->orderBy('created_at', 'desc')->get();
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $announcements = $query->paginate(15)->withQueryString();
 
         return view('ukm.announcements.index', compact('announcements', 'events'));
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'UKM Management') - Sistem Informasi UKM</title>
+    <title>@yield('title', 'Sistem UKM') - Universitas Pancasila</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,9 +205,16 @@
                 <i class="ph ph-x"></i>
             </button>
             
-            <div class="sidebar-header" style="display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem;">
-                <img src="{{ asset('images/logoup.png') }}" alt="Logo" style="width: 32px; height: 32px; object-fit: contain;">
-                <span style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.025em; color: var(--text-primary);">{{ \App\Services\SettingService::get('app_name', 'Sistem UKM') }}</span>
+            <div class="sidebar-header" style="display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem 1rem;">
+                <a href="/" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; width: 100%;">
+                    <div style="width: 38px; height: 38px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; box-shadow: var(--shadow-sm); flex-shrink: 0;">
+                        <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                        <span style="font-weight: 800; font-size: 0.95rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--text-primary); font-family: 'Outfit', sans-serif;">{{ \App\Services\SettingService::get('app_name', 'Sistem UKM') }}</span>
+                        <span style="font-size: 0.6rem; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1;">Universitas Pancasila</span>
+                    </div>
+                </a>
             </div>
             
             <ul class="nav-menu">
@@ -244,7 +251,7 @@
                     <li class="nav-section-title">Kegiatan & Pembelajaran</li>
                     <li class="nav-item">
                         <a href="/calendar" class="{{ request()->is('calendar') ? 'active' : '' }}">
-                            <i class="ph ph-calendar"></i> Agenda & Jadwal
+                            <i class="ph ph-calendar"></i> Kalender & Agenda
                         </a>
                     </li>
                     <li class="nav-item">
@@ -284,7 +291,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="/admin/users" class="{{ request()->is('admin/users*') ? 'active' : '' }}">
-                                <i class="ph ph-users"></i> Kelola User
+                                <i class="ph ph-users"></i> Kelola Pengguna
                             </a>
                         </li>
                         <li class="nav-item">
@@ -369,18 +376,13 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/member/feed" class="{{ request()->is('member/feed') ? 'active' : '' }}">
-                                    <i class="ph ph-rss"></i> Feed UKM
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a href="/member/join" class="{{ request()->is('member/join') ? 'active' : '' }}">
                                     <i class="ph ph-user-plus"></i> Daftar UKM
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="/calendar" class="{{ request()->is('calendar') ? 'active' : '' }}">
-                                    <i class="ph ph-calendar"></i> Agenda Kalender
+                                    <i class="ph ph-calendar"></i> Kalender & Agenda
                                 </a>
                             </li>
                         @endif

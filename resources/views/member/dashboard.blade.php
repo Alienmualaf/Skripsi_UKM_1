@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard Mahasiswa')
-@section('header', 'Halo, ' . auth()->user()->name)
+@section('header', 'Dashboard Mahasiswa')
 
 @section('content')
 <!-- Responsive Styling for Tablet & HP -->
@@ -300,6 +300,76 @@
         </div>
         <div class="stat-value" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-color); margin-top: 0.5rem;">{{ $upcomingEvents->count() }}</div>
         <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Jadwal dalam waktu dekat</div>
+    </div>
+</div>
+
+<!-- Notifications Feed from UKMs -->
+<div class="card animate-fade-in" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; border-top: 3px solid var(--accent-color); margin-top: 1.5rem; margin-bottom: 0 !important;">
+    <h3 style="font-size: 1.1rem; font-weight: 750; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); margin: 0 0 1rem 0;">
+        <i class="ph-fill ph-bell" style="color: var(--accent-color); font-size: 1.25rem;"></i> Notifikasi & Update UKM Saya
+    </h3>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        @forelse($notifications as $notif)
+            @if($notif->notification_type === 'announcement')
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; background: var(--bg-color); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem; min-width: 250px; flex: 1;">
+                        <div style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.15rem;">
+                            <i class="ph-fill ph-megaphone"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">Pengumuman Baru</span>
+                                <span style="font-size: 0.725rem; background: var(--border-color); color: var(--text-secondary); padding: 0.15rem 0.4rem; border-radius: 6px; font-weight: 700;">{{ $notif->ukm->name }}</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-primary); margin: 0.35rem 0 0 0; line-height: 1.4;">
+                                {{ Str::limit(strip_tags($notif->content), 150) }}
+                            </p>
+                            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.35rem;">
+                                <i class="ph ph-clock"></i> {{ $notif->created_at->diffForHumans() }}
+                            </div>
+                        </div>
+                    </div>
+                    @php
+                        $targetUrl = $notif->event_id ? route('classroom.show', [$notif->ukm_id, $notif->event_id]) : "/room/{$notif->ukm_id}/classroom";
+                    @endphp
+                    <a href="{{ $targetUrl }}" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        Lihat <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+            @elseif($notif->notification_type === 'event')
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; background: var(--bg-color); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem; min-width: 250px; flex: 1;">
+                        <div style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.15rem;">
+                            <i class="ph-fill ph-calendar"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">Agenda Baru: {{ $notif->title }}</span>
+                                <span style="font-size: 0.725rem; background: var(--border-color); color: var(--text-secondary); padding: 0.15rem 0.4rem; border-radius: 6px; font-weight: 700;">{{ $notif->ukm->name }}</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <span style="display: inline-flex; align-items: center; gap: 0.2rem;"><i class="ph ph-calendar-blank"></i> {{ \Carbon\Carbon::parse($notif->start_date)->format('d M Y, H:i') }}</span>
+                                @if($notif->location)
+                                    <span>•</span>
+                                    <span style="display: inline-flex; align-items: center; gap: 0.2rem;"><i class="ph ph-map-pin"></i> {{ $notif->location }}</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.35rem;">
+                                <i class="ph ph-clock"></i> {{ $notif->created_at->diffForHumans() }}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ route('classroom.show', [$notif->ukm_id, $notif->id]) }}" class="btn btn-primary" style="padding: 0.45rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        Ikuti Sesi <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+            @endif
+        @empty
+            <div style="text-align: center; padding: 2rem 1rem; background: var(--bg-color); border: 1px dashed var(--border-color); border-radius: 12px;">
+                <i class="ph ph-bell-slash" style="font-size: 2rem; opacity: 0.2; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;"></i>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Belum ada update atau pengumuman terbaru dari UKM yang Anda ikuti.</p>
+            </div>
+        @endforelse
     </div>
 </div>
 

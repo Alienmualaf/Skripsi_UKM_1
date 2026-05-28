@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Classroom Admin')
-@section('header', 'Classroom Admin: ' . $ukm->name)
+@section('title', 'Pusat Kegiatan')
+@section('header', 'Pusat Kegiatan')
 
 @section('content')
 <!-- SweetAlert2 -->
@@ -18,10 +18,10 @@
 <div class="card animate-fade-in" style="border-radius: 24px; padding: 2rem;">
     <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h3 style="font-weight: 800; font-size: 1.75rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Pusat Kegiatan & Aktivitas Mengajar</h3>
+            <h3 style="font-weight: 800; font-size: 1.75rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Pusat Kegiatan</h3>
             <p style="color: var(--text-secondary); font-size: 0.95rem;">Pilih agenda di bawah ini untuk mengelola materi, pengumuman, dan mencatat absensi (GCR-style).</p>
         </div>
-        <a href="/ukm/events" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <a href="/ukm/events?create=true" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
             <i class="ph ph-plus-circle"></i> Tambah Agenda Baru
         </a>
     </div>

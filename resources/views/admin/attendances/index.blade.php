@@ -31,8 +31,18 @@
                 <option value="alpa" {{ request('status') == 'alpa' ? 'selected' : '' }}>Alpa</option>
             </select>
         </div>
-        @if(request()->anyFilled(['ukm_id', 'status']))
-            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-x-circle"></i> Reset</a>
+        
+        <div style="flex: 2; min-width: 250px; display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div style="position: relative; flex: 1;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Absensi</label>
+                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau kegiatan..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
+        </div>
+
+        @if(request()->anyFilled(['ukm_id', 'status', 'search']))
+            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
         @endif
     </form>
 </div>
@@ -44,7 +54,7 @@
             <i class="ph ph-calendar-check" style="color: var(--accent-color);"></i> Log Kehadiran Anggota
         </h4>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
-            Total: {{ count($attendances) }} Data Absensi
+            Total: {{ $attendances->total() }} Data Absensi
         </span>
     </div>
 
@@ -103,6 +113,9 @@
                 @endif
             </tbody>
         </table>
+    </div>
+    <div style="margin-top: 1.25rem;">
+        {{ $attendances->links('shared.pagination') }}
     </div>
 </div>
 

@@ -7,14 +7,34 @@ use App\Models\Membership;
 
 class MemberController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $ukmId = session('managed_ukm_id');
+        $search = $request->input('search');
+        $role = $request->input('role');
+        $status = $request->input('status');
 
-        $members = Membership::with(['user', 'classification'])
+        $query = Membership::with(['user', 'classification'])
             ->where('ukm_id', $ukmId)
-            ->get();
+            ->latest();
 
+        if ($search) {
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('npm', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($role) {
+            $query->where('role_in_ukm', $role);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $members = $query->paginate(15)->withQueryString();
         $classifications = \App\Models\UKMClassification::where('ukm_id', $ukmId)->get();
 
         return view('ukm.members.index', compact('members', 'classifications'));

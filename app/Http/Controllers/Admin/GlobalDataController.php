@@ -27,11 +27,19 @@ class GlobalDataController extends Controller
         if ($request->filled('ukm_id')) {
             $query->where('ukm_id', $request->ukm_id);
         }
+
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
         
-        $events = $query->get();
+        $events = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
         
-        return view('admin.events.index', compact('events', 'ukms', 'selectedUkm'));
+        return view('admin.events.index', compact('events', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyEvent(Event $event)
@@ -61,10 +69,18 @@ class GlobalDataController extends Controller
             $query->where('ukm_id', $request->ukm_id);
         }
 
-        $finances = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        $finances = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.finances.index', compact('finances', 'ukms', 'selectedUkm'));
+        return view('admin.finances.index', compact('finances', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyFinance(Finance $finance)
@@ -94,10 +110,18 @@ class GlobalDataController extends Controller
             $query->where('ukm_id', $request->ukm_id);
         }
 
-        $inventories = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('condition', 'like', "%{$search}%");
+            });
+        }
+
+        $inventories = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.inventories.index', compact('inventories', 'ukms', 'selectedUkm'));
+        return view('admin.inventories.index', compact('inventories', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyInventory(Inventory $inventory)
@@ -127,10 +151,15 @@ class GlobalDataController extends Controller
             $query->where('ukm_id', $request->ukm_id);
         }
 
-        $galleries = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        $galleries = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.galleries.index', compact('galleries', 'ukms', 'selectedUkm'));
+        return view('admin.galleries.index', compact('galleries', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyGallery(Gallery $gallery)
@@ -158,10 +187,18 @@ class GlobalDataController extends Controller
             $query->where('ukm_id', $request->ukm_id);
         }
 
-        $materials = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $materials = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.materials.index', compact('materials', 'ukms', 'selectedUkm'));
+        return view('admin.materials.index', compact('materials', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyMaterial(Material $material)
@@ -190,10 +227,18 @@ class GlobalDataController extends Controller
             $query->where('ukm_id', $request->ukm_id);
         }
 
-        $announcements = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $announcements = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.announcements.index', compact('announcements', 'ukms', 'selectedUkm'));
+        return view('admin.announcements.index', compact('announcements', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyAnnouncement(Announcement $announcement)
@@ -217,11 +262,19 @@ class GlobalDataController extends Controller
             $query->where('status', $request->status);
         }
 
-        $memberships = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $memberships = $query->paginate(15)->withQueryString();
         $classifications = UKMClassification::with('ukm')->get();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.memberships.index', compact('memberships', 'ukms', 'classifications', 'selectedUkm'));
+        return view('admin.memberships.index', compact('memberships', 'ukms', 'classifications', 'selectedUkm', 'search'));
     }
 
     public function destroyMembership(Membership $membership)
@@ -242,10 +295,19 @@ class GlobalDataController extends Controller
             $query->where('category', $request->category);
         }
 
-        $coaches = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('skills', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $coaches = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.coaches.index', compact('coaches', 'ukms', 'selectedUkm'));
+        return view('admin.coaches.index', compact('coaches', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyCoach(Coach $coach)
@@ -268,10 +330,21 @@ class GlobalDataController extends Controller
             $query->where('status', $request->status);
         }
 
-        $attendances = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($qu) use ($search) {
+                    $qu->where('name', 'like', "%{$search}%");
+                })->orWhereHas('event', function($qe) use ($search) {
+                    $qe->where('title', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $attendances = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.attendances.index', compact('attendances', 'ukms', 'selectedUkm'));
+        return view('admin.attendances.index', compact('attendances', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyAttendance(Attendance $attendance)
@@ -294,10 +367,21 @@ class GlobalDataController extends Controller
             $query->where('status', $request->status);
         }
 
-        $coachAttendances = $query->get();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('coach', function($qc) use ($search) {
+                    $qc->where('name', 'like', "%{$search}%");
+                })->orWhereHas('event', function($qe) use ($search) {
+                    $qe->where('title', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $coachAttendances = $query->paginate(15)->withQueryString();
         $selectedUkm = $request->filled('ukm_id') ? $ukms->firstWhere('id', $request->ukm_id) : null;
 
-        return view('admin.coach_attendances.index', compact('coachAttendances', 'ukms', 'selectedUkm'));
+        return view('admin.coach_attendances.index', compact('coachAttendances', 'ukms', 'selectedUkm', 'search'));
     }
 
     public function destroyCoachAttendance(CoachAttendance $coachAttendance)

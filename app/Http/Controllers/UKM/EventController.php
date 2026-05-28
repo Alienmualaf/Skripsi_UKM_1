@@ -10,10 +10,32 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        $events = Event::where('ukm_id', $ukmId)->latest()->get();
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $archived = $request->input('archived');
+
+        $query = Event::where('ukm_id', $ukmId)->latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($archived !== null && $archived !== '') {
+            $query->where('is_archived', $archived === '1');
+        }
+
+        $events = $query->paginate(15)->withQueryString();
 
         return view('ukm.events.index', compact('events'));
     }

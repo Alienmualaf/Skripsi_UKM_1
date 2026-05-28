@@ -14,10 +14,23 @@ class CoachAttendanceController extends Controller
     /**
      * Step 1: List Agendas (Events)
      */
-    public function index()
+    public function index(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        $events = Event::where('ukm_id', $ukmId)->orderBy('start_date', 'desc')->get();
+        $search = $request->input('search');
+
+        $query = Event::where('ukm_id', $ukmId)->orderBy('start_date', 'desc');
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        $events = $query->paginate(15)->withQueryString();
+
         return view('ukm.attendances.coach_index', compact('events'));
     }
 

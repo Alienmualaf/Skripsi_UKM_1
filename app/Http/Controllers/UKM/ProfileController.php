@@ -28,6 +28,7 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:30',
             'vision' => 'nullable|string',
             'mission' => 'nullable|string',
+            'history' => 'nullable|string',
             'is_recruitment_open' => 'required|boolean',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'structure_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:3072', // Max 3MB
@@ -38,6 +39,7 @@ class ProfileController extends Controller
             'phone' => $request->phone,
             'vision' => $request->vision,
             'mission' => $request->mission,
+            'history' => $request->history,
             'is_recruitment_open' => $request->is_recruitment_open,
         ];
 

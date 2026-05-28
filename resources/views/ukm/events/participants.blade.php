@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola Peserta Agenda')
-@section('header', 'Peserta: ' . $event->title)
+@section('title', 'Kelola Peserta Kegiatan')
+@section('header', 'Kelola Peserta Kegiatan')
 
 @section('content')
 <form action="/ukm/events/{{ $event->id }}/participants" method="POST">

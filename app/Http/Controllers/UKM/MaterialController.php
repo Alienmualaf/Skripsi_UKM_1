@@ -10,10 +10,31 @@ use Illuminate\Support\Facades\Storage;
 
 class MaterialController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $ukmId = session('managed_ukm_id');
-        $materials = Material::with('event')->where('ukm_id', $ukmId)->latest()->get();
+        $search = $request->input('search');
+        $type = $request->input('type');
+        $eventId = $request->input('event_id');
+
+        $query = Material::with('event')->where('ukm_id', $ukmId)->latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($eventId) {
+            $query->where('event_id', $eventId);
+        }
+
+        $materials = $query->paginate(15)->withQueryString();
         $events = Event::where('ukm_id', $ukmId)->latest()->get();
 
         return view('ukm.materials.index', compact('materials', 'events'));

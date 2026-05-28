@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola Users')
-@section('header', 'Data Pengguna')
+@section('title', 'Kelola Pengguna')
+@section('header', 'Kelola Pengguna')
 
 @section('content')
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -10,19 +10,30 @@
         <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Super Admin mengelola seluruh akun pengguna dan menentukan hak akses/peran dalam platform.</p>
     </div>
     <a href="{{ route('users.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
-        <i class="ph ph-user-plus"></i> Tambah User Baru
+        <i class="ph ph-user-plus"></i> Tambah Pengguna Baru
     </a>
 </div>
 
 <div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-users" style="color: var(--accent-color);"></i> Keseluruhan Pengguna
         </h4>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
-            <i class="ph ph-database" style="margin-right: 0.25rem;"></i> Total {{ count($users) }} Pengguna
+            <i class="ph ph-database" style="margin-right: 0.25rem;"></i> Total {{ $users->total() }} Pengguna
         </span>
     </div>
+
+    <form action="{{ url('/admin/users') }}" method="GET" style="margin-bottom: 1.25rem; display: flex; gap: 0.5rem; max-width: 400px; width: 100%;">
+        <div style="position: relative; flex: 1;">
+            <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pengguna..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
+        @if(request('search'))
+            <a href="{{ url('/admin/users') }}" class="btn btn-secondary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Reset</a>
+        @endif
+    </form>
 
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
         <table class="table">
@@ -51,7 +62,7 @@
                             </span>
                         @else
                             <span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid rgba(30, 64, 175, 0.15);">
-                                User Biasa
+                                Mahasiswa / Umum
                             </span>
                         @endif
                     </td>
@@ -69,6 +80,9 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <div style="margin-top: 1.25rem;">
+        {{ $users->links('shared.pagination') }}
     </div>
 </div>
 @endsection

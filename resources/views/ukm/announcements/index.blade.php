@@ -15,7 +15,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div>
                 <h3 style="font-weight: 700; font-size: 1.25rem;">Daftar Pengumuman</h3>
-                <p style="color: var(--text-secondary); font-size: 0.875rem;">Informasi yang diterbitkan untuk setiap agenda.</p>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Total: {{ $announcements->total() }} pengumuman diterbitkan.</p>
             </div>
             @if($isOperator)
             <button onclick="document.getElementById('modal-add-announcement').style.display='flex'" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
@@ -58,19 +58,35 @@
                 <p style="margin-top: 1rem;">Belum ada pengumuman.</p>
             </div>
         @endif
+
+        <div style="margin-top: 1.25rem;">
+            {{ $announcements->links('shared.pagination') }}
+        </div>
     </div>
 
     <div class="card animate-fade-in" style="position: sticky; top: 1.5rem;">
-        <h4 style="font-weight: 700; margin-bottom: 1.25rem;">Filter Agenda</h4>
-        <form action="" method="GET">
-            <select name="event_id" class="form-control" onchange="this.form.submit()" style="margin-bottom: 1rem;">
-                <option value="">Semua Agenda</option>
-                @foreach($events as $ev)
-                    <option value="{{ $ev->id }}" {{ request('event_id') == $ev->id ? 'selected' : '' }}>{{ $ev->title }}</option>
-                @endforeach
-            </select>
+        <h4 style="font-weight: 700; margin-bottom: 1.25rem;">Pencarian & Filter</h4>
+        <form action="" method="GET" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Filter Agenda</label>
+                <select name="event_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">Semua Agenda</option>
+                    @foreach($events as $ev)
+                        <option value="{{ $ev->id }}" {{ request('event_id') == $ev->id ? 'selected' : '' }}>{{ $ev->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Kata Kunci</label>
+                <div style="position: relative; display: flex; gap: 0.5rem; flex-direction: column;">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi..." class="form-control" style="font-size: 0.875rem;">
+                    <button type="submit" class="btn btn-primary" style="font-weight: 700; border-radius: 8px; width: 100%;">Cari</button>
+                </div>
+            </div>
+            @if(request()->anyFilled(['event_id', 'search']))
+                <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; text-align: center;"><i class="ph ph-x-circle"></i> Reset</a>
+            @endif
         </form>
-        <p style="font-size: 0.75rem; color: var(--text-secondary);">Pilih agenda tertentu untuk melihat pengumuman terkait.</p>
     </div>
 </div>
 

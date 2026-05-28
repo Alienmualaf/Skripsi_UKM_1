@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Input Absensi Sesi')
-@section('header', 'Absensi: ' . $session->title)
+@section('title', 'Absensi Sesi')
+@section('header', 'Absensi Sesi')
 
 @section('content')
 <div class="card mb-4 animate-fade-in">

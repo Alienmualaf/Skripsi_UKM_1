@@ -21,8 +21,18 @@
                 @endforeach
             </select>
         </div>
-        @if(request()->filled('ukm_id'))
-            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-x-circle"></i> Reset</a>
+        
+        <div style="flex: 2; min-width: 250px; display: flex; gap: 0.5rem; align-items: flex-end;">
+            <div style="position: relative; flex: 1;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Materi</label>
+                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul materi..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
+        </div>
+
+        @if(request()->filled('ukm_id') || request()->filled('search'))
+            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
         @endif
     </form>
 </div>
@@ -34,7 +44,7 @@
             <i class="ph ph-book-open" style="color: var(--accent-color);"></i> Daftar Materi Pembelajaran
         </h4>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
-            Total: {{ count($materials) }} Materi
+            Total: {{ $materials->total() }} Materi
         </span>
     </div>
 
@@ -54,13 +64,20 @@
                 <tr>
                     <td style="font-weight: 600; color: var(--text-primary);">{{ $m->title }}</td>
                     <td style="font-weight: 600; color: var(--accent-color);">{{ $m->ukm->name }}</td>
-                    <td><span class="badge badge-info">{{ ucfirst($m->file_type) }}</span></td>
+                    <td><span class="badge badge-info">{{ ucfirst($m->type) }}</span></td>
                     <td>{{ \Carbon\Carbon::parse($m->created_at)->format('d M Y') }}</td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
-                            <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
-                                <i class="ph ph-eye"></i> Lihat
-                            </a>
+                            @if($m->file_path)
+                                <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    <i class="ph ph-eye"></i> Lihat File
+                                </a>
+                            @endif
+                            @if($m->link)
+                                <a href="{{ $m->link }}" target="_blank" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--success-color); text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    <i class="ph ph-link"></i> Buka Link
+                                </a>
+                            @endif
                             <form action="/admin/materials/{{ $m->id }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="display: inline;">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;">
@@ -76,6 +93,9 @@
                 @endif
             </tbody>
         </table>
+    </div>
+    <div style="margin-top: 1.25rem;">
+        {{ $materials->links('shared.pagination') }}
     </div>
 </div>
 @endsection

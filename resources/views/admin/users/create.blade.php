@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah User')
-@section('header', 'Tambah User Baru')
+@section('title', 'Tambah Pengguna')
+@section('header', 'Tambah Pengguna')
 
 @section('content')
 <div style="margin-bottom: 1.5rem;">
-    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Tambah User Baru</h3>
+    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Tambah Pengguna Baru</h3>
     <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Buat akun pengguna baru dan tentukan tingkat hak akses.</p>
 </div>
 
@@ -35,7 +35,7 @@
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Role Pengguna</label>
             <select name="role" class="form-control" required style="padding: 0.65rem;">
-                <option value="user">User Biasa / Anggota</option>
+                <option value="user">Mahasiswa / Umum</option>
                 <option value="super_admin">Super Admin</option>
             </select>
         </div>
