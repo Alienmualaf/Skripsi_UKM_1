@@ -322,35 +322,7 @@
     </div>
 </div>
 
-<style>
-    .classroom-tab-btn {
-        padding: 0.5rem 1.25rem;
-        font-weight: 700;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        text-decoration: none;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        color: var(--text-secondary);
-        border: 1px solid transparent;
-        background: transparent;
-        cursor: pointer;
-    }
-    .classroom-tab-btn.active {
-        background: var(--surface-color);
-        color: var(--accent-color);
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--border-color);
-    }
-    .tab-content {
-        min-height: 400px;
-    }
-    @media (max-width: 768px) {
-        .hidden-mobile { display: none; }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
 
 <script>
     function switchClassroomTab(tabId) {

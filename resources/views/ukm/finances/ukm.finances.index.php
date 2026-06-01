@@ -6,8 +6,8 @@
 
 @extends('layouts.app')
 
-@section('title', 'Kelola Inventaris')
-@section('header', 'Kelola Inventaris')
+@section('title', 'Kelola Keuangan')
+@section('header', 'Kelola Keuangan')
 
 @section('content')
 @if(session('success'))
@@ -22,42 +22,41 @@
 <div class="card mb-4 animate-fade-in" style="border-top: 3px solid var(--accent-color);">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
         <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--accent-light); display: flex; align-items: center; justify-content: center;">
-            <i class="ph-fill ph-package" style="font-size: 1.25rem; color: var(--accent-color);"></i>
+            <i class="ph-fill ph-wallet" style="font-size: 1.25rem; color: var(--accent-color);"></i>
         </div>
         <div>
-            <h3 style="margin: 0; font-weight: 800; font-size: 1.1rem;">Tambah Barang Baru</h3>
-            <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Catat barang inventaris milik organisasi.</p>
+            <h3 style="margin: 0; font-weight: 800; font-size: 1.1rem;">Catat Transaksi Baru</h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Catat pemasukan dan pengeluaran keuangan organisasi.</p>
         </div>
     </div>
 
-    <form action="/ukm/inventory" method="POST">
+    <form action="/ukm/finance" method="POST">
         @csrf
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 2rem;">
             {{-- KOLOM KIRI --}}
             <div>
-                <div class="form-group">
-                    <label class="form-label">Nama Barang <span style="color: var(--danger-color);">*</span></label>
-                    <input type="text" name="name" class="form-control" placeholder="Contoh: Bola Basket, Matras Yoga" required>
-                </div>
-
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label class="form-label">Jumlah <span style="color: var(--danger-color);">*</span></label>
-                        <input type="number" name="quantity" class="form-control" required min="1" value="1">
+                        <label class="form-label">Jenis Transaksi <span style="color: var(--danger-color);">*</span></label>
+                        <select name="type" class="form-control" required>
+                            <option value="income">Pemasukan</option>
+                            <option value="expense">Pengeluaran</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Kondisi <span style="color: var(--danger-color);">*</span></label>
-                        <select name="condition" class="form-control" required>
-                            <option value="good">Baik</option>
-                            <option value="damaged">Rusak</option>
-                            <option value="lost">Hilang</option>
-                        </select>
+                        <label class="form-label">Nominal (Rp) <span style="color: var(--danger-color);">*</span></label>
+                        <input type="number" name="amount" class="form-control" required min="0" placeholder="0">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Lokasi Penyimpanan</label>
-                    <input type="text" name="location" class="form-control" placeholder="Contoh: Gudang Lantai 2, Ruang Sekretariat">
+                    <label class="form-label">Judul / Keterangan Singkat <span style="color: var(--danger-color);">*</span></label>
+                    <input type="text" name="title" class="form-control" placeholder="Contoh: Iuran Bulanan, Pembelian Alat" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tanggal Transaksi <span style="color: var(--danger-color);">*</span></label>
+                    <input type="date" name="transaction_date" class="form-control" required value="{{ date('Y-m-d') }}">
                 </div>
             </div>
 
@@ -71,12 +70,12 @@
                             <option value="{{ $event->id }}">{{ $event->title }}</option>
                         @endforeach
                     </select>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem;">Pilih agenda jika barang terkait kegiatan tertentu.</p>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem;">Pilih "Operasional BPH" untuk transaksi rutin organisasi.</p>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Deskripsi (Opsional)</label>
-                    <textarea name="description" class="form-control" rows="3" placeholder="Catatan tambahan tentang barang ini..." style="resize: vertical;"></textarea>
+                    <label class="form-label">Deskripsi Lengkap (Opsional)</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Rincian transaksi, catatan tambahan..." style="resize: vertical;"></textarea>
                 </div>
             </div>
         </div>
@@ -84,7 +83,7 @@
         <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
             <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);"><i class="ph ph-info" style="margin-right: 0.25rem;"></i> Field bertanda <span style="color: var(--danger-color); font-weight: 700;">*</span> wajib diisi.</p>
             <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
-                <i class="ph ph-plus-circle" style="font-size: 1.1rem;"></i> Simpan Barang
+                <i class="ph ph-plus-circle" style="font-size: 1.1rem;"></i> Simpan Transaksi
             </button>
         </div>
     </form>
@@ -94,50 +93,50 @@
 {{-- TABEL DATA (MAKS 10) --}}
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-        <h3 style="margin: 0; font-weight: 800;">Daftar Inventaris</h3>
+        <h3 style="margin: 0; font-weight: 800;">Riwayat Keuangan</h3>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
-            <i class="ph ph-database" style="margin-right: 0.25rem;"></i> Total {{ $totalInventories }} barang
+            <i class="ph ph-database" style="margin-right: 0.25rem;"></i> Total {{ $totalFinances }} transaksi
         </span>
     </div>
     <div class="table-wrapper">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nama Barang</th>
-                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                    <th>Transaksi</th>
                     <th>Agenda</th>
-                    <th>Kondisi</th>
-                    <th>Lokasi</th>
+                    <th>Jenis</th>
+                    <th>Nominal</th>
                     @if($isOperator)
                         <th>Aksi</th>
                     @endif
                 </tr>
             </thead>
             <tbody>
-                @foreach($inventories as $item)
+                @foreach($finances as $finance)
                 <tr>
-                    <td style="font-weight: 600;">{{ $item->name }}</td>
-                    <td>{{ $item->quantity }}</td>
+                    <td>{{ \Carbon\Carbon::parse($finance->transaction_date)->format('d/m/Y') }}</td>
+                    <td style="font-weight: 600;">{{ $finance->title }}</td>
                     <td>
-                        @if($item->event)
-                            <span class="text-secondary" style="font-size: 0.8125rem; font-weight: 600;">{{ $item->event->title }}</span>
+                        @if($finance->event)
+                            <span class="text-secondary" style="font-size: 0.8125rem; font-weight: 600;">{{ $finance->event->title }}</span>
                         @else
                             <span class="text-secondary" style="font-size: 0.8125rem; font-style: italic;">Operasional BPH</span>
                         @endif
                     </td>
                     <td>
-                        @if($item->condition == 'good')
-                            <span class="badge badge-approved">Baik</span>
-                        @elseif($item->condition == 'damaged')
-                            <span class="badge badge-pending">Rusak</span>
+                        @if($finance->type == 'income')
+                            <span class="badge badge-approved">Pemasukan</span>
                         @else
-                            <span class="badge" style="background-color: rgba(239, 68, 68, 0.2); color: #ef4444;">Hilang</span>
+                            <span class="badge badge-pending" style="background-color: rgba(239, 68, 68, 0.2); color: #ef4444;">Pengeluaran</span>
                         @endif
                     </td>
-                    <td>{{ $item->location ?? '-' }}</td>
+                    <td style="font-weight: bold; color: {{ $finance->type == 'income' ? 'var(--success-color)' : 'var(--danger-color)' }}">
+                        {{ $finance->type == 'income' ? '+' : '-' }} Rp {{ number_format($finance->amount, 0, ',', '.') }}
+                    </td>
                     @if($isOperator)
                     <td>
-                        <form action="/ukm/inventory/{{ $item->id }}" method="POST" onsubmit="return confirm('Hapus barang ini dari daftar inventaris?');">
+                        <form action="/ukm/finance/{{ $finance->id }}" method="POST" onsubmit="return confirm('Hapus catatan ini?');" style="margin: 0;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.85rem; font-size: 0.8125rem;"><i class="ph ph-trash"></i> Hapus</button>
@@ -147,11 +146,11 @@
                 </tr>
                 @endforeach
                 
-                @if(count($inventories) == 0)
+                @if(count($finances) == 0)
                 <tr>
                     <td colspan="{{ $isOperator ? 6 : 5 }}" class="text-secondary text-center" style="padding: 2.5rem;">
-                        <i class="ph ph-package" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
-                        Belum ada barang inventaris tercatat.
+                        <i class="ph ph-wallet" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.4;"></i>
+                        Belum ada catatan keuangan.
                     </td>
                 </tr>
                 @endif
@@ -160,19 +159,14 @@
     </div>
 
     {{-- TOMBOL LIHAT SELENGKAPNYA --}}
-    @if($totalInventories > 10)
+    @if($totalFinances > 10)
     <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
-        <a href="/ukm/inventory/all" class="btn" style="background: var(--accent-light); color: var(--accent-color); font-weight: 700; padding: 0.65rem 1.75rem; display: inline-flex; align-items: center; gap: 0.5rem; border-radius: var(--radius-md); transition: all 0.2s ease; border: 1px solid rgba(30, 64, 175, 0.15);">
+        <a href="/ukm/finance/all" class="btn" style="background: var(--accent-light); color: var(--accent-color); font-weight: 700; padding: 0.65rem 1.75rem; display: inline-flex; align-items: center; gap: 0.5rem; border-radius: var(--radius-md); transition: all 0.2s ease; border: 1px solid rgba(30, 64, 175, 0.15);">
             <i class="ph ph-arrow-right"></i> Lihat Selengkapnya
+        </a>
     </div>
     @endif
 </div>
 
-<style>
-    @media (max-width: 768px) {
-        div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
 @endsection

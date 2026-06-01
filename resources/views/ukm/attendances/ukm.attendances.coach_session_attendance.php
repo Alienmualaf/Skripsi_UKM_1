@@ -194,14 +194,7 @@
     </div>
 </div>
 
-<style>
-    /* Styling layout grid */
-    @media (min-width: 992px) {
-        .coach-attendance-grid {
-            grid-template-columns: 4fr 6fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
 
 <script>
     // Toggle active classes and validations on category selection

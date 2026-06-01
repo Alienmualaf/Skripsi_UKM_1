@@ -7,13 +7,7 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<style>
-    .swal2-custom-popup {
-        border-radius: 24px !important;
-        font-family: 'Outfit', sans-serif !important;
-        padding: 2rem !important;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
 
 <div class="card animate-fade-in" style="border-radius: 24px; padding: 2rem;">
     <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">

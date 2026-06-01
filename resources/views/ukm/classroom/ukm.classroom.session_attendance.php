@@ -142,29 +142,5 @@
         </div>
     </form>
 
-<style>
-    .lock-indicator {
-        background: rgba(255,255,255,0.9);
-        backdrop-filter: blur(10px);
-        padding: 0.75rem 2rem;
-        border-radius: 50px;
-        border: 1px solid var(--success-color);
-        color: var(--success-color);
-        font-weight: 800;
-        font-size: 0.9rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-    }
-    .btn-save {
-        padding: 1rem 3.5rem;
-        border-radius: 50px;
-        font-weight: 800;
-        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
 @endsection
