@@ -361,3 +361,18 @@ graph LR
     SuperAdmin --> UC26
     SuperAdmin --> UC27
 ```
+
+---
+
+## 3. Konsolidasi Aktivitas Berbasis Classroom (Penampilan & Job Eksternal)
+
+Sistem telah dikonsolidasi penuh dengan struktur aktivitas tunggal yang dikelola melalui entitas **Classroom**:
+
+1. **Pusat Classroom Terpadu**:
+   - Baik **Penampilan Internal** (terikat ke Program Kerja via `program_id`) maupun **Job Eksternal / Delegasi** (tidak terikat program, `program_id` bernilai `null`) direpresentasikan oleh model `Performance` di database.
+   - Entitas lama `Job` dan `job_members` telah dihapus sepenuhnya.
+   - Kolom `job_id` pada tabel `classrooms` telah dihapus. Relasi antar kelas sekarang 100% menggunakan `performance_id`.
+
+2. **Akses Data Sub-Aktivitas**:
+   - Seluruh sub-data seperti **Materi Latihan** (`materials`), **Pengumuman** (`announcements`), **Target Lagu** (`song_targets`), **Jadwal** (`classroom_schedules`), dan **Presensi** (`attendances`/`attendance_details`) diakses dan dikelola secara eksklusif melalui entitas `Classroom` dan relasinya.
+   - Data anggota yang bertugas untuk setiap penampilan/job dikelola melalui relasi pivot `classroom_members` (model `Classroom` -> `Member`).

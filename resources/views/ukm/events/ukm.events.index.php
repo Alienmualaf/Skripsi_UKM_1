@@ -11,14 +11,14 @@
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
 @endif
 
 @if($isOperator && request()->has('create'))
-<div class="card mb-4 animate-fade-in" style="max-width: 800px; border-top: 3px solid var(--accent-color);">
+<div class="card mb-4 animate-fade-in" style="max-width: 800px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <h3 style="margin: 0; font-weight: 800;">Buat Kegiatan Baru</h3>
         <a href="/ukm/events" class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.8125rem; border-radius: var(--radius-md); display: inline-flex; align-items: center; gap: 0.25rem;">
@@ -60,7 +60,7 @@
 @endif
 
 <!-- Filter Card -->
-<div class="card mb-4" style="border-top: 3px solid var(--accent-color); padding: 1.25rem;">
+<div class="card mb-4" style="padding: 1.25rem;">
     <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div style="width: 160px;">
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Status Kegiatan</label>

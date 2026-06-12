@@ -11,7 +11,7 @@ class RoleMiddleware
     {
         $user = auth()->user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        if (!$user || !$user->role || !in_array($user->role->name, $roles)) {
             abort(403, 'Akses ditolak');
         }
 

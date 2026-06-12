@@ -10,7 +10,7 @@
 </div>
 
 <!-- Filter Card -->
-<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 1.5rem;">
+<div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
     <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 200px;">
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Filter berdasarkan UKM</label>

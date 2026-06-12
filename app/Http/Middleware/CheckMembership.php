@@ -4,23 +4,26 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Membership;
 
 class CheckMembership
 {
     public function handle(Request $request, Closure $next)
     {
         $user = auth()->user();
-        $ukm = $request->route('ukm');
-        $ukmId = $ukm instanceof \App\Models\UKM ? $ukm->id : $ukm;
 
-        $membership = Membership::where('user_id', $user->id)
-            ->where('ukm_id', $ukmId)
-            ->where('status', 'approved')
-            ->first();
+        if (!$user) {
+            abort(401);
+        }
 
-        if (!$membership) {
-            abort(403, 'Anda belum menjadi anggota UKM ini');
+        // Admins and Pengurus always have access
+        if ($user->isSuperAdmin() || $user->isAdminUkm() || $user->isPengurus()) {
+            return $next($request);
+        }
+
+        // If regular member, must be active
+        $member = $user->member;
+        if (!$member || $member->status !== 'Anggota Aktif') {
+            abort(403, 'Akses ditolak. Anda belum menjadi anggota aktif PSUP.');
         }
 
         return $next($request);

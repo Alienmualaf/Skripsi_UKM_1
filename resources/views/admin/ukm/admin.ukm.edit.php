@@ -9,7 +9,7 @@
     <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Perbarui data profil, logo, dan identitas Unit Kegiatan Mahasiswa.</p>
 </div>
 
-<div class="card" style="max-width: 600px; border-top: 3px solid var(--accent-color); padding: 2rem;">
+<div class="card" style="max-width: 600px; padding: 2rem;">
     <h4 style="margin: 0 0 1.5rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
         <i class="ph ph-pencil-simple" style="color: var(--accent-color);"></i> Profil UKM: {{ $ukm->name }}
     </h4>

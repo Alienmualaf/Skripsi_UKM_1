@@ -12,14 +12,14 @@
 </div>
 
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
 @endif
 
 @if(session('error'))
-    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #ef4444;">
+    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-warning" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('error') }}
     </div>
@@ -59,7 +59,7 @@
     <!-- RIGHT COLUMN: Settings Forms -->
     <div style="display: flex; flex-direction: column; gap: 2rem;">
         <!-- Card 1: Informasi Profil -->
-        <div id="profile-info" class="card" style="margin-bottom: 0; padding: 1.75rem; border-top: 3px solid var(--accent-color);">
+        <div id="profile-info" class="card" style="margin-bottom: 0; padding: 1.75rem;">
             <h4 style="font-weight: 800; margin: 0 0 1.5rem 0; font-size: 1.1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">
                 <i class="ph ph-user-gear" style="color: var(--accent-color); font-size: 1.35rem; vertical-align: middle; margin-right: 0.25rem;"></i>
                 Informasi Personal
@@ -85,7 +85,7 @@
         </div>
 
         <!-- Card 2: Keamanan Akun -->
-        <div id="security-info" class="card" style="margin-bottom: 0; padding: 1.75rem; border-top: 3px solid var(--warning-color);">
+        <div id="security-info" class="card" style="margin-bottom: 0; padding: 1.75rem;">
             <h4 style="font-weight: 800; margin: 0 0 1.5rem 0; font-size: 1.1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">
                 <i class="ph ph-shield-check" style="color: var(--warning-color); font-size: 1.35rem; vertical-align: middle; margin-right: 0.25rem;"></i>
                 Ubah Password Keamanan

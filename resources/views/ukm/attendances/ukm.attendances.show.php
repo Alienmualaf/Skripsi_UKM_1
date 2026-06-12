@@ -5,7 +5,7 @@
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
@@ -56,7 +56,7 @@
     </div>
 
     <!-- RIGHT CONTENT COLUMN: Interactive Timeline Sesi -->
-    <div class="card" style="margin-bottom: 0; padding: 1.75rem; border-top: 3px solid var(--accent-color);">
+    <div class="card" style="margin-bottom: 0; padding: 1.75rem;">
         <h4 style="font-weight: 800; margin: 0 0 2rem 0; font-size: 1.1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">
             <i class="ph ph-git-commit" style="color: var(--accent-color); font-size: 1.35rem; vertical-align: middle; margin-right: 0.25rem;"></i>
             Timeline Pertemuan & Absensi

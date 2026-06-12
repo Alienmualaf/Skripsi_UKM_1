@@ -11,7 +11,7 @@
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
@@ -19,7 +19,7 @@
 
 {{-- FORM INPUT FULL WIDTH: 2 KOLOM --}}
 @if($isOperator)
-<div class="card mb-4 animate-fade-in" style="border-top: 3px solid var(--accent-color);">
+<div class="card mb-4 animate-fade-in">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
         <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--accent-light); display: flex; align-items: center; justify-content: center;">
             <i class="ph-fill ph-package" style="font-size: 1.25rem; color: var(--accent-color);"></i>

@@ -17,6 +17,8 @@
   --accent-light: rgba(30, 64, 175, 0.06);
   /* Clean solid light cobalt tint */
   --accent-glow: rgba(30, 64, 175, 0.08);
+  --primary-color: var(--accent-color);
+  --primary-hover: var(--accent-hover);
 
   --warning-color: #eab308;
   /* Solid Gold Yellow */
@@ -63,6 +65,8 @@
   --accent-hover: #60a5fa;
   --accent-light: rgba(59, 130, 246, 0.08);
   --accent-glow: rgba(59, 130, 246, 0.16);
+  --primary-color: var(--accent-color);
+  --primary-hover: var(--accent-hover);
 
   --warning-color: #fbbf24;
   --warning-light: rgba(251, 191, 36, 0.08);
@@ -199,15 +203,13 @@ h6 {
   color: var(--text-primary);
 }
 
-/* Branded Active Item: Sleek Left Accent Strip, Light Slate-Blue Tint, Cobalt Text */
+/* Branded Active Item: Light Slate-Blue Tint, Cobalt Text */
 .nav-item a.active {
   background-color: var(--accent-light);
   color: var(--accent-color) !important;
   font-weight: 700;
-  border-left: 3px solid var(--accent-color);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  padding-left: calc(0.85rem - 3px);
-  /* Shift alignment to compensate for left-border */
+  border-radius: var(--radius-md);
+  padding-left: 0.85rem;
 }
 
 .nav-item a.active i {
@@ -344,9 +346,7 @@ h6 {
   /* Crisp 8px corners */
   padding: 1.75rem;
   border: 1px solid var(--border-color);
-  border-top: 3px solid var(--accent-color);
-  /* Sleek Cobalt Blue top brand rail */
-  margin-bottom: 2.25rem;
+  margin-bottom: 1.5rem;
   /* Clean vertical spacing between stacked cards! */
   transition: border-color 0.15s ease;
   position: relative;
@@ -365,8 +365,8 @@ h6 {
   /* Forced 4-column single horizontal row on desktop! */
   gap: 1.75rem;
   /* Increased grid spacing gaps */
-  margin-bottom: 2.75rem;
-  /* Increased spacing below grid */
+  margin-bottom: 1.5rem;
+  /* Spacing below grid */
 }
 
 .stat-card {
@@ -390,14 +390,12 @@ h6 {
 /* Minimalist alternating top brand rails for statistic cards */
 .stat-grid .stat-card:nth-child(1),
 .stat-grid .stat-card:nth-child(2) {
-  border-top: 3px solid var(--accent-color);
-  /* Cobalt Blue brand rail */
+  /* Cobalt Blue brand rail removed */
 }
 
 .stat-grid .stat-card:nth-child(3),
 .stat-grid .stat-card:nth-child(4) {
-  border-top: 3px solid var(--warning-color);
-  /* Gold Yellow brand rail */
+  /* Gold Yellow brand rail removed */
 }
 
 .stat-value {

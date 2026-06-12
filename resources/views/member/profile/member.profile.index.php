@@ -43,12 +43,12 @@
             
             <div class="form-group">
                 <label class="form-label">Password Baru</label>
-                <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter">
+                <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter" autocomplete="new-password">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Konfirmasi Password Baru</label>
-                <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru">
+                <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru" autocomplete="new-password">
             </div>
         </div>
 

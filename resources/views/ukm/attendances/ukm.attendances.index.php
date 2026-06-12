@@ -5,7 +5,7 @@
 
 @section('content')
 <!-- Filter Card -->
-<div class="card mb-4" style="border-top: 3px solid var(--accent-color); padding: 1.25rem;">
+<div class="card mb-4" style="padding: 1.25rem;">
     <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div style="flex: 2; min-width: 250px; display: flex; gap: 0.5rem; align-items: flex-end;">
             <div style="position: relative; flex: 1;">

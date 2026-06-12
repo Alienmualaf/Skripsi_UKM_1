@@ -2,25 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Gallery extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'ukm_id',
-        'created_by',
-        'title',
-        'type',
-        'file_path',
-    ];
-
-    public function ukm()
-    {
-        return $this->belongsTo(UKM::class, 'ukm_id');
-    }
+    protected $fillable = ['ukm_id', 'created_by', 'title', 'file_path', 'description', 'type', 'show_on_landing'];
 
     public function creator()
     {

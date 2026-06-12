@@ -2,36 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Material extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'ukm_id',
-        'created_by',
+        'folder_id',
+        'classroom_id',
         'title',
         'type',
         'file_path',
-        'link',
+        'file_type',
         'description',
-        'event_id',
+        'uploader_id',
     ];
 
-    public function ukm()
+    public function folder(): BelongsTo
     {
-        return $this->belongsTo(UKM::class, 'ukm_id');
+        return $this->belongsTo(Folder::class);
     }
 
-    public function creator()
+    public function uploader(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'uploader_id');
     }
 
-    public function event()
+    public function classroom(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Classroom::class);
     }
 }

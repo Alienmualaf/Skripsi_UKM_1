@@ -100,7 +100,7 @@
         
         <!-- Sejarah UKM Card -->
         @if($ukm->history)
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; margin-bottom: 0 !important;">
             <h3 style="font-weight: 800; font-size: 1.35rem; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); letter-spacing: -0.02em;">
                 <i class="ph-fill ph-book-open" style="color: var(--accent-color); font-size: 1.6rem;"></i> Sejarah UKM
             </h3>
@@ -113,21 +113,21 @@
 
         <!-- Visi & Misi Card -->
         @if($ukm->vision || $ukm->mission)
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; margin-bottom: 0 !important;">
             <h3 style="font-weight: 800; font-size: 1.35rem; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); letter-spacing: -0.02em;">
                 <i class="ph-fill ph-flag-banner" style="color: var(--accent-color); font-size: 1.6rem;"></i> Visi & Misi UKM
             </h3>
             
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 @if($ukm->vision)
-                <div style="background: var(--bg-color); border-left: 4px solid var(--accent-color); padding: 1.25rem 1.5rem; border-radius: 4px 16px 16px 4px; box-shadow: var(--shadow-sm);">
+                <div style="background: var(--bg-color); padding: 1.25rem 1.5rem; border-radius: 16px; box-shadow: var(--shadow-sm);">
                     <h4 style="font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Visi</h4>
                     <p style="font-size: 1.1rem; font-weight: 600; line-height: 1.6; font-style: italic; color: var(--text-primary); margin: 0;">"{{ $ukm->vision }}"</p>
                 </div>
                 @endif
                 
                 @if($ukm->mission)
-                <div style="background: var(--bg-color); border-left: 4px solid var(--accent-color); padding: 1.25rem 1.5rem; border-radius: 4px 16px 16px 4px; box-shadow: var(--shadow-sm);">
+                <div style="background: var(--bg-color); padding: 1.25rem 1.5rem; border-radius: 16px; box-shadow: var(--shadow-sm);">
                     <h4 style="font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Misi</h4>
                     <div style="white-space: pre-line; line-height: 1.7; font-size: 1rem; color: var(--text-primary); font-weight: 600;">{{ $ukm->mission }}</div>
                 </div>
@@ -138,7 +138,7 @@
 
         <!-- Struktur Organisasi -->
         @if($ukm->structure_image)
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important; display: flex; flex-direction: column; align-items: center;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; margin-bottom: 0 !important; display: flex; flex-direction: column; align-items: center;">
             <h3 style="font-weight: 800; font-size: 1.35rem; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); letter-spacing: -0.02em; align-self: flex-start;">
                 <i class="ph-fill ph-tree-structure" style="color: var(--accent-color); font-size: 1.6rem;"></i> Struktur Organisasi
             </h3>
@@ -151,7 +151,7 @@
         @endif
 
         <!-- Dokumentasi Kegiatan (Galeri) -->
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 2rem; margin-bottom: 0 !important;">
             <h3 style="font-weight: 800; font-size: 1.35rem; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); letter-spacing: -0.02em;">
                 <i class="ph-fill ph-image" style="color: var(--warning-color); font-size: 1.6rem;"></i> Galeri Dokumentasi
             </h3>
@@ -187,7 +187,7 @@
     <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 100%;">
         
         <!-- Pelatih Resmi UKM -->
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; border-top: 3px solid var(--success-color); margin-bottom: 0 !important;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; margin-bottom: 0 !important;">
             <h4 style="font-weight: 800; font-size: 1.15rem; margin: 0 0 1.25rem 0; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); letter-spacing: -0.02em;">
                 <i class="ph-fill ph-briefcase" style="color: var(--success-color); font-size: 1.4rem;"></i> Pelatih & Pengajar
             </h4>
@@ -215,7 +215,7 @@
         </div>
 
         <!-- Kegiatan Mendatang -->
-        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; border-top: 3px solid var(--accent-color); margin-bottom: 0 !important;">
+        <div class="card" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; margin-bottom: 0 !important;">
             <h4 style="font-weight: 800; font-size: 1.15rem; margin: 0 0 1.25rem 0; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); letter-spacing: -0.02em;">
                 <i class="ph-fill ph-calendar-blank" style="color: var(--accent-color); font-size: 1.4rem;"></i> Kegiatan Mendatang
             </h4>

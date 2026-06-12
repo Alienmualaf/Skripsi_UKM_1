@@ -5,13 +5,13 @@
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
 @endif
 @if(session('error'))
-    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #ef4444;">
+    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-x-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('error') }}
     </div>
@@ -19,7 +19,7 @@
 
 <div class="animate-fade-in">
     <!-- Header / Banner Agenda -->
-    <div style="background: linear-gradient(135deg, var(--accent-color), #2563eb); color: white; border-radius: var(--radius-md); padding: 2.5rem 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.15); border-top: 4px solid var(--warning-color);">
+    <div style="background: linear-gradient(135deg, var(--accent-color), #2563eb); color: white; border-radius: var(--radius-md); padding: 2.5rem 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.15);">
         <div style="position: relative; z-index: 2;">
             <span class="badge" style="background: rgba(255, 255, 255, 0.15); color: white; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.725rem; border: 1px solid rgba(255, 255, 255, 0.25); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.75rem;">
                 Pusat Kegiatan (Admin)
@@ -56,7 +56,7 @@
         <div id="tab-content-stream" class="classroom-tab-content" style="display: {{ $tab === 'stream' ? 'grid' : 'none' }}; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start;">
             <!-- Left Info Sidebar -->
             <div class="hidden-mobile" style="display: flex; flex-direction: column; gap: 1rem;">
-                <div class="card" style="padding: 1.25rem; border-top: 3px solid var(--warning-color); margin-bottom: 0;">
+                <div class="card" style="padding: 1.25rem; margin-bottom: 0;">
                     <h4 style="font-weight: 800; font-size: 0.875rem; margin: 0 0 0.5rem 0; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Info Ringkas</h4>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
                         <div>Peserta: <strong>{{ count($participants) }} orang</strong></div>
@@ -82,7 +82,7 @@
                 <!-- Announcements Timeline -->
                 <div style="display: flex; flex-direction: column; gap: 1rem;">
                     @forelse($announcements as $ann)
-                    <div class="card" style="padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start; border-left: 3px solid var(--accent-color); margin-bottom: 0;">
+                    <div class="card" style="padding: 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 0;">
                         <div style="width: 38px; height: 38px; background: var(--accent-light); color: var(--accent-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">
                             {{ strtoupper(substr($ann->creator->name, 0, 1)) }}
                         </div>
@@ -136,7 +136,7 @@
                 <h4 style="font-weight: 800; font-size: 1.15rem; color: var(--text-primary); margin: 0.5rem 0;">Daftar Materi yang Dibagikan</h4>
                 
                 @forelse($materials as $material)
-                <div class="card" style="padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.2s; border-left: 3px solid var(--accent-color); margin-bottom: 0;">
+                <div class="card" style="padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.2s; margin-bottom: 0;">
                     <div style="display: flex; align-items: center; gap: 1rem; min-width: 0; flex: 1;">
                         <div style="width: 42px; height: 42px; background: var(--accent-light); color: var(--accent-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
                             <i class="ph ph-{{ $material->type === 'audio' ? 'music-note' : ($material->type === 'video' ? 'video-camera' : 'file-text') }}"></i>
@@ -201,7 +201,7 @@
                 @php
                     $filledCount = $session->attendances->count();
                 @endphp
-                <div class="card" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.2s; border-left: 3px solid var(--accent-color); margin-bottom: 0;">
+                <div class="card" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.2s; margin-bottom: 0;">
                     <div style="min-width: 0; flex: 1;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
                             <h4 style="font-weight: 800; margin: 0; font-size: 1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">{{ $session->title }}</h4>
@@ -263,7 +263,7 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     @forelse($coaches as $coach)
-                    <div class="card" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; margin-bottom: 0; border-left: 3px solid var(--accent-color);">
+                    <div class="card" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; margin-bottom: 0;">
                         @if($coach->photo)
                             <img src="{{ asset('storage/' . $coach->photo) }}" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover;">
                         @else
@@ -373,20 +373,9 @@
         <form action="/ukm/materials" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="event_id" value="{{ $event->id }}">
-            
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                <div class="form-group">
-                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Materi <span style="color: var(--danger-color);">*</span></label>
-                    <input type="text" name="title" class="form-control" required placeholder="Contoh: Slide Presentasi Teori Dasar" style="border-radius: 10px;">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Jenis <span style="color: var(--danger-color);">*</span></label>
-                    <select name="type" class="form-control" required style="border-radius: 10px;">
-                        <option value="dokumen">Dokumen</option>
-                        <option value="audio">Audio</option>
-                        <option value="video">Video</option>
-                    </select>
-                </div>
+            <div class="form-group mb-3">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Judul Materi <span style="color: var(--danger-color);">*</span></label>
+                <input type="text" name="title" class="form-control" required placeholder="Contoh: Slide Presentasi Teori Dasar" style="border-radius: 10px; height: 2.6rem;">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">

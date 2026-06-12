@@ -3,115 +3,130 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Models\Classroom;
 use App\Models\Announcement;
 use App\Models\Attendance;
-use App\Models\Event;
+use App\Models\ClassroomSchedule;
+use App\Models\ClassroomSongTarget;
 use App\Models\Material;
-use App\Models\UKM;
-use App\Models\ActivitySession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ClassroomController extends Controller
 {
-    // 🔥 Pilih Agenda (Daftar Kelas)
-    public function index(UKM $ukm)
+    /**
+     * Tampilkan menu "Classroom Saya" yang berisi daftar Classroom berdasarkan Penampilan yang diikuti.
+     */
+    public function index()
     {
         $user = Auth::user();
-        $membership = $user->memberships()->where('ukm_id', $ukm->id)->where('status', 'approved')->first();
+        $member = $user->member;
 
-        if (!$membership) abort(403);
-
-        $events = $ukm->events()->whereHas('participants', function($q) use ($membership) {
-            $q->where('membership_id', $membership->id);
-        })->get();
-
-        return view('member.classroom.index', compact('ukm', 'events'));
-    }
-
-    // 🔥 Halaman Classroom (Halaman Utama Agenda)
-    public function classroom(UKM $ukm, Event $event, Request $request)
-    {
-        // Validasi akses
-        if (!Auth::user()->isParticipant($event->id)) {
-            abort(403, 'Anda bukan peserta agenda ini.');
+        if (!$member) {
+            return redirect()->route('member.dashboard')->with('error', 'Profil anggota tidak ditemukan.');
         }
 
-        $tab = $request->query('tab', 'stream'); // Default ke stream
+        // Ambil daftar classroom yang diikuti oleh anggota
+        $classrooms = $member->classrooms()->with(['performance'])->get();
 
-        // Load stream data
-        $announcements = Announcement::with('creator')
-            ->where('event_id', $event->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        $latestMaterials = Material::where('event_id', $event->id)
-            ->orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
+        return view('member.classroom.index', compact('classrooms'));
+    }
 
-        // Load materials data
-        $materials = Material::where('event_id', $event->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    /**
+     * Tampilkan detail Classroom (Informasi, Materi, Peserta, Absensi)
+     */
+    public function show($classroomId, Request $request)
+    {
+        $user = Auth::user();
+        $member = $user->member;
 
-        // Load members data
-        $participants = $event->participants()->with('user', 'classification')->get();
-        $coaches = $event->coaches;
+        if (!$member) {
+            abort(403, 'Akses ditolak.');
+        }
 
-        // Load attendances data
-        $sessions = ActivitySession::where('event_id', $event->id)
-            ->with(['attendances' => function($q) {
-                $q->where('user_id', Auth::id());
+        $classroom = Classroom::with(['performance', 'members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets'])
+            ->findOrFail($classroomId);
+
+        // Validasi keikutsertaan anggota di classroom tersebut
+        if (!$classroom->members()->where('member_id', $member->id)->exists()) {
+            abort(403, 'Anda bukan peserta di classroom ini.');
+        }
+
+        $tab = $request->query('tab', 'stream');
+
+        // Load stream (pengumuman)
+        $announcements = $classroom->announcements()->with('creator')->latest()->get();
+
+        // Load materi
+        $materials = $classroom->materials()->latest()->get();
+
+        // Load peserta
+        $participants = $classroom->members()->with(['user', 'voiceClassification'])->get();
+
+        // Load jadwal latihan
+        $schedules = $classroom->schedules()->orderBy('date', 'asc')->orderBy('start_time', 'asc')->get();
+
+        // Load target lagu / penugasan suara
+        $songTargets = $classroom->songTargets()->get();
+
+        // Load absensi khusus untuk member ini
+        $attendances = $classroom->attendances()
+            ->with(['details' => function ($q) use ($member) {
+                $q->where('member_id', $member->id);
             }])
             ->orderBy('date', 'desc')
             ->get();
-        
-        $totalSessions = $sessions->count();
-        $hadir = 0;
-        $izin = 0;
-        $tidakHadir = 0;
-        
-        foreach ($sessions as $session) {
-            $att = $session->attendances->first();
-            if ($att) {
-                if ($att->status === 'hadir') {
-                    $hadir++;
-                } elseif ($att->status === 'izin') {
-                    $izin++;
-                } elseif ($att->status === 'tidak hadir' || $att->status === 'alpa') {
-                    $tidakHadir++;
+
+        $totalSessions = $classroom->attendances()->count();
+        $hadirCount = 0;
+        $izinCount = 0;
+        $sakitCount = 0;
+        $tidakHadirCount = 0;
+
+        foreach ($attendances as $att) {
+            $detail = $att->details->first();
+            if ($detail) {
+                $status = strtolower($detail->status);
+                if ($status === 'hadir') {
+                    $hadirCount++;
+                } elseif ($status === 'izin') {
+                    $izinCount++;
+                } elseif ($status === 'sakit') {
+                    $sakitCount++;
+                } elseif (in_array($status, ['alpha', 'alpa', 'tidak hadir'])) {
+                    $tidakHadirCount++;
                 }
             }
         }
-        
-        $persentase = $totalSessions > 0 ? ($hadir / $totalSessions) * 100 : 0;
 
-        $data = [
-            'ukm' => $ukm,
-            'event' => $event,
-            'activeTab' => $tab,
-            'announcements' => $announcements,
-            'latestMaterials' => $latestMaterials,
-            'materials' => $materials,
-            'participants' => $participants,
-            'coaches' => $coaches,
-            'sessions' => $sessions,
-            'totalSessions' => $totalSessions,
-            'hadirCount' => $hadir,
-            'izinCount' => $izin,
-            'tidakHadirCount' => $tidakHadir,
-            'persentase' => round($persentase, 2),
-        ];
+        $persentase = $totalSessions > 0 ? (($hadirCount + $izinCount + $sakitCount) / $totalSessions) * 100 : 0;
+        $persentase = round($persentase, 2);
 
-        return view('member.classroom.classroom', $data);
+        return view('member.classroom.classroom', compact(
+            'classroom',
+            'tab',
+            'announcements',
+            'materials',
+            'participants',
+            'schedules',
+            'songTargets',
+            'attendances',
+            'totalSessions',
+            'hadirCount',
+            'izinCount',
+            'sakitCount',
+            'tidakHadirCount',
+            'persentase'
+        ));
     }
 
-    public function downloadMaterial($ukm, $id)
+    /**
+     * Download material file
+     */
+    public function downloadMaterial($id)
     {
         $material = Material::findOrFail($id);
-        if (!Auth::user()->isParticipant($material->event_id)) abort(403);
 
         if ($material->file_path) {
             return Storage::disk('public')->download($material->file_path, $material->title);

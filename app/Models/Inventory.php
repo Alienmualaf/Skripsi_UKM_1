@@ -2,90 +2,41 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inventory extends Model
 {
-    use HasFactory;
-
-    /**
-     * Mass assignable
-     */
     protected $fillable = [
-        'ukm_id',
-        'created_by',
         'name',
-        'quantity',
+        'code',
+        'category',
         'condition',
-        'location',
-        'description',
-        'event_id',
+        'quantity',
+        'storage_location',
+        'used_for',
+        'program_id',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
-
-    // inventory milik 1 UKM
-    public function ukm()
+    public function loans(): HasMany
     {
-        return $this->belongsTo(UKM::class, 'ukm_id');
+        return $this->hasMany(InventoryLoan::class);
     }
 
-    // siapa yang input (admin UKM)
-    public function creator()
+    public function program(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Program::class);
     }
 
-    public function event()
+    public function getAvailableQtyAttribute(): int
     {
-        return $this->belongsTo(Event::class);
+        return $this->quantity;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | HELPER METHODS
-    |--------------------------------------------------------------------------
-    */
-
-    // cek kondisi barang
-    public function isGood()
+    public function getTotalQtyAttribute(): int
     {
-        return $this->condition === 'good';
-    }
-
-    public function isDamaged()
-    {
-        return $this->condition === 'damaged';
-    }
-
-    public function isLost()
-    {
-        return $this->condition === 'lost';
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
-
-    public function scopeGood($query)
-    {
-        return $query->where('condition', 'good');
-    }
-
-    public function scopeDamaged($query)
-    {
-        return $query->where('condition', 'damaged');
-    }
-
-    public function scopeLost($query)
-    {
-        return $query->where('condition', 'lost');
+        $borrowed = $this->loans()->where('status', 'Dipinjam')->sum('quantity');
+        return $this->quantity + $borrowed;
     }
 }

@@ -4,80 +4,140 @@ namespace App\Http\Controllers\UKM;
 
 use App\Http\Controllers\Controller;
 use App\Models\Finance;
+use App\Models\FinanceCategory;
 use Illuminate\Http\Request;
 
 class FinanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ukmId = session('managed_ukm_id');
-        // Ambil maksimal 10 transaksi keuangan terbaru
-        $finances = Finance::with('event')->where('ukm_id', $ukmId)->orderBy('transaction_date', 'desc')->take(10)->get();
-        // Hitung total transaksi keuangan
-        $totalFinances = Finance::where('ukm_id', $ukmId)->count();
-        $events = \App\Models\Event::where('ukm_id', $ukmId)->latest()->get();
+        $query = Finance::with('category');
 
-        return view('ukm.finances.index', compact('finances', 'events', 'totalFinances'));
+        if ($request->filled('category_id')) {
+            $query->where('finance_category_id', $request->category_id);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $finances = $query->orderBy('transaction_date', 'desc')->paginate(10);
+        $categories = FinanceCategory::all();
+
+        // Calculate global net balance (all transactions)
+        $totalIncome = Finance::where('type', 'income')->sum('amount');
+        $totalExpense = Finance::where('type', 'expense')->sum('amount');
+        $netBalance = $totalIncome - $totalExpense;
+
+        return view('pengurus.finances.index', compact('finances', 'categories', 'netBalance'));
     }
 
-    public function all(Request $request)
+    public function create()
     {
-        $ukmId = session('managed_ukm_id');
-        $search = $request->input('search');
-        $type = $request->input('type');
-
-        $query = Finance::with('event')->where('ukm_id', $ukmId)->orderBy('transaction_date', 'desc');
-
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($type) {
-            $query->where('type', $type);
-        }
-
-        $finances = $query->paginate(15)->withQueryString();
-        
-        return view('ukm.finances.all', compact('finances'));
+        $categories = FinanceCategory::all();
+        $programs = \App\Models\Program::active()->get();
+        return view('pengurus.finances.create', compact('categories', 'programs'));
     }
 
     public function store(Request $request)
     {
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'type' => 'required|in:income,expense',
+        $data = $request->validate([
+            'finance_category_id' => 'required|exists:finance_categories,id',
             'amount' => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'transaction_date' => 'required|date',
-            'event_id' => 'nullable|exists:events,id',
+            'receipt_file' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:2048',
+            'used_for' => 'required|in:Umum,Program Kerja',
+            'program_id' => 'required_if:used_for,Program Kerja|nullable|exists:programs,id',
         ]);
 
-        Finance::create([
-            'ukm_id' => session('managed_ukm_id'),
-            'created_by' => auth()->id(),
-            'title' => $request->title,
+        $category = FinanceCategory::findOrFail($request->finance_category_id);
+        $data['type'] = $category->type;
+
+        if ($data['used_for'] === 'Umum') {
+            $data['program_id'] = null;
+        }
+
+        if ($request->hasFile('receipt_file')) {
+            $path = $request->file('receipt_file')->store('receipts', 'public');
+            $data['receipt_file'] = $path;
+        }
+
+        Finance::create($data);
+
+        return redirect()->route('pengurus.finances.index')->with('success', 'Transaksi keuangan berhasil dicatat.');
+    }
+
+    public function edit($id)
+    {
+        $finance = Finance::findOrFail($id);
+        $categories = FinanceCategory::all();
+        $programs = \App\Models\Program::active()->get();
+        return view('pengurus.finances.edit', compact('finance', 'categories', 'programs'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $finance = Finance::findOrFail($id);
+
+        $data = $request->validate([
+            'finance_category_id' => 'required|exists:finance_categories,id',
+            'amount' => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'transaction_date' => 'required|date',
+            'receipt_file' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:2048',
+            'used_for' => 'required|in:Umum,Program Kerja',
+            'program_id' => 'required_if:used_for,Program Kerja|nullable|exists:programs,id',
+        ]);
+
+        $category = FinanceCategory::findOrFail($request->finance_category_id);
+        $data['type'] = $category->type;
+
+        if ($data['used_for'] === 'Umum') {
+            $data['program_id'] = null;
+        }
+
+        if ($request->hasFile('receipt_file')) {
+            $path = $request->file('receipt_file')->store('receipts', 'public');
+            $data['receipt_file'] = $path;
+        }
+
+        $finance->update($data);
+
+        return redirect()->route('pengurus.finances.index')->with('success', 'Transaksi keuangan berhasil diperbarui.');
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:finance_categories,name',
+            'type' => 'required|in:income,expense',
+        ]);
+
+        FinanceCategory::create([
+            'name' => $request->name,
             'type' => $request->type,
-            'amount' => $request->amount,
-            'description' => $request->description,
-            'transaction_date' => $request->transaction_date,
-            'event_id' => $request->event_id,
         ]);
 
-        return back()->with('success', 'Transaksi berhasil ditambahkan');
+        return back()->with('success', 'Kategori keuangan berhasil ditambahkan.');
+    }
+
+    public function destroyCategory($id)
+    {
+        $category = FinanceCategory::findOrFail($id);
+        if ($category->finances()->exists()) {
+            return back()->with('error', 'Kategori tidak bisa dihapus karena sudah memiliki data transaksi.');
+        }
+        $category->delete();
+        return back()->with('success', 'Kategori keuangan berhasil dihapus.');
     }
 
     public function destroy($id)
     {
-
-        $ukmId = session('managed_ukm_id');
-        $finance = Finance::where('id', $id)->where('ukm_id', $ukmId)->firstOrFail();
+        $finance = Finance::findOrFail($id);
         $finance->delete();
-
-        return back()->with('success', 'Transaksi berhasil dihapus');
+        return back()->with('success', 'Transaksi keuangan berhasil dihapus.');
     }
-
 }

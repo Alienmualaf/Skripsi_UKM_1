@@ -25,7 +25,7 @@
         <div class="auth-form-side">
             <div class="auth-header">
                 <div class="auth-logo-container">
-                    <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila">
+                    <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP">
                 </div>
                 <h2 class="auth-title">@yield('title')</h2>
                 <p class="auth-subtitle">@yield('subtitle')</p>

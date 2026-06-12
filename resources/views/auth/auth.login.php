@@ -29,7 +29,7 @@
     </form>
 
     <div class="auth-footer">
-        Belum punya akun? <a href="/register">Daftar di sini</a>
+        Belum terdaftar menjadi anggota? <a href="/daftar">Daftar di sini</a>
     </div>
 
 @endsection

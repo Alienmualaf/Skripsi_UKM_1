@@ -64,8 +64,8 @@
     .event-item {
         padding: 1rem;
         background: var(--bg-color);
+        border: 1px solid var(--border-color);
         border-radius: 0.75rem;
-        border-left: 4px solid var(--accent-color);
         transition: transform 0.2s;
     }
     .event-item:hover { transform: translateX(5px); }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\UKM;
 
 use App\Http\Controllers\Controller;
+use App\Models\Folder;
 use App\Models\Material;
-use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,80 +12,125 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $ukmId = session('managed_ukm_id');
-        $search = $request->input('search');
-        $type = $request->input('type');
-        $eventId = $request->input('event_id');
+        $currentFolderId = $request->query('folder_id');
+        $search = $request->query('search');
+        $type = $request->query('type'); // Partitur, Audio, Video
+        $classroomId = $request->query('classroom_id');
 
-        $query = Material::with('event')->where('ukm_id', $ukmId)->latest();
+        $classroom = $classroomId ? \App\Models\Classroom::with('materials')->find($classroomId) : null;
 
+        // Build breadcrumbs if inside a folder
+        $breadcrumbs = [];
+        if ($currentFolderId) {
+            $folder = Folder::findOrFail($currentFolderId);
+            $breadcrumbs[] = $folder;
+            $parent = $folder->parent;
+            while ($parent) {
+                array_unshift($breadcrumbs, $parent);
+                $parent = $parent->parent;
+            }
+        }
+
+        // Folders list
+        $foldersQuery = Folder::query();
+        if ($currentFolderId) {
+            $foldersQuery->where('parent_id', $currentFolderId);
+        } else {
+            $foldersQuery->whereNull('parent_id');
+        }
         if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+            $foldersQuery->where('name', 'like', "%{$search}%");
         }
+        $folders = $foldersQuery->orderBy('name', 'asc')->get();
 
+        // Materials list
+        $materialsQuery = Material::with('uploader');
+        if ($currentFolderId) {
+            $materialsQuery->where('folder_id', $currentFolderId);
+        } else {
+            $materialsQuery->whereNull('folder_id');
+        }
+        if ($search) {
+            $materialsQuery->where('title', 'like', "%{$search}%");
+        }
         if ($type) {
-            $query->where('type', $type);
+            $materialsQuery->where('type', $type);
         }
+        $materials = $materialsQuery->orderBy('title', 'asc')->get();
 
-        if ($eventId) {
-            $query->where('event_id', $eventId);
-        }
-
-        $materials = $query->paginate(15)->withQueryString();
-        $events = Event::where('ukm_id', $ukmId)->latest()->get();
-
-        return view('ukm.materials.index', compact('materials', 'events'));
+        return view('pengurus.materials.index', compact('folders', 'materials', 'breadcrumbs', 'currentFolderId', 'search', 'type', 'classroom', 'classroomId'));
     }
 
-    public function store(Request $request)
+    public function storeFolder(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:folders,id',
+        ]);
 
+        Folder::create([
+            'name' => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return back()->with('success', 'Folder berhasil dibuat.');
+    }
+
+    public function deleteFolder($id)
+    {
+        $folder = Folder::findOrFail($id);
+        $folder->delete(); // Cascades delete to children and materials
+
+        return back()->with('success', 'Folder dan seluruh isinya berhasil dihapus.');
+    }
+
+    public function storeMaterial(Request $request)
+    {
         $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:dokumen,audio,video',
-            'file' => 'nullable|file|max:10240', // max 10MB
-            'link' => 'nullable|url',
+            'type' => 'required|in:Partitur,Audio,Video',
+            'folder_id' => 'nullable|exists:folders,id',
             'description' => 'nullable|string',
-            'event_id' => 'required|exists:events,id',
+            'file' => 'required|file|mimes:pdf,docx,mp3,wav,mp4,mov|max:51200', // Max 50MB
         ]);
 
-        if (!$request->hasFile('file') && !$request->link) {
-            return back()->with('error', 'Wajib mengunggah file atau mencantumkan link materi.')->withInput();
-        }
-
-        $path = null;
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('materials', 'public');
-        }
+            $file = $request->file('file');
+            $path = $file->store('materials', 'public');
+            $extension = strtolower($file->getClientOriginalExtension());
 
-        Material::create([
-            'ukm_id' => session('managed_ukm_id'),
-            'created_by' => auth()->id(),
-            'title' => $request->title,
-            'type' => $request->type,
-            'file_path' => $path,
-            'link' => $request->link,
-            'description' => $request->description,
-            'event_id' => $request->event_id,
-        ]);
+            Material::create([
+                'title' => $request->title,
+                'type' => $request->type,
+                'folder_id' => $request->folder_id,
+                'description' => $request->description,
+                'file_path' => $path,
+                'file_type' => $extension,
+                'uploader_id' => auth()->id(),
+            ]);
+        }
 
         return back()->with('success', 'Materi berhasil diunggah.');
     }
 
-    public function destroy($id)
+    public function deleteMaterial($id)
     {
-
-        $ukmId = session('managed_ukm_id');
-        $material = Material::where('id', $id)->where('ukm_id', $ukmId)->firstOrFail();
-        
+        $material = Material::findOrFail($id);
         if ($material->file_path) {
             Storage::disk('public')->delete($material->file_path);
         }
         $material->delete();
 
         return back()->with('success', 'Materi berhasil dihapus.');
+    }
+
+    public function download($id)
+    {
+        $material = Material::findOrFail($id);
+        if (!Storage::disk('public')->exists($material->file_path)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($material->file_path, $material->title . '.' . $material->file_type);
     }
 }

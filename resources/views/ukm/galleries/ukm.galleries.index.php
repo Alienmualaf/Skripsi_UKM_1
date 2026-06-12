@@ -11,7 +11,7 @@
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
@@ -39,13 +39,19 @@
                 <input type="file" name="file" class="form-control" required accept="image/*,video/*">
             </div>
         </div>
+        <div style="margin-top: 1rem; margin-bottom: 1.25rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">
+                <input type="checkbox" name="show_on_landing" value="1" style="width: auto; margin: 0; cursor: pointer;">
+                Tampilkan di Landing Page
+            </label>
+        </div>
         <button type="submit" class="btn btn-primary"><i class="ph ph-upload-simple"></i> Upload ke Galeri</button>
     </form>
 </div>
 @endif
 
 <!-- Filter Card -->
-<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 1.5rem;">
+<div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
     <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div style="width: 180px;">
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Jenis Media</label>
@@ -88,12 +94,20 @@
         <div style="padding: 1rem;">
             <h4 style="margin: 0 0 0.5rem 0;">{{ $item->title }}</h4>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.75rem; color: var(--text-secondary);">Oleh: {{ $item->creator->name }}</span>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">Oleh: {{ $item->creator?->name ?? 'Admin' }}</span>
                 @if($isOperator)
-                <form action="/ukm/galleries/{{ $item->id }}" method="POST" onsubmit="return confirm('Hapus dari galeri?');">
-                    @csrf @method('DELETE')
-                    <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"><i class="ph ph-trash"></i></button>
-                </form>
+                <div style="display: flex; gap: 0.35rem; align-items: center;">
+                    <form action="/ukm/galleries/{{ $item->id }}/toggle-landing" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: {{ $item->show_on_landing ? 'var(--accent-color)' : 'var(--bg-color)' }}; border: 1px solid {{ $item->show_on_landing ? 'var(--accent-color)' : 'var(--border-color)' }}; color: {{ $item->show_on_landing ? '#fff' : 'var(--text-secondary)' }}; display: inline-flex; align-items: center; justify-content: center;" title="{{ $item->show_on_landing ? 'Batal Tampilkan di Landing Page' : 'Tampilkan di Landing Page' }}">
+                            <i class="{{ $item->show_on_landing ? 'ph-fill ph-star' : 'ph ph-star' }}"></i>
+                        </button>
+                    </form>
+                    <form action="/ukm/galleries/{{ $item->id }}" method="POST" onsubmit="return confirm('Hapus dari galeri?');" style="margin: 0;">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center;"><i class="ph ph-trash"></i></button>
+                    </form>
+                </div>
                 @endif
             </div>
         </div>

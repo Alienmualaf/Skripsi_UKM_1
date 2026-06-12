@@ -2,32 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Attendance extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'event_id',
-        'session_id',
-        'user_id',
-        'status',
+        'title',
+        'type',
+        'date',
+        'qr_code',
+        'is_active_qr',
+        'classroom_id',
     ];
 
-    public function event()
+    public function details(): HasMany
     {
-        return $this->belongsTo(Event::class);
+        return $this->hasMany(AttendanceDetail::class);
     }
 
-    public function session()
+    public function classroom()
     {
-        return $this->belongsTo(ActivitySession::class, 'session_id');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Classroom::class);
     }
 }

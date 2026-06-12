@@ -11,11 +11,10 @@ class GalleryController extends Controller
 {
     public function index(Request $request)
     {
-        $ukmId = session('managed_ukm_id');
         $search = $request->input('search');
         $type = $request->input('type');
 
-        $query = Gallery::where('ukm_id', $ukmId)->latest();
+        $query = Gallery::latest();
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -34,31 +33,39 @@ class GalleryController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:photo,video',
             'file' => 'required|file|max:20480', // max 20MB
+            'show_on_landing' => 'nullable|boolean',
         ]);
 
         $path = $request->file('file')->store('galleries', 'public');
 
         Gallery::create([
-            'ukm_id' => session('managed_ukm_id'),
-            'created_by' => auth()->id(),
             'title' => $request->title,
             'type' => $request->type,
             'file_path' => $path,
+            'show_on_landing' => $request->has('show_on_landing'),
         ]);
 
         return back()->with('success', 'Media berhasil ditambahkan ke galeri');
     }
 
+    public function toggleLanding($id)
+    {
+        $media = Gallery::findOrFail($id);
+        
+        $media->update([
+            'show_on_landing' => !$media->show_on_landing
+        ]);
+
+        return back()->with('success', 'Visibilitas media galeri berhasil diubah.');
+    }
+
     public function destroy($id)
     {
-
-        $ukmId = session('managed_ukm_id');
-        $media = Gallery::where('id', $id)->where('ukm_id', $ukmId)->firstOrFail();
+        $media = Gallery::findOrFail($id);
         
         Storage::disk('public')->delete($media->file_path);
         $media->delete();

@@ -19,7 +19,7 @@
 <div class="animate-fade-in" style="display: grid; grid-template-columns: 300px 1fr; gap: 2rem; align-items: start; margin-top: 1.5rem;">
     <!-- LEFT SIDEBAR COLUMN: Upcoming Activities -->
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <div class="card" style="margin-bottom: 0; padding: 1.5rem; border-top: 3px solid var(--warning-color);">
+        <div class="card" style="margin-bottom: 0; padding: 1.5rem;">
             <h4 style="font-weight: 800; margin: 0 0 1.25rem 0; font-size: 1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">
                 <i class="ph ph-bell" style="color: var(--warning-color); font-size: 1.25rem; vertical-align: middle; margin-right: 0.25rem;"></i>
                 Kegiatan Terdekat
@@ -42,14 +42,14 @@
     </div>
 
     <!-- RIGHT COLUMN: Calendar Grid Canvas -->
-    <div class="card" style="margin-bottom: 0; padding: 1.5rem; border-top: 3px solid var(--accent-color);">
+    <div class="card" style="margin-bottom: 0; padding: 1.5rem;">
         <div id="calendar" style="min-height: 600px;"></div>
     </div>
 </div>
 
 <!-- Modal Detail Agenda -->
 <div id="eventModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 2rem;">
-    <div class="card" style="width: 100%; max-width: 600px; position: relative; animation: slideUp 0.3s ease; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; border-top: 3px solid var(--accent-color);">
+    <div class="card" style="width: 100%; max-width: 600px; position: relative; animation: slideUp 0.3s ease; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
         <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--surface-color);">
             <h3 id="modalDate" class="text-accent" style="font-weight: 800; margin: 0; font-size: 1.15rem; font-family: 'Outfit', sans-serif; color: var(--accent-color);">15 Mei 2026</h3>
             <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%;">

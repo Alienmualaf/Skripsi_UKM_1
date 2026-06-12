@@ -1,45 +1,42 @@
-@php
-    $ukmId = session('managed_ukm_id');
-    $userRole = auth()->user()->roleInUKM($ukmId);
-    $isOperator = auth()->user()->isSuperAdmin() || $userRole === 'admin';
-@endphp
-
 @extends('layouts.app')
 
 @section('title', 'Kelola Anggota')
-@section('header', 'Kelola Anggota')
+@section('header', 'Kelola Anggota PSUP')
 
 @section('content')
 @if(session('success'))
-    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #10b981;">
+    <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
         {{ session('success') }}
     </div>
 @endif
-@if(session('error'))
-    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600; border-top: 3px solid #ef4444;">
-        <i class="ph-fill ph-x-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
-        {{ session('error') }}
-    </div>
-@endif
 
-<!-- Filter Card -->
-<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 1.5rem;">
-    <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-        <div style="width: 150px;">
-            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Peran</label>
-            <select name="role" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
-                <option value="">Semua Peran</option>
-                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                <option value="member" {{ request('role') == 'member' ? 'selected' : '' }}>Anggota</option>
+<div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Daftar Anggota Paduan Suara</h3>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Kelola klasifikasi suara, status keanggotaan (Aktif/Alumni), dan detail profil penyanyi.</p>
+    </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+    <form method="GET" action="{{ route('ukm.members') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="width: 200px;">
+            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Klasifikasi Suara</label>
+            <select name="voice" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
+                <option value="">Semua Suara</option>
+                @foreach($classifications as $c)
+                    <option value="{{ $c->id }}" {{ request('voice') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                @endforeach
             </select>
         </div>
-        <div style="width: 150px;">
-            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Status</label>
+
+        <div style="width: 200px;">
+            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Status Anggota</label>
             <select name="status" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
                 <option value="">Semua Status</option>
-                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Tertunda</option>
+                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                <option value="alumni" {{ request('status') === 'alumni' ? 'selected' : '' }}>Alumni</option>
             </select>
         </div>
         
@@ -52,8 +49,8 @@
             <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
         </div>
 
-        @if(request()->anyFilled(['role', 'status', 'search']))
-            <a href="{{ request()->url() }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
+        @if(request()->anyFilled(['voice', 'status', 'search']))
+            <a href="{{ route('ukm.members') }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
         @endif
     </form>
 </div>
@@ -61,93 +58,74 @@
 <div class="card" style="padding: 1.5rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
         <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-            <i class="ph ph-users" style="color: var(--accent-color);"></i> Daftar Pendaftar & Anggota
+            <i class="ph ph-users" style="color: var(--accent-color);"></i> Daftar Penyanyi PSUP
         </h4>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
             Total: {{ $members->total() }} Anggota
         </span>
     </div>
+
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nama Pengguna</th>
-                    <th>Email</th>
-                    <th>Role di UKM</th>
+                    <th>NPM</th>
+                    <th>Nama Lengkap</th>
+                    <th>Fakultas</th>
+                    <th>No. HP</th>
+                    <th>Klasifikasi Suara</th>
                     <th>Status</th>
-                    <th>Klasifikasi Anggota</th>
-                    @if($isOperator)
-                        <th>Aksi</th>
-                    @endif
+                    <th style="width: 150px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($members as $member)
+                @forelse($members as $member)
                 <tr>
-                    <td>{{ optional($member->user)->name ?? 'User dihapus' }}</td>
-                    <td>{{ optional($member->user)->email ?? '-' }}</td>
+                    <td style="font-weight: 600; color: var(--text-primary);">{{ $member->npm ?? '-' }}</td>
+                    <td style="font-weight: 700; color: var(--text-primary);">{{ $member->user->name ?? 'User dihapus' }}</td>
+                    <td style="color: var(--text-secondary);">{{ $member->faculty ?? '-' }}</td>
+                    <td style="color: var(--text-secondary);">{{ $member->phone ?? '-' }}</td>
                     <td>
-                        @if($isOperator && $member->status == 'approved')
-                            <form action="/ukm/members/{{ $member->id }}/role" method="POST" style="margin: 0; display: inline-block;">
-                                @csrf @method('PUT')
-                                <select name="role_in_ukm" class="form-control" style="padding: 0.25rem 0.5rem; font-size: 0.875rem; width: auto;" onchange="this.form.submit()">
-                                    <option value="admin" {{ $member->role_in_ukm == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="member" {{ $member->role_in_ukm == 'member' ? 'selected' : '' }}>Anggota</option>
-                                </select>
-                            </form>
+                        @if($member->user && $member->user->role && $member->user->role->name !== 'anggota')
+                            <span class="badge" style="background: #f1f5f9; color: #64748b; font-style: italic;">N/A (Bukan Anggota)</span>
+                        @elseif($member->voiceClassification)
+                            <span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color);">{{ $member->voiceClassification->name }}</span>
                         @else
-                            @if($member->role_in_ukm == 'admin')
-                                <span class="badge badge-admin">Admin</span>
-                            @else
-                                <span class="badge badge-member">Anggota</span>
-                            @endif
+                            <span class="badge" style="background: #f1f5f9; color: #475569;">Belum diklasifikasi</span>
                         @endif
                     </td>
                     <td>
-                        <span class="badge {{ $member->status == 'approved' ? 'badge-approved' : 'badge-pending' }}">
-                            {{ ucfirst($member->status) }}
-                        </span>
-                    </td>
-                    <td>
-                        @if($isOperator && $member->status === 'approved')
-                            <form action="/ukm/members/{{ $member->id }}/classification" method="POST" style="display: flex; gap: 0.5rem;">
-                                @csrf @method('PUT')
-                                <select name="ukm_classification_id" class="form-control" style="padding: 0.25rem 0.5rem; font-size: 0.875rem; width: auto;" onchange="this.form.submit()">
-                                    <option value="">- Belum Ditentukan -</option>
-                                    @foreach($classifications as $c)
-                                        <option value="{{ $c->id }}" {{ $member->ukm_classification_id == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-                                    @endforeach
-                                </select>
-                            </form>
+                        @if($member->status === 'Anggota Aktif')
+                            <span style="color: var(--success-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span> Aktif
+                            </span>
                         @else
-                            {{ $member->classification->name ?? '-' }}
+                            <span style="color: var(--text-muted); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span> Alumni
+                            </span>
                         @endif
                     </td>
-                    @if($isOperator)
                     <td>
-                        <div class="flex gap-2">
-                            @if($member->status == 'pending')
-                            <form action="/ukm/members/{{ $member->id }}/approve" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;"><i class="ph ph-check"></i> Terima</button>
-                            </form>
-                            @endif
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <a href="{{ route('ukm.members.edit', $member->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;"><i class="ph ph-pencil-simple"></i> Edit</a>
                             
-                            @if($member->role_in_ukm != 'admin')
-                            <form action="/ukm/members/{{ $member->id }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus/menolak anggota ini?');">
+                            <form action="{{ route('ukm.members.destroy', $member->id) }}" method="POST" onsubmit="return confirm('Keluarkan anggota ini dari PSUP? Akun pengguna tetap ada namun status keanggotaan terhapus.');" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;"><i class="ph ph-x"></i> Tolak / Keluarkan</button>
+                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-trash"></i> Hapus</button>
                             </form>
-                            @endif
                         </div>
                     </td>
-                    @endif
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center text-secondary py-4">Tidak ada data anggota ditemukan.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+    
     <div style="margin-top: 1.25rem;">
         {{ $members->links('shared.pagination') }}
     </div>

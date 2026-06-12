@@ -1,86 +1,181 @@
 @extends('layouts.app')
 
 @section('title', 'Kelola Pengguna')
-@section('header', 'Kelola Pengguna')
+@section('header', 'Kelola Pengguna PSUP')
 
 @section('content')
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
-        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Daftar Pengguna Platform</h3>
-        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Super Admin mengelola seluruh akun pengguna dan menentukan hak akses/peran dalam platform.</p>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Manajemen Pengguna</h3>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Kelola seluruh akun pengguna, atur status aktivasi/suspend, dan lakukan reset sandi.</p>
     </div>
-    <a href="{{ route('users.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
-        <i class="ph ph-user-plus"></i> Tambah Pengguna Baru
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+        <i class="ph ph-user-plus" style="font-size: 1.2rem;"></i> Tambah Pengguna Baru
     </a>
 </div>
 
-<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+<!-- Filters & Search -->
+<div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+    <form action="{{ route('admin.users.index') }}" method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; justify-content: space-between;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; flex: 1;">
+            <!-- Search Input -->
+            <div style="position: relative; min-width: 280px; flex: 1;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Pengguna</label>
+                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, username..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+            </div>
+            
+            <!-- Role Filter -->
+            <div style="width: 180px;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Peran (Role)</label>
+                <select name="role" class="form-control" style="height: 2.5rem; font-size: 0.875rem; border-radius: 8px;" onchange="this.form.submit()">
+                    <option value="">Semua Peran</option>
+                    @foreach(\App\Models\Role::all() as $role)
+                        <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ $role->display_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div style="width: 150px;">
+                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Status Akun</label>
+                <select name="status" class="form-control" style="height: 2.5rem; font-size: 0.875rem; border-radius: 8px;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                    <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; height: 2.5rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0 1.25rem; font-weight: 700; border-radius: 8px;">Filter</button>
+            @if(request()->anyFilled(['search', 'role', 'status']))
+                <a href="{{ route('admin.users.index') }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; justify-content: center; height: 2.5rem;">Reset</a>
+            @endif
+        </div>
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="card" style="padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
         <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-            <i class="ph ph-users" style="color: var(--accent-color);"></i> Keseluruhan Pengguna
+            <i class="ph ph-users" style="color: var(--accent-color);"></i> Daftar Pengguna Platform
         </h4>
         <span style="font-size: 0.8125rem; color: var(--text-secondary); font-weight: 600;">
-            <i class="ph ph-database" style="margin-right: 0.25rem;"></i> Total {{ $users->total() }} Pengguna
+            Total: {{ $users->total() }} Pengguna
         </span>
     </div>
-
-    <form action="{{ url('/admin/users') }}" method="GET" style="margin-bottom: 1.25rem; display: flex; gap: 0.5rem; max-width: 400px; width: 100%;">
-        <div style="position: relative; flex: 1;">
-            <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pengguna..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
-        </div>
-        <button type="submit" class="btn btn-primary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px;">Cari</button>
-        @if(request('search'))
-            <a href="{{ url('/admin/users') }}" class="btn btn-secondary" style="height: 2.5rem; padding: 0 1rem; font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Reset</a>
-        @endif
-    </form>
 
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
         <table class="table">
             <thead>
                 <tr>
                     <th>Nama</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Aksi</th>
+                    <th>Email / Username</th>
+                    <th>Peran</th>
+                    <th>Status</th>
+                    <th>Login Terakhir</th>
+                    <th>Dibuat Pada</th>
+                    <th style="width: 260px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($users as $user)
-                @php
-                    $adminMembership = $user->memberships()->where('role_in_ukm', 'admin')->first();
-                @endphp
+                @forelse($users as $user)
                 <tr>
-                    <td style="font-weight: 600; color: var(--text-primary);">{{ $user->name }}</td>
-                    <td style="color: var(--text-secondary);">{{ $user->email }}</td>
-                    <td>
-                        @if($user->role == 'super_admin')
-                            <span class="badge badge-approved" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2);">Super Admin</span>
-                        @elseif($adminMembership)
-                            <span class="badge badge-warning" style="background: #fff8e6; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25);">
-                                Admin UKM: {{ $adminMembership->ukm->name ?? '-' }}
-                            </span>
-                        @else
-                            <span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid rgba(30, 64, 175, 0.15);">
-                                Mahasiswa / Umum
-                            </span>
+                    <td style="font-weight: 700; color: var(--text-primary);">
+                        {{ $user->name }}
+                        @if(auth()->id() == $user->id)
+                            <span style="font-size: 0.7rem; background: var(--accent-light); color: var(--accent-color); padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Saya</span>
                         @endif
                     </td>
                     <td>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('users.edit', $user->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;"><i class="ph ph-pencil-simple"></i> Edit</a>
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');" style="display: inline;">
+                        <div style="font-weight: 600; color: var(--text-primary);">{{ explode('@', $user->email)[0] }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ $user->email }}</div>
+                    </td>
+                    <td>
+                        @if($user->isSuperAdmin())
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">{{ $user->role->display_name }}</span>
+                        @elseif($user->isAdminUkm())
+                            <span class="badge" style="background: #fff8e6; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); font-weight: 700;">{{ $user->role->display_name }}</span>
+                        @elseif($user->isPengurus())
+                            <span class="badge" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid rgba(30, 64, 175, 0.15); font-weight: 700;">{{ $user->role->display_name }}</span>
+                        @else
+                            <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700;">{{ $user->role ? $user->role->display_name : 'Anggota' }}</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($user->status === 'active')
+                            <span style="color: var(--success-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span> Aktif
+                            </span>
+                        @elseif($user->status === 'suspended')
+                            <span style="color: var(--danger-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger-color); display: inline-block;"></span> Suspended
+                            </span>
+                        @else
+                            <span style="color: var(--text-muted); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span> Nonaktif
+                            </span>
+                        @endif
+                    </td>
+                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        @php
+                            $lastLogin = $user->loginHistories()->where('status', 'Success')->latest('login_at')->first();
+                        @endphp
+                        @if($lastLogin)
+                            <span title="{{ $lastLogin->login_at->format('d M Y H:i:s') }}">{{ $lastLogin->login_at->diffForHumans() }}</span>
+                        @else
+                            <span style="color: var(--text-muted);">Belum pernah login</span>
+                        @endif
+                    </td>
+                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        {{ $user->created_at ? $user->created_at->format('d M Y H:i') : '-' }}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit Akun"><i class="ph ph-pencil-simple"></i> Edit</a>
+                            
+                            <!-- Toggle Status Actions -->
+                            @if($user->id !== auth()->id())
+                                <form action="{{ route('admin.users.toggle-status', $user->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    @if($user->status === 'active')
+                                        <button type="submit" name="status" value="suspended" class="btn" style="background: #fff5f5; border: 1px solid #feb2b2; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #c53030; border-radius: 6px;" onclick="return confirm('Suspend akun pengguna ini?');" title="Suspend Akun">Suspend</button>
+                                        <button type="submit" name="status" value="inactive" class="btn" style="background: #f7fafc; border: 1px solid #e2e8f0; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #4a5568; border-radius: 6px;" onclick="return confirm('Nonaktifkan akun pengguna ini?');" title="Nonaktifkan Akun">Matikan</button>
+                                    @else
+                                        <button type="submit" name="status" value="active" class="btn" style="background: #f0fff4; border: 1px solid #9ae6b4; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #22543d; border-radius: 6px;" onclick="return confirm('Aktifkan kembali akun pengguna ini?');" title="Aktivasi Akun">Aktivasi</button>
+                                    @endif
+                                </form>
+                            @endif
+
+                            <!-- Force Reset Password -->
+                            <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Reset sandi akun ini? Sandi baru otomatis menjadi \'password\'.');">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-trash"></i> Hapus</button>
+                                <button type="submit" class="btn" style="background: #fffff0; border: 1px solid #faf089; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #b7791f; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.15rem;" title="Reset Sandi ke 'password'"><i class="ph ph-key"></i> Reset</button>
                             </form>
+
+                            <!-- Delete Akun -->
+                            @if($user->id !== auth()->id())
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus permanen pengguna ini? Seluruh profil anggota terkait akan dilepas.');" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.15rem;" title="Hapus Akun"><i class="ph ph-trash"></i> Hapus</button>
+                                </form>
+                            @endif
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center text-secondary py-4">Tidak ada data pengguna ditemukan.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+    
     <div style="margin-top: 1.25rem;">
         {{ $users->links('shared.pagination') }}
     </div>

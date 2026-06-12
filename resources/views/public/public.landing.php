@@ -1,14 +1,19 @@
-@php
-    $ukms = \App\Models\UKM::withCount(['memberships' => function ($query) {
-        $query->where('status', 'approved');
-    }])->get();
-@endphp
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth overflow-x-hidden">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Manajemen UKM - Universitas Pancasila</title>
+    <title>{{ $profile->name }} | Company Profile Resmi</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{ $profile->description }}">
+    <meta name="keywords" content="PSUP, Paduan Suara Universitas Pancasila, Paduan Suara Mahasiswa, Choir, Universitas Pancasila, Wisuda, Konser Musik, Sponsorship">
+    <meta name="author" content="{{ $profile->name }}">
+    <meta property="og:title" content="{{ $profile->name }} - Profil & Kemitraan Resmi">
+    <meta property="og:description" content="{{ $profile->description }}">
+    <meta property="og:image" content="{{ $profile->logo ? asset('storage/' . $profile->logo) : asset('images/logo_PSUP.jpeg') }}">
+    <meta property="og:url" content="{{ request()->url() }}">
+    <meta name="twitter:card" content="summary_large_image">
 
     <!-- Tailwind & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,18 +33,18 @@
                         outfit: ['Outfit', 'sans-serif'],
                     },
                     colors: {
-                        cobalt: {
-                            50: '#f0f6ff',
-                            100: '#e0efff',
-                            600: '#1d4ed8',
-                            700: '#1e40af',
-                            800: '#0d47a1',
-                            900: '#0b3a82',
+                        navy: {
+                            50: '#f4f6fa',
+                            100: '#e9edf5',
+                            800: '#0A1128',
+                            900: '#00072D',
+                            950: '#000314'
                         },
-                        ambergold: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
+                        gold: {
+                            400: '#F3D279',
+                            500: '#D4AF37',
+                            600: '#B89324',
+                            700: '#997619'
                         }
                     }
                 }
@@ -47,441 +52,994 @@
         }
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
+    <style>
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #F3D279 50%, #B89324 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bg-gradient-navy {
+            background: linear-gradient(135deg, #0A1128 0%, #00072D 100%);
+        }
+        .bg-gradient-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #F3D279 100%);
+        }
+        .music-wave {
+            background-image: radial-gradient(circle at 100% 150%, rgba(212, 175, 55, 0.04) 24%, white 24%, white 28%, rgba(10, 17, 40, 0.01) 28%, rgba(10, 17, 40, 0.01) 36%, white 36%, white 40%, rgba(212, 175, 55, 0.01) 40%);
+        }
+        .border-gold-glow {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+        }
+        .card-hover-navy:hover {
+            transform: translateY(-6px);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 12px 30px rgba(10, 17, 40, 0.06);
+        }
+        /* Scroll Reveal Animation Styles */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+        .reveal-element.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 
-<body class="bg-[#fafbfd] text-slate-800 font-sans antialiased overflow-x-hidden">
+<body class="bg-white text-navy-800 font-sans antialiased overflow-x-hidden music-wave">
 
-<!-- Ambient Background Lights (Pastel/Light) -->
-<div class="glow-sphere glow-primary w-[500px] h-[500px] top-[-100px] left-[-100px] animate-float-slow"></div>
-<div class="glow-sphere glow-secondary w-[400px] h-[400px] top-[200px] right-[-100px] animate-float-fast"></div>
-<div class="glow-sphere glow-primary w-[600px] h-[600px] bottom-[500px] left-[10%] animate-float-slow"></div>
-
-<!-- 🌟 FLOATING HEADER / NAVBAR -->
-<div class="fixed top-0 inset-x-0 z-50 px-4 pt-4">
-    <header class="max-w-[1200px] mx-auto rounded-2xl border border-slate-200/80 shadow-md bg-white/80 backdrop-blur-lg px-6 py-3.5 transition-all duration-300">
+<!-- 🌟 FIXED HEADER / NAVIGATION -->
+<div id="main-header" class="fixed top-0 inset-x-0 z-50 transition-transform duration-300 bg-gradient-to-b from-navy-950/95 via-navy-950/60 to-transparent pb-10">
+    <header class="max-w-[1400px] mx-auto px-6 pt-6 pb-2 transition-all duration-300">
         <nav class="flex justify-between items-center">
             
-            <!-- Logo -->
-            <a href="/" class="flex items-center space-x-3 group">
-                <div class="w-9 h-9 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">
-                    <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" class="w-full h-full object-contain">
+            <!-- Logo Brand (Classic Serif) -->
+            <a href="/" class="flex items-center space-x-4 group">
+                <div class="w-12 h-12 flex items-center justify-center transition-transform group-hover:scale-105 rounded-full overflow-hidden border border-white/20 shadow-sm shrink-0 bg-white">
+                    @if($profile->logo)
+                        <img src="{{ asset('storage/' . $profile->logo) }}" alt="Logo {{ $profile->alias }}" class="w-full h-full object-contain p-1">
+                    @else
+                        <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP" class="w-full h-full object-contain p-1">
+                    @endif
                 </div>
-                <div>
-                    <h1 class="font-outfit font-black text-sm tracking-tight text-slate-850 leading-tight">Sistem UKM</h1>
-                    <p class="text-[9px] text-amber-600 font-bold tracking-wider uppercase leading-none">Universitas Pancasila</p>
+                <div class="hidden sm:block">
+                    <h1 class="font-serif text-xs md:text-sm tracking-widest text-white leading-tight uppercase font-normal">
+                        @php
+                            $name = trim($profile->name);
+                            $line1 = $name;
+                            $line2 = '';
+                            if (stripos($name, 'Universitas') !== false) {
+                                $pos = stripos($name, 'Universitas');
+                                $line1 = trim(substr($name, 0, $pos));
+                                $line2 = trim(substr($name, $pos));
+                            }
+                        @endphp
+                        @if($line2)
+                            <span class="block">{{ $line1 }}</span>
+                            <span class="block text-[9px] md:text-[10px] text-white/70 tracking-[0.2em] mt-0.5">{{ $line2 }}</span>
+                        @else
+                            {{ $name }}
+                        @endif
+                    </h1>
                 </div>
             </a>
 
-            <!-- Menu Navigation Links -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#fitur" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Fitur Layanan</a>
-                <a href="#alur-kerja" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Alur Kerja</a>
-                <a href="#daftar-ukm" class="text-xs font-bold text-slate-500 hover:text-blue-700 transition-colors tracking-wide uppercase">Daftar UKM</a>
+            <!-- Navigation Links -->
+            <div class="hidden lg:flex items-center space-x-8">
+                <a href="#about" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Tentang</a>
+                <a href="#why-us" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Bergabung</a>
+                <a href="#history" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Sejarah</a>
+                <a href="#structure" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Struktur</a>
+                <a href="#trainers" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Pelatih</a>
+                <a href="#programs" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Proker</a>
+                <a href="#achievements" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Prestasi</a>
+                <a href="#events" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Kegiatan</a>
+                <a href="#downloads" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Berkas</a>
             </div>
 
-            <!-- Auth Actions -->
-            <div class="flex items-center space-x-3">
-                <a href="/login" class="text-xs font-bold text-slate-600 hover:text-blue-700 transition-colors px-4 py-2 uppercase tracking-wider">
-                    Masuk
-                </a>
-                <a href="/register" 
-                   class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-black tracking-wider uppercase shadow-md transition-all duration-200 hover:-translate-y-0.5">
-                     Daftar Akun
-                </a>
+            <!-- CTA Actions -->
+            <div class="flex items-center space-x-5">
+                @auth
+                    <a href="/login" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-6 py-2.5 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="/login" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">
+                        Masuk
+                    </a>
+                    @if($profile->recruitment_active)
+                        <a href="/daftar" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-6 py-2.5 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
+                            Daftar
+                        </a>
+                    @endif
+                @endauth
             </div>
 
         </nav>
     </header>
 </div>
 
-<!-- 🌟 HERO SECTION -->
-<main class="relative pt-48 pb-20 overflow-hidden bg-gradient-to-b from-blue-50/60 via-slate-50/40 to-[#fafbfd]">
-    <!-- Grid Overlay -->
-    <div class="absolute inset-0 bg-grid-lines bg-grid-mask pointer-events-none z-0"></div>
+<!-- Header Scroll Hide Script -->
+<script>
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('main-header');
+        if (window.scrollY > 100 && window.scrollY > lastScrollY) {
+            // Scroll down: hide header
+            header.style.transform = 'translateY(-150%)';
+        } else {
+            // Scroll up: show header
+            header.style.transform = 'translateY(0)';
+        }
+        lastScrollY = window.scrollY;
+    });
+</script>
 
-    <div class="max-w-[1000px] mx-auto px-6 relative z-10 text-center space-y-8">
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-100/80 px-4 py-1.5 rounded-full text-blue-700 font-extrabold text-[10px] uppercase tracking-wider shadow-sm mx-auto">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-            Portal Layanan Resmi Kemahasiswaan
+<!-- 🌟 HERO SECTION (CLASSIC CHOIR STYLE) -->
+<section class="relative min-h-[100vh] flex items-center justify-end overflow-hidden bg-navy-900 pt-20">
+    <!-- Background Image (Clear, no global overlay) -->
+    <div class="absolute inset-0 z-0">
+        @if($profile->banner)
+            <img src="{{ asset('storage/' . $profile->banner) }}" alt="Hero Banner" class="w-full h-full object-cover">
+        @else
+            <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Choir Group" class="w-full h-full object-cover">
+        @endif
+    </div>
+
+    <!-- Text block completely flushed to the right edge -->
+    <div class="relative z-10 w-full lg:w-3/5 xl:w-1/2 ml-auto">
+        
+        <!-- Dark semi-transparent box (No blur) with left border -->
+        <div class="bg-navy-950/85 border-l-[6px] border-gold-500 py-16 px-10 md:px-16 lg:py-24 w-full text-left reveal-element">
+            <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[4.5rem] text-white leading-[1.1] font-normal">
+                Paduan Suara<br>
+                <span class="text-gold-400">Universitas Pancasila.</span>
+            </h1>
         </div>
         
-        <!-- Main Headings -->
-        <h2 class="font-outfit text-4xl sm:text-5xl lg:text-[4rem] font-black text-slate-900 tracking-tight leading-[1.08] max-w-3xl mx-auto">
-            Sistem Layanan Kegiatan Mahasiswa <br>
-            <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-indigo-650 to-amber-600">Universitas Pancasila</span>
+    </div>
+</section>
+
+<!-- Stats underneath hero section -->
+<div class="bg-navy-950 py-12 border-b border-white/5 relative z-20">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="flex flex-wrap justify-center gap-8 md:gap-24">
+            <div class="text-center">
+                <p class="text-4xl md:text-5xl font-serif text-white mb-2">1995</p>
+                <p class="text-[10px] text-white/50 uppercase tracking-widest font-sans font-bold">Tahun Berdiri</p>
+            </div>
+            <div class="text-center">
+                <p class="text-4xl md:text-5xl font-serif text-white mb-2">{{ $memberCount ?? 80 }}+</p>
+                <p class="text-[10px] text-white/50 uppercase tracking-widest font-sans font-bold">Anggota Aktif</p>
+            </div>
+            <div class="text-center">
+                <p class="text-4xl md:text-5xl font-serif text-white mb-2">{{ $achievementCount ?? 15 }}+</p>
+                <p class="text-[10px] text-white/50 uppercase tracking-widest font-sans font-bold">Penghargaan</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 🌟 TENTANG KAMI (ABOUT) -->
+<section id="about" class="py-24 relative overflow-hidden">
+    <div class="max-w-[1240px] mx-auto px-6 relative z-10">
+        
+        <!-- Top Text Grid (Matches 'Choral excellence' reference) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-16 reveal-element">
+            <!-- Left side (Full text) -->
+            <div class="lg:col-span-7 space-y-6">
+                <h2 class="font-serif text-5xl md:text-6xl lg:text-[4.5rem] text-navy-900 leading-[1.1] font-normal">
+                    Harmoni Vokal
+                </h2>
+                <p class="text-slate-800 font-sans text-base sm:text-lg font-normal leading-relaxed">
+                    {{ $profile->description }}
+                </p>
+                <div class="border-l-4 border-gold-500 pl-6">
+                    <p class="text-slate-600 font-sans text-sm sm:text-base italic leading-relaxed">
+                        "Paduan suara bukan sekadar teknik vokal yang baik, melainkan penyelarasan ego untuk melahirkan satu harmoni suara yang utuh dan menyentuh jiwa pendengar."
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Right side (Logo PSUP) -->
+            <div class="lg:col-span-5 flex justify-center items-center">
+                <div class="w-64 h-64 md:w-80 md:h-80 overflow-hidden rounded-lg shadow-lg border border-slate-100 hover:scale-[1.02] transition-transform duration-300">
+                    @if($profile->logo)
+                        <img src="{{ asset('storage/' . $profile->logo) }}" alt="Logo {{ $profile->alias }}" class="w-full h-full object-cover">
+                    @else
+                        <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP" class="w-full h-full object-cover">
+                    @endif
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+
+<!-- 🌟 MENGAPA BERMITRA (WHY US) -->
+<section id="why-us" class="py-24 relative overflow-hidden">
+    <div class="max-w-[1240px] mx-auto px-6 relative z-10">
+        
+        <!-- Section Title (Matches 'Powerful performances' reference) -->
+        <h2 class="font-serif text-5xl md:text-6xl lg:text-[5rem] text-navy-900 leading-[1.05] font-normal mb-12 md:mb-20">
+            Alasan Bergabung<br>PSUP
         </h2>
-        
-        <!-- Description -->
-        <p class="text-slate-500 text-base sm:text-lg leading-relaxed font-medium max-w-2xl mx-auto">
-            Portal resmi untuk digitalisasi administrasi, transparansi keuangan kas, absensi kehadiran, dan otomatisasi Laporan Pertanggungjawaban (LPJ) seluruh Unit Kegiatan Mahasiswa (UKM) di lingkungan Universitas Pancasila.
-        </p>
-        
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-2 justify-center items-center">
-            <a href="/login" 
-               class="group bg-blue-700 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl text-xs font-black tracking-wider uppercase shadow-lg shadow-blue-700/10 hover:shadow-blue-700/25 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2.5">
-                Akses Portal Mahasiswa <i class="ph ph-arrow-right text-sm transition-transform group-hover:translate-x-1"></i>
-            </a>
-            <a href="#daftar-ukm" 
-               class="bg-white border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-2xl text-xs font-black tracking-wider uppercase shadow-sm transition-all duration-300 text-center">
-                Direktori UKM UP
-            </a>
-        </div>
-    </div>
-</main>
 
-<!-- 🌟 STATS METRIC BENTO SECTION -->
-<section class="py-12 bg-transparent relative z-10 -mt-10">
-    <div class="max-w-[1200px] mx-auto px-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="statistik">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-650 text-2xl shrink-0">
-                    <i class="ph ph-buildings"></i>
-                </div>
-                <div class="text-left">
-                    <div class="text-2xl font-black text-slate-800 font-outfit">12+</div>
-                    <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">UKM Terdaftar</div>
-                </div>
+        <!-- Overlapping Layout -->
+        <div class="relative w-full reveal-element">
+            <!-- Image on the right -->
+            <div class="w-full md:w-4/5 ml-auto h-[400px] md:h-[550px] relative shadow-xl">
+                 <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Kemitraan" class="w-full h-full object-cover">
             </div>
-            
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-2xl shrink-0">
-                    <i class="ph ph-users"></i>
-                </div>
-                <div class="text-left">
-                    <div class="text-2xl font-black text-slate-800 font-outfit">1,500+</div>
-                    <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Mahasiswa Aktif</div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-2xl shrink-0">
-                    <i class="ph ph-trend-up"></i>
-                </div>
-                <div class="text-left">
-                    <div class="text-2xl font-black text-slate-800 font-outfit">98%</div>
-                    <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Akurasi Uang Kas</div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-650 text-2xl shrink-0">
-                    <i class="ph ph-clock"></i>
-                </div>
-                <div class="text-left">
-                    <div class="text-2xl font-black text-slate-800 font-outfit">Real-time</div>
-                    <div class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mt-0.5">Sinkronisasi LPJ</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- 🌟 PRESTIGIOUS BENTO GRID SHOWCASE (FITUR UTAMA) -->
-<section id="fitur" class="py-24 bg-[#fafbfd] relative z-10">
-    <div class="max-w-[1200px] mx-auto px-6">
-        
-        <!-- Header -->
-        <div class="text-center max-w-xl mx-auto mb-20">
-            <span class="text-xs font-bold uppercase tracking-widest text-blue-700">EKOSISTEM DIGITAL</span>
-            <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-                Fitur Unggulan Sistem Informasi UKM
-            </h2>
-            <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-                Kelola segala aspek administrasi UKM dengan satu dasbor terintegrasi dan ringkas.
-            </p>
-        </div>
-
-        <!-- Bento Grid Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Bento Box 1: Double Columns (LMS & Materi) -->
-            <div class="md:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                <div class="absolute right-[-40px] bottom-[-20px] w-64 h-64 bg-blue-100/30 rounded-full filter blur-3xl group-hover:bg-blue-100/50 transition-all"></div>
+            <!-- Overlapping White Box on the left -->
+            <div class="static md:absolute top-1/2 md:-translate-y-1/2 left-0 w-full md:w-[450px] lg:w-[500px] bg-white p-8 md:p-12 lg:p-16 shadow-2xl z-10 border-t-[6px] border-gold-500">
+                <h3 class="font-serif font-normal text-2xl md:text-3xl text-navy-900 mb-4 tracking-tight">Mengapa Bergabung dengan PSUP?</h3>
+                <p class="text-slate-600 font-sans text-sm md:text-base leading-relaxed mb-8">
+                    Bergabung bersama kami memberikan kesempatan luar biasa untuk mengembangkan bakat seni olah suara, membangun relasi yang solid, dan meraih prestasi bersama.
+                </p>
                 
-                <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-                    <div class="space-y-4 max-w-md">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-xl">
-                            <i class="ph ph-books"></i>
-                        </div>
-                        <h3 class="font-outfit font-extrabold text-xl text-slate-800">LMS & Perpustakaan Digital Latihan</h3>
-                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                            Bagi dan akses file materi penunjang kegiatan (.pdf, materi video, partitur, naskah latihan) secara daring tanpa batas ruang penyimpanan fisik.
-                        </p>
-                    </div>
-                    
-                    <!-- Inside Visual Mockup -->
-                    <div class="bg-slate-50 p-4.5 rounded-2xl border border-slate-200 w-full md:w-56 space-y-2 shrink-0">
-                        <div class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-100 shadow-sm">
-                            <i class="ph-fill ph-file-pdf text-red-500 text-base"></i>
-                            <div class="leading-none"><span class="text-[9px] font-bold text-slate-700 block">Taktik_Basket.pdf</span><span class="text-[7px] text-slate-400">2.4 MB</span></div>
-                        </div>
-                        <div class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-100 shadow-sm">
-                            <i class="ph-fill ph-video-camera text-blue-500 text-base"></i>
-                            <div class="leading-none"><span class="text-[9px] font-bold text-slate-700 block">Video_Replay.mp4</span><span class="text-[7px] text-slate-400">45 MB</span></div>
-                        </div>
-                    </div>
-                </div>
+                <ul class="space-y-4 font-sans text-sm text-navy-900 font-semibold tracking-wide">
+                    <li class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full bg-gold-500"></div> Mengembangkan Teknik & Karakter Vokal
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full bg-gold-500"></div> Meraih Prestasi di Dalam Maupun Luar Negeri
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full bg-gold-500"></div> Kesempatan Tampil di Konser Resmi
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full bg-gold-500"></div> Pengalaman Organisasi & Kerja Sama
+                    </li>
+                </ul>
             </div>
-
-            <!-- Bento Box 2: Standard (Absensi Sesi Mandiri) -->
-            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                <div class="absolute right-[-40px] bottom-[-20px] w-48 h-48 bg-amber-100/20 rounded-full filter blur-2xl"></div>
-                <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-xl">
-                        <i class="ph ph-check-square-offset"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-xl text-slate-800">Absensi Mandiri Praktis</h3>
-                    <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                        Tinggalkan kertas absen. Anggota mengisi kehadiran mandiri dengan satu ketukan tombol di HP ketika sesi dimulai oleh admin.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Bento Box 3: Standard (Keuangan & Kas) -->
-            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                <div class="absolute right-[-40px] bottom-[-20px] w-48 h-48 bg-emerald-100/20 rounded-full filter blur-2xl"></div>
-                <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-xl">
-                        <i class="ph ph-money"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-xl text-slate-800">Pencatatan Keuangan & Kas</h3>
-                    <p class="text-slate-550 text-xs sm:text-sm leading-relaxed">
-                        Catat uang kas bulanan anggota, iuran event, dan kas pengeluaran operasional secara transparan dan akurat.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Bento Box 4: Double Columns (Ekspor LPJ Digital) -->
-            <div class="md:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                <div class="absolute right-[-40px] bottom-[-20px] w-64 h-64 bg-amber-100/30 rounded-full filter blur-3xl group-hover:bg-amber-100/50 transition-all"></div>
-                
-                <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-                    <div class="space-y-4 max-w-md">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-xl">
-                            <i class="ph ph-file-pdf"></i>
-                        </div>
-                        <h3 class="font-outfit font-extrabold text-xl text-slate-800">Ekspor Dokumen LPJ Instan</h3>
-                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                            Cetak Laporan Pertanggungjawaban (LPJ) keuangan & daftar kehadiran kegiatan secara otomatis dalam bentuk file PDF yang terformat rapi sesuai kebutuhan Biro Kemahasiswaan.
-                        </p>
-                    </div>
-                    
-                    <!-- Inside Visual Action Mockup -->
-                    <div class="bg-slate-50 p-4.5 rounded-2xl border border-slate-200 w-full md:w-56 space-y-3 shrink-0 flex flex-col items-center justify-center py-6 text-center shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 text-base shadow-sm">
-                            <i class="ph ph-file-text"></i>
-                        </div>
-                        <div>
-                            <span class="text-[9px] font-bold text-slate-800 block">LPJ_Kegiatan_2026.pdf</span>
-                            <span class="text-[7px] text-slate-400 mt-0.5 block">File siap diunduh</span>
-                        </div>
-                        <button class="w-full py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[8px] font-extrabold tracking-wide uppercase transition-colors shadow-sm">
-                            <i class="ph ph-download"></i> Cetak LPJ PDF
-                        </button>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
     </div>
 </section>
 
-<!-- 🌟 TIMELINE SECTION (ALUR KERJA) -->
-<section id="alur-kerja" class="py-24 bg-white border-t border-b border-slate-100 relative z-10">
-    <div class="max-w-[1200px] mx-auto px-6">
-        
-        <!-- Header -->
-        <div class="text-center max-w-xl mx-auto mb-20">
-            <span class="text-xs font-bold uppercase tracking-widest text-blue-700">TAHAPAN KERJA</span>
-            <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-                Bagaimana Sistem Bekerja?
-            </h2>
-            <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-                Empat langkah praktis digitalisasi sistem operasional organisasi.
-            </p>
-        </div>
-
-        <!-- Timeline Path Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+<!-- 🌟 VISI MISI -->
+<section id="vision-mission" class="py-28 bg-white overflow-hidden">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
             
-            <!-- Step 1 -->
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 relative group shadow-sm">
-                <span class="absolute top-4 right-4 text-4xl font-black text-slate-200 group-hover:text-slate-300 transition-colors font-mono">01</span>
-                <div class="space-y-4 pt-4">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-lg">
-                        <i class="ph ph-user-plus"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-base text-slate-800">Daftar Akun Member</h3>
-                    <p class="text-slate-550 text-xs leading-relaxed">
-                        Mahasiswa mendaftar akun pada platform dan memilih UKM yang ingin mereka ikuti secara online.
-                    </p>
+            <!-- Visi (Left Column) -->
+            <div class="lg:col-span-5 space-y-8 reveal-element">
+                <div>
+                    <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">ARAH STRATEGIS</span>
+                    <h2 class="font-serif text-5xl md:text-6xl text-navy-900 leading-[1.1] font-normal mt-2">
+                        Visi Kami
+                    </h2>
                 </div>
+                <blockquote class="relative">
+                    <span class="absolute -top-10 -left-6 text-[8rem] font-serif text-gold-500/10 leading-none pointer-events-none">“</span>
+                    <p class="font-serif text-xl sm:text-2xl text-navy-850 leading-relaxed italic relative z-10 pl-2">
+                        {{ $profile->vision }}
+                    </p>
+                </blockquote>
+                <div class="w-16 h-1 bg-gradient-gold rounded-full"></div>
             </div>
 
-            <!-- Step 2 -->
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 relative group shadow-sm">
-                <span class="absolute top-4 right-4 text-4xl font-black text-slate-200 group-hover:text-slate-300 transition-colors font-mono">02</span>
-                <div class="space-y-4 pt-4">
-                    <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-lg">
-                        <i class="ph ph-seal-check"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-base text-slate-800">Persetujuan BPH UKM</h3>
-                    <p class="text-slate-550 text-xs leading-relaxed">
-                        BPH meninjau data pendaftar baru melalui halaman verifikasi dan mengubah status keanggotaan menjadi Approved.
-                    </p>
+            <!-- Misi (Right Column) -->
+            <div class="lg:col-span-7 space-y-8 reveal-element">
+                <div>
+                    <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">LANGKAH NYATA</span>
+                    <h2 class="font-serif text-5xl md:text-6xl text-navy-900 leading-[1.1] font-normal mt-2">
+                        Misi Kami
+                    </h2>
                 </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 relative group shadow-sm">
-                <span class="absolute top-4 right-4 text-4xl font-black text-slate-200 group-hover:text-slate-300 transition-colors font-mono">03</span>
-                <div class="space-y-4 pt-4">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-lg">
-                        <i class="ph ph-check-square"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-base text-slate-800">Sesi & Absensi Mandiri</h3>
-                    <p class="text-slate-550 text-xs leading-relaxed">
-                        Anggota mengikuti kegiatan, mengakses berkas latihan di LMS, serta melakukan check-in kehadiran secara instan.
-                    </p>
+                
+                <div class="space-y-6 sm:space-y-8">
+                    @php
+                        $misiPoints = array_filter(explode("\n", $profile->mission));
+                    @endphp
+                    @forelse($misiPoints as $index => $misi)
+                        <div class="flex gap-5 items-start">
+                            <span class="w-8 h-8 rounded-xl bg-navy-50 border border-slate-200 flex items-center justify-center text-gold-600 text-sm font-bold shrink-0 shadow-sm">
+                                {{ sprintf('%02d', $index + 1) }}
+                            </span>
+                            <p class="font-serif text-xl sm:text-2xl text-navy-850 leading-relaxed pt-0.5">{{ trim($misi) }}</p>
+                        </div>
+                    @empty
+                        <p class="text-slate-400 text-xs">Misi belum ditentukan.</p>
+                    @endforelse
                 </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="bg-[#fafbfd] p-6 rounded-2xl border border-slate-200 relative group shadow-sm">
-                <span class="absolute top-4 right-4 text-4xl font-black text-slate-200 group-hover:text-slate-300 transition-colors font-mono">04</span>
-                <div class="space-y-4 pt-4">
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-lg">
-                        <i class="ph ph-file-arrow-up"></i>
-                    </div>
-                    <h3 class="font-outfit font-extrabold text-base text-slate-800">Rekapitulasi & LPJ</h3>
-                    <p class="text-slate-555 text-xs leading-relaxed">
-                        Sistem merekap absensi & kas secara otomatis dan menyajikannya dalam file cetak LPJ PDF instan di akhir proker.
-                    </p>
-                </div>
+                <div class="w-16 h-1 bg-gradient-gold rounded-full"></div>
             </div>
 
         </div>
-
     </div>
 </section>
 
-<!-- 🌟 DAFTAR UNIT KEGIATAN MAHASISWA (UKM) SECTION -->
-<section id="daftar-ukm" class="py-24 bg-[#fafbfd] relative z-10">
-    <div class="max-w-[1200px] mx-auto px-6">
-        
-        <!-- Header -->
-        <div class="text-center max-w-xl mx-auto mb-20">
-            <span class="text-xs font-bold uppercase tracking-widest text-blue-700">DIREKTORI ORGANISASI</span>
-            <h2 class="font-outfit text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
-                Unit Kegiatan Mahasiswa Universitas Pancasila
-            </h2>
-            <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-                Temukan dan bergabunglah dengan organisasi kemahasiswaan yang sesuai dengan minat dan bakat Anda.
-            </p>
+<!-- 🌟 TIMELINE SEJARAH -->
+<section id="history" class="py-24 bg-slate-50 border-t border-b border-slate-100">
+    <div class="max-w-[1000px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-gold-600 uppercase tracking-widest">TIMELINE PERJALANAN</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Sejarah & Milestone</h3>
+            <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <!-- UKM Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            @forelse($ukms as $ukm)
-                <div class="bg-white p-6.5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                    <div>
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-12 h-12 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center p-2 overflow-hidden flex-shrink-0">
-                                @if($ukm->logo)
-                                    <img src="{{ filter_var($ukm->logo, FILTER_VALIDATE_URL) ? $ukm->logo : asset('storage/' . $ukm->logo) }}" alt="{{ $ukm->name }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" class="w-full h-full object-contain opacity-50">
-                                @endif
-                            </div>
-                            <div>
-                                <h3 class="font-outfit font-extrabold text-base text-slate-800 leading-tight">{{ $ukm->name }}</h3>
-                                <span class="text-[10px] bg-amber-50 border border-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full mt-1.5 inline-block uppercase tracking-wider">
-                                    {{ $ukm->memberships_count }} Anggota Aktif
-                                </span>
-                            </div>
-                        </div>
-                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">
-                            {{ Str::limit($ukm->description, 120, '...') }}
-                        </p>
+        <div class="relative border-l-2 border-slate-200 ml-4 md:ml-36">
+            @forelse($histories as $history)
+                <div class="mb-14 relative pl-8 md:pl-0 reveal-element">
+                    <!-- Point marker -->
+                    <div class="absolute -left-[9px] top-2 w-[16px] h-[16px] rounded-full border-4 border-white bg-gold-500 shadow-md"></div>
+                    
+                    <!-- Left side Year (MD screens) -->
+                    <div class="hidden md:block absolute -left-36 top-1 w-28 text-right">
+                        <span class="font-serif font-normal text-2xl text-navy-900">{{ $history->year }}</span>
                     </div>
-                    <div>
-                        <a href="/login" class="w-full py-3 bg-blue-50 hover:bg-blue-100 border border-blue-100 text-blue-700 rounded-xl text-xs font-black tracking-wider uppercase text-center block transition-all">
-                            Gabung UKM
-                        </a>
+
+                    <!-- Top side Year (Mobile screens) -->
+                    <div class="md:hidden block mb-2">
+                        <span class="font-serif font-normal text-xl text-gold-600">{{ $history->year }}</span>
+                    </div>
+
+                    <!-- Content card -->
+                    <div class="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-serif font-normal text-lg text-navy-900 mb-3">{{ $history->title }}</h4>
+                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{{ $history->description }}</p>
+                        
+                        @if($history->photo)
+                            <div class="max-w-md rounded-2xl overflow-hidden border border-slate-100 cursor-pointer" onclick="zoomStructure('{{ asset('storage/' . $history->photo) }}')">
+                                <img src="{{ asset('storage/' . $history->photo) }}" alt="{{ $history->title }}" class="w-full h-auto object-cover hover:scale-[1.01] transition-transform duration-300">
+                            </div>
+                        @endif
                     </div>
                 </div>
             @empty
-                <div class="col-span-full bg-white py-16 px-6 rounded-3xl border border-slate-200 text-center shadow-sm">
-                    <i class="ph ph-buildings text-slate-300 text-5xl mb-4 block"></i>
-                    <p class="text-slate-500 font-bold text-sm">Belum ada Unit Kegiatan Mahasiswa yang terdaftar di sistem.</p>
+                <div class="text-center py-16 text-slate-400 text-xs bg-white border border-slate-100 rounded-3xl pl-8 md:pl-0">
+                    Sejarah belum diunggah.
                 </div>
             @endforelse
         </div>
-
     </div>
 </section>
 
-<!-- 🌟 GRAND PRESTIGIOUS CALL TO ACTION (CTA) -->
-<section class="py-24 bg-white relative z-10 overflow-hidden border-t border-slate-100">
-    <div class="max-w-[1000px] mx-auto px-6 relative z-10">
-        <div class="bg-gradient-to-br from-blue-900 to-slate-950 rounded-3xl p-8 sm:p-14 text-center space-y-8 relative overflow-hidden shadow-xl text-white border border-blue-950">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(245,158,11,0.05),transparent_50%)]"></div>
-            
-            <h2 class="font-outfit text-3xl sm:text-5xl font-black text-white leading-tight">
-                Mulai Langkah Kontribusi Anda <br>di Universitas Pancasila
-            </h2>
-            
-            <p class="text-slate-300 max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed font-semibold">
-                Daftar sebagai anggota atau kelola kepengurusan UKM Anda secara digital hari ini. Bersama SIM-UKM, wujudkan kegiatan mahasiswa yang lebih aktif, berprestasi, dan transparan.
+<!-- 🌟 STRUKTUR KEPENGURUSAN -->
+<section id="structure" class="py-24 bg-white">
+    <div class="max-w-[950px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">STRUKTUR RESMI</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Bagan Organisasi</h3>
+            <div class="w-16 h-1 bg-gradient-navy mx-auto mt-4 rounded-full"></div>
+            <p class="text-slate-500 text-xs sm:text-sm mt-4">Struktur kepengurusan Paduan Suara Universitas Pancasila.</p>
+        </div>
+
+        <div class="text-center max-w-[760px] mx-auto">
+            @if($profile->structure_image)
+                <div class="relative group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md reveal-element" onclick="zoomStructure('{{ asset('storage/' . $profile->structure_image) }}')">
+                    <img src="{{ asset('storage/' . $profile->structure_image) }}" alt="Bagan PSUP" class="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02] block">
+                    <div class="absolute inset-0 bg-navy-950/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="bg-white text-navy-900 px-5 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center gap-2">
+                            <i class="ph ph-magnifying-glass-plus text-base"></i> Klik Untuk Zoom Bagan
+                        </span>
+                    </div>
+                </div>
+            @else
+                <div class="bg-slate-50 border border-slate-150 rounded-[36px] p-20 text-slate-400">
+                    <i class="ph ph-tree-structure text-5xl mb-4 text-slate-300"></i>
+                    <p class="font-bold text-sm text-slate-500">Bagan Struktur Belum Diunggah</p>
+                    <p class="text-xs text-slate-400 mt-1">Pengurus belum merilis bagan kepengurusan untuk periode aktif.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 TIM PELATIH & PEMBINA -->
+<section id="trainers" class="py-24 bg-white border-t border-slate-100">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">Choir Coaching</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Pelatih Paduan Suara Universitas Pancasila</h3>
+            <div class="w-16 h-1 bg-gradient-navy mx-auto mt-4 rounded-full"></div>
+            <p class="text-slate-500 text-xs sm:text-sm mt-4 max-w-lg mx-auto leading-relaxed">
+                Dipimpin oleh para profesional yang berdedikasi dalam membimbing vokal dan musikalitas anggota untuk mencapai performa terbaik.
             </p>
+        </div>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="/register" 
-                   class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md transition-transform hover:-translate-y-0.5">
-                    Daftar Akun Baru
-                </a>
-                <a href="/login" 
-                   class="w-full sm:w-auto bg-white/10 border border-white/20 hover:bg-white/20 text-white px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-colors">
-                    Masuk Portal
-                </a>
-            </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            @forelse($trainers as $trainer)
+                <div class="bg-white border border-slate-100 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-[280px] card-hover-navy reveal-element">
+                    <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-gold-400 p-1 mb-6 shrink-0 relative bg-slate-50">
+                        @if($trainer->photo)
+                            <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}" class="w-full h-full object-cover rounded-full">
+                        @else
+                            <div class="w-full h-full rounded-full bg-navy-50 flex items-center justify-center font-bold text-navy-800 text-2xl">
+                                {{ substr($trainer->name, 0, 1) }}
+                            </div>
+                        @endif
+                    </div>
+                    <h4 class="font-serif font-normal text-base text-navy-900 mb-1 leading-tight">{{ $trainer->name }}</h4>
+                    <span class="inline-block px-3 py-1 rounded-full text-[9px] font-bold bg-gold-50 text-gold-700 border border-gold-100/50 mb-4">{{ $trainer->specialty }}</span>
+                    <p class="text-slate-400 text-[11px] leading-relaxed mb-6">
+                        Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.
+                    </p>
+                    @if($trainer->phone)
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $trainer->phone) }}" target="_blank" class="text-xs text-navy-900 hover:text-gold-600 font-bold flex items-center gap-1.5 transition-colors">
+                            <i class="ph ph-whatsapp-logo text-base"></i> Hubungi WhatsApp
+                        </a>
+                    @endif
+                </div>
+            @empty
+                <div class="w-full text-center py-16 text-slate-400 text-xs">
+                    Belum ada data pelatih terdaftar.
+                </div>
+            @endforelse
         </div>
     </div>
 </section>
 
-<!-- 🌟 MINIMALIST LIGHT FOOTER -->
-<footer class="bg-slate-950 text-slate-400 text-[11px] py-16 relative z-10 border-t border-slate-900">
-    <div class="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+<!-- 🌟 PROGRAM KERJA UNGGULAN -->
+<section id="programs" class="py-24 bg-slate-50 border-t border-b border-slate-100">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-gold-600 uppercase tracking-widest">PROGRAM KERJA</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Agenda Kegiatan Unggulan</h3>
+            <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8">
+            @forelse($programs as $program)
+                <div class="bg-white border border-slate-100 hover:border-gold-500/20 rounded-[28px] p-7 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                    <div>
+                        <div class="flex justify-between items-center mb-5">
+                            <span class="inline-block px-3 py-1 rounded-full text-[9px] font-black bg-navy-50 text-navy-800 border border-slate-100">
+                                @if($program->activity_type === 'Event')
+                                    Event {{ $program->event_category }}
+                                @else
+                                    Kompetisi
+                                @endif
+                            </span>
+                            <span class="inline-block px-3 py-1 rounded-full text-[9px] font-black 
+                                @if($program->status == 'Selesai') bg-emerald-50 text-emerald-800 border border-emerald-100
+                                @elseif($program->status == 'Berjalan') bg-blue-50 text-blue-800 border border-blue-100
+                                @else bg-amber-50 text-amber-800 border border-amber-100 @endif">
+                                {{ $program->status }}
+                            </span>
+                        </div>
+                        
+                        <h4 class="font-serif font-normal text-lg text-navy-900 mb-3 leading-tight">{{ $program->name }}</h4>
+                        <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">
+                            {{ $program->description }}
+                        </p>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-5 space-y-2 text-xs text-slate-400">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-1.5">
+                                <i class="ph ph-calendar"></i>
+                                <span>{{ date('d M Y', strtotime($program->start_date)) }}</span>
+                            </div>
+                            <span>s/d</span>
+                            <div class="flex items-center gap-1.5">
+                                <i class="ph ph-calendar"></i>
+                                <span>{{ date('d M Y', strtotime($program->end_date)) }}</span>
+                            </div>
+                        </div>
+                        @if($program->venue)
+                        <div class="flex items-center gap-1.5">
+                            <i class="ph ph-map-pin text-gold-500"></i>
+                            <span>{{ $program->venue }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="w-full text-center py-16 text-slate-400 text-xs">
+                    Belum ada program kerja yang terdaftar.
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 PRESTASI ORGANISASI -->
+<section id="achievements" class="py-24 bg-white">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">AWARDS & LAURELS</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Daftar Prestasi & Medali</h3>
+            <div class="w-16 h-1 bg-gradient-navy mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8">
+            @forelse($achievements as $achievement)
+                <div class="bg-white border border-slate-100 rounded-[28px] overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                    <div>
+                        @if($achievement->photo)
+                            <div class="aspect-video overflow-hidden bg-slate-50">
+                                <img src="{{ asset('storage/' . $achievement->photo) }}" alt="{{ $achievement->title }}" class="w-full h-full object-cover">
+                            </div>
+                        @else
+                            <div class="aspect-video bg-navy-50 flex items-center justify-center text-navy-800 text-4xl">
+                                <i class="ph ph-trophy"></i>
+                            </div>
+                        @endif
+                        
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-black text-gold-600 uppercase tracking-wider">
+                                    <i class="ph ph-award"></i> Penghargaan Utama
+                                </span>
+                                <span class="text-xs text-slate-400 font-bold">{{ date('Y', strtotime($achievement->date)) }}</span>
+                            </div>
+                            <h4 class="font-serif font-normal text-base sm:text-lg text-navy-900 mb-2 leading-tight">{{ $achievement->title }}</h4>
+                            <p class="text-slate-500 text-xs sm:text-sm leading-relaxed">{{ $achievement->description }}</p>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="w-full text-center py-16 text-slate-400 text-xs">
+                    Belum ada prestasi yang ditambahkan.
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 PENAMPILAN DAN KEGIATAN -->
+<section id="events" class="py-24 bg-slate-50 border-t border-b border-slate-100">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-gold-600 uppercase tracking-widest">SHOWCASE LIVE</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Penampilan & Kegiatan</h3>
+            <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8">
+            @forelse($agendas as $agenda)
+                <div class="bg-white border border-slate-100 rounded-[28px] p-7 shadow-sm hover:shadow-md transition-all w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                    <span class="inline-block px-3 py-1 rounded-full text-[9px] font-black bg-navy-50 text-navy-900 mb-4 border border-slate-100">{{ $agenda->status }}</span>
+                    <h4 class="font-serif font-normal text-lg text-navy-900 mb-3 leading-tight">{{ $agenda->title }}</h4>
+                    <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{{ $agenda->description }}</p>
+                    
+                    <div class="border-t border-slate-100 pt-5 text-xs text-slate-400 space-y-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <i class="ph ph-calendar text-gold-500 text-sm"></i>
+                            <span>{{ date('d F Y', strtotime($agenda->performance_date)) }}</span>
+                        </div>
+                        @if($agenda->performance_time)
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph ph-clock text-gold-500 text-sm"></i>
+                                <span>{{ $agenda->performance_time }} WIB</span>
+                            </div>
+                        @endif
+                        <div class="flex items-start gap-2.5">
+                            <i class="ph ph-map-pin text-gold-500 text-sm mt-0.5"></i>
+                            <span>{{ $agenda->venue }}</span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="w-full text-center py-16 text-slate-400 text-xs">
+                    Tidak ada agenda terdekat.
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 DOKUMENTASI/GALERI -->
+<section id="gallery" class="py-24 bg-white">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">DOKUMENTASI DOKUMEN</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Galeri Kegiatan</h3>
+            <div class="w-16 h-1 bg-gradient-navy mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6">
+            @forelse($galleries as $gallery)
+                <div class="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1rem)] max-w-sm reveal-element" onclick="zoomStructure('{{ asset('storage/' . $gallery->file_path) }}')">
+                    <div class="aspect-video overflow-hidden bg-slate-50 relative">
+                        <img src="{{ asset('storage/' . $gallery->file_path) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="w-11 h-11 rounded-full bg-white flex items-center justify-center text-navy-900 shadow-md">
+                                <i class="ph ph-magnifying-glass-plus text-lg font-bold"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-bold text-sm text-navy-900 line-clamp-1 leading-tight">{{ $gallery->title }}</h4>
+                        <p class="text-slate-400 text-xs mt-1.5 line-clamp-2">{{ $gallery->description }}</p>
+                    </div>
+                </div>
+            @empty
+                <div class="w-full text-center py-16 text-slate-400 text-xs">
+                    Belum ada foto dokumentasi.
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+
+
+<!-- 🌟 OPEN RECRUITMENT -->
+@if($profile->recruitment_active)
+    <section id="recruitment" class="py-24 bg-white">
+        <div class="max-w-[950px] mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-100 uppercase tracking-widest mb-4">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Pendaftaran Calon Anggota Baru
+                </span>
+                <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Mulai Perjalanan Musikmu Bersama Kami</h3>
+                <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="bg-gradient-navy text-white rounded-[40px] p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute -left-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    <div class="lg:col-span-8">
+                        <div class="flex items-center gap-2.5 text-gold-400 mb-6">
+                            <i class="ph ph-calendar-blank text-xl"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest">
+                                Periode: 
+                                {{ $profile->recruitment_start_date ? $profile->recruitment_start_date->format('d M Y') : '' }} 
+                                s/d 
+                                {{ $profile->recruitment_end_date ? $profile->recruitment_end_date->format('d M Y') : '' }}
+                            </span>
+                        </div>
+                        
+                        <h4 class="font-serif font-normal text-2xl mb-8 leading-tight">Jadilah bagian dari generasi harmoni paduan suara Universitas Pancasila selanjutnya.</h4>
+                        
+                        <!-- Requirements -->
+                        <div class="mb-8">
+                            <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-4">Persyaratan Utama</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @php
+                                    $reqs = array_filter(explode("\n", $profile->recruitment_requirements));
+                                @endphp
+                                @forelse($reqs as $req)
+                                    <div class="flex gap-3 text-xs sm:text-sm text-slate-300">
+                                        <i class="ph ph-check-circle text-gold-400 text-base shrink-0"></i>
+                                        <span>{{ trim($req) }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-slate-400 text-xs">Persyaratan belum ditentukan.</p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <!-- Stages -->
+                        <div>
+                            <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-4">Tahapan Registrasi & Audisi</h5>
+                            <div class="space-y-3">
+                                @php
+                                    $stages = array_filter(explode("\n", $profile->recruitment_stages));
+                                @endphp
+                                @forelse($stages as $stage)
+                                    <div class="flex gap-3 text-xs sm:text-sm text-slate-300">
+                                        <i class="ph ph-caret-right text-gold-500 font-bold text-sm"></i>
+                                        <span>{{ trim($stage) }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-slate-400 text-xs">Tahapan seleksi belum ditentukan.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 text-center">
+                        <a href="/daftar" class="inline-block w-full bg-gradient-gold text-navy-900 px-6 py-4.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:opacity-95 transition-all hover:-translate-y-0.5">
+                            Gabung PSUP Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endif
+
+<!-- 🌟 DOWLOADS / RESMI BERKAS KEMITRAAN -->
+<section id="downloads" class="py-24 bg-white border-t border-slate-100">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-gold-600 uppercase tracking-widest">PUSAT BERKAS</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Unduh Dokumen Kerja Sama</h3>
+            <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
+            <p class="text-slate-500 text-xs sm:text-sm mt-4">Silakan unduh dokumen legal pendukung di bawah ini untuk proposal sponsorship atau pengenalan umum.</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8 max-w-[1050px] mx-auto">
+            
+            <!-- Company Profile -->
+            <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-sm w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                <div>
+                    <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-red-500 text-xl font-bold mb-6">
+                        <i class="ph ph-file-pdf"></i>
+                    </div>
+                    <h4 class="font-serif font-normal text-base text-navy-900 mb-2">Company Profile</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Dokumen lengkap yang mendeskripsikan visi misi, sejarah, kepengurusan, prestasi, dan galeri umum PSUP.</p>
+                </div>
+                @if($profile->company_profile_pdf)
+                    <a href="{{ asset('storage/' . $profile->company_profile_pdf) }}" target="_blank" class="w-full bg-navy-900 text-white hover:bg-gold-600 hover:text-navy-900 py-3.5 rounded-xl font-bold text-xs text-center transition-colors uppercase tracking-wider block">
+                        Unduh PDF Berkas
+                    </a>
+                @else
+                    <button class="w-full bg-slate-200 text-slate-400 py-3.5 rounded-xl font-bold text-xs text-center cursor-not-allowed uppercase tracking-wider block" disabled>
+                        Belum Tersedia
+                    </button>
+                @endif
+            </div>
+
+            <!-- Sponsorship Proposal -->
+            <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-sm w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                <div>
+                    <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-red-500 text-xl font-bold mb-6">
+                        <i class="ph ph-file-pdf"></i>
+                    </div>
+                    <h4 class="font-serif font-normal text-base text-navy-900 mb-2">Sponsorship Proposal</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Paket benefit, rincian branding, anggaran biaya konser, serta mekanisme kerja sama sponsor dengan PSUP.</p>
+                </div>
+                @if($profile->sponsorship_proposal_pdf)
+                    <a href="{{ asset('storage/' . $profile->sponsorship_proposal_pdf) }}" target="_blank" class="w-full bg-navy-900 text-white hover:bg-gold-600 hover:text-navy-900 py-3.5 rounded-xl font-bold text-xs text-center transition-colors uppercase tracking-wider block">
+                        Unduh PDF Berkas
+                    </a>
+                @else
+                    <button class="w-full bg-slate-200 text-slate-400 py-3.5 rounded-xl font-bold text-xs text-center cursor-not-allowed uppercase tracking-wider block" disabled>
+                        Belum Tersedia
+                    </button>
+                @endif
+            </div>
+
+            <!-- Media Kit -->
+            <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-sm w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm reveal-element">
+                <div>
+                    <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-red-500 text-xl font-bold mb-6">
+                        <i class="ph ph-file-pdf"></i>
+                    </div>
+                    <h4 class="font-serif font-normal text-base text-navy-900 mb-2">Media Kit & Logo</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Aset identitas visual resmi PSUP (logo resolusi tinggi, palet warna, tipografi) untuk kolaborasi publikasi.</p>
+                </div>
+                @if($profile->media_kit_pdf)
+                    <a href="{{ asset('storage/' . $profile->media_kit_pdf) }}" target="_blank" class="w-full bg-navy-900 text-white hover:bg-gold-600 hover:text-navy-900 py-3.5 rounded-xl font-bold text-xs text-center transition-colors uppercase tracking-wider block">
+                        Unduh PDF Berkas
+                    </a>
+                @else
+                    <button class="w-full bg-slate-200 text-slate-400 py-3.5 rounded-xl font-bold text-xs text-center cursor-not-allowed uppercase tracking-wider block" disabled>
+                        Belum Tersedia
+                    </button>
+                @endif
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 KONTAK & DETAIL SEKRERATARIAT -->
+<section id="contact" class="py-24 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="text-center mb-20">
+            <span class="text-[10px] font-black text-navy-800 uppercase tracking-widest">KONTAK KAMI</span>
+            <h3 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mt-2">Hubungi Sekretariat</h3>
+            <div class="w-16 h-1 bg-gradient-navy mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            <!-- Contact Card -->
+            <div class="lg:col-span-5 bg-white border border-slate-100 rounded-[32px] p-8 sm:p-10 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="font-serif font-normal text-xl text-navy-900 mb-8 leading-tight">Hubungi Kami Secara Langsung</h4>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-navy-900 text-lg shrink-0">
+                                <i class="ph ph-map-pin"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-[10px] text-slate-400 uppercase tracking-wider mb-1">Sekretariat</h5>
+                                <p class="text-xs text-slate-500 leading-relaxed">{{ $profile->address }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-navy-900 text-lg shrink-0">
+                                <i class="ph ph-envelope"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-[10px] text-slate-400 uppercase tracking-wider mb-1">E-mail Resmi</h5>
+                                <a href="mailto:{{ $profile->email }}" class="text-xs text-blue-600 hover:underline font-bold">{{ $profile->email }}</a>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-navy-900 text-lg shrink-0">
+                                <i class="ph ph-phone"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-[10px] text-slate-400 uppercase tracking-wider mb-1">Kontak Humas</h5>
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $profile->phone) }}" target="_blank" class="text-xs text-blue-600 hover:underline font-bold">{{ $profile->phone }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social links -->
+                <div class="border-t border-slate-100 pt-8 mt-10">
+                    <h5 class="font-bold text-[10px] text-slate-400 uppercase tracking-wider mb-4">Temukan Kami di Media Sosial</h5>
+                    <div class="flex gap-4">
+                        @if($profile->instagram)
+                            <a href="{{ $profile->instagram }}" target="_blank" class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 text-navy-900 hover:border-gold-500 hover:text-gold-500 hover:bg-white transition-all shadow-sm">
+                                <i class="ph ph-instagram-logo text-lg font-bold"></i>
+                            </a>
+                        @endif
+                        @if($profile->youtube)
+                            <a href="{{ $profile->youtube }}" target="_blank" class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 text-navy-900 hover:border-gold-500 hover:text-gold-500 hover:bg-white transition-all shadow-sm">
+                                <i class="ph ph-youtube-logo text-lg font-bold"></i>
+                            </a>
+                        @endif
+                        @if($profile->tiktok)
+                            <a href="{{ $profile->tiktok }}" target="_blank" class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 text-navy-900 hover:border-gold-500 hover:text-gold-500 hover:bg-white transition-all shadow-sm">
+                                <i class="ph ph-tiktok-logo text-lg font-bold"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maps Embed -->
+            <div class="lg:col-span-7 rounded-[32px] overflow-hidden border border-slate-200 shadow-md h-[450px] relative z-10 bg-white">
+                <iframe src="https://maps.google.com/maps?q=-6.338301828326995,106.83244555983342&t=&z=17&ie=UTF8&iwloc=&output=embed" class="w-full h-full border-0" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 SOCIAL SHARE PANEL SECTION -->
+<section class="py-16 bg-navy-900 text-white relative">
+    <div class="max-w-[1240px] mx-auto px-6 relative z-10 text-center">
+        <h4 class="font-serif font-normal text-2xl mb-4 leading-tight">Bagikan Portal Company Profile PSUP</h4>
+        <p class="text-slate-400 text-xs sm:text-sm mb-8 max-w-lg mx-auto leading-relaxed">Bantu sebarkan informasi resmi PSUP ke jejaring media sosial Anda untuk menarik minat calon pendaftar, sponsor, & mitra universitas.</p>
         
-        <!-- Left Logo -->
-        <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-white border border-slate-800 rounded p-1 flex items-center justify-center">
-                <img src="{{ asset('images/logoup.png') }}" alt="Logo Universitas Pancasila" class="w-full h-full object-contain">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="https://api.whatsapp.com/send?text=Kunjungi%20Website%20Resmi%20Company%20Profile%20Paduan%20Suara%20Universitas%20Pancasila%20di%20{{ urlencode(request()->url()) }}" target="_blank" class="flex items-center justify-center bg-[#25D366] text-white px-6 py-3.5 rounded-2xl text-xs font-bold gap-2.5 hover:opacity-90 transition-opacity">
+                <i class="ph ph-whatsapp-logo text-base font-bold"></i> WhatsApp
+            </a>
+            
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" class="flex items-center justify-center bg-[#1877F2] text-white px-6 py-3.5 rounded-2xl text-xs font-bold gap-2.5 hover:opacity-90 transition-opacity">
+                <i class="ph ph-facebook-logo text-base font-bold"></i> Facebook
+            </a>
+
+            <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text=Website%20Resmi%20Company%20Profile%20Paduan%20Suara%20Universitas%20Pancasila" target="_blank" class="flex items-center justify-center bg-[#000000] text-white px-6 py-3.5 rounded-2xl text-xs font-bold gap-2.5 hover:opacity-90 transition-opacity">
+                <i class="ph ph-twitter-logo text-base font-bold"></i> Twitter / X
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 🌟 FOOTER -->
+<footer class="py-16 bg-navy-950 text-white border-t border-slate-900">
+    <div class="max-w-[1240px] mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-12">
+            
+            <!-- Left Brand column -->
+            <div class="lg:col-span-5">
+                <a href="/" class="flex items-center space-x-3.5 mb-6">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden border border-gold-500 shrink-0">
+                        @if($profile->logo)
+                            <img src="{{ asset('storage/' . $profile->logo) }}" alt="Logo" class="w-full h-full object-cover">
+                        @else
+                            <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP" class="w-full h-full object-cover">
+                        @endif
+                    </div>
+                    <div>
+                        <h4 class="font-serif font-normal text-sm tracking-tight text-white leading-tight">{{ $profile->name }}</h4>
+                        <p class="text-[9px] text-gold-500 font-bold uppercase tracking-wider leading-none">{{ $profile->alias }}</p>
+                    </div>
+                </a>
+                <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
+                    {{ $profile->description }}
+                </p>
             </div>
-            <div>
-                <p class="font-outfit font-black text-white text-xs">Sistem UKM</p>
-                <p class="text-[8px] text-amber-500 font-bold uppercase tracking-widest leading-none">Universitas Pancasila</p>
+
+            <!-- Navigation Links Column -->
+            <div class="lg:col-span-3">
+                <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-5">Navigasi Utama</h5>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><a href="#about" class="hover:text-white transition-colors">Tentang Kami</a></li>
+                    <li><a href="#why-us" class="hover:text-white transition-colors">Alasan Bergabung</a></li>
+                    <li><a href="#history" class="hover:text-white transition-colors">Sejarah / Timeline</a></li>
+                    <li><a href="#structure" class="hover:text-white transition-colors">Bagan Organisasi</a></li>
+                    <li><a href="#trainers" class="hover:text-white transition-colors">Tim Pelatih</a></li>
+                    <li><a href="#programs" class="hover:text-white transition-colors">Program Kerja</a></li>
+                    <li><a href="#achievements" class="hover:text-white transition-colors">Prestasi & Penghargaan</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Column -->
+            <div class="lg:col-span-4">
+                <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-5">Hubungi Kami</h5>
+                <ul class="space-y-3.5 text-xs text-slate-400">
+                    <li class="flex items-start gap-2.5">
+                        <i class="ph ph-map-pin text-gold-500 mt-0.5 shrink-0"></i>
+                        <span class="leading-relaxed">{{ $profile->address }}</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="ph ph-envelope text-gold-500 shrink-0"></i>
+                        <a href="mailto:{{ $profile->email }}" class="hover:text-white transition-colors">{{ $profile->email }}</a>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="ph ph-phone text-gold-500 shrink-0"></i>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $profile->phone) }}" target="_blank" class="hover:text-white transition-colors">{{ $profile->phone }}</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="border-t border-slate-900 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
+            <p>© 2026 {{ $profile->name }}. All Rights Reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="/login" class="hover:text-slate-300">Akses Sistem Portal PSUP (Internal)</a>
             </div>
         </div>
-
-        <!-- Center Text -->
-        <div class="text-center md:text-left leading-normal font-semibold">
-            <p class="text-slate-200">Sistem Informasi Manajemen Unit Kegiatan Mahasiswa (SIM-UKM)</p>
-            <p class="text-slate-500 mt-1 text-[9px]">Portal Resmi Biro Kemahasiswaan & Alumni Universitas Pancasila</p>
-        </div>
-
-        <!-- Right Copyright -->
-        <div class="text-center md:text-right font-bold text-[10px] space-y-1">
-            <p>© {{ date('Y') }} All Rights Reserved.</p>
-            <p class="text-slate-500">Membina Kreativitas, Prestasi, dan Karakter Mahasiswa Pancasila</p>
-        </div>
-
     </div>
 </footer>
+
+<!-- modal Image Preview/Zoom -->
+<div id="zoomModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 3, 20, 0.95); z-index: 99999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;">
+    <button onclick="closeZoom()" style="position: absolute; top: 20px; right: 30px; font-size: 2.8rem; color: white; cursor: pointer; background: none; border: none; font-weight: bold;">&times;</button>
+    <img id="zoomedImage" style="max-width: 92%; max-height: 92%; border-radius: 16px; box-shadow: 0 0 35px rgba(0,0,0,0.6);">
+</div>
+
+<script>
+    function zoomStructure(src) {
+        const modal = document.getElementById('zoomModal');
+        const img = document.getElementById('zoomedImage');
+        img.src = src;
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.style.opacity = '1';
+        }, 10);
+    }
+
+    function closeZoom() {
+        const modal = document.getElementById('zoomModal');
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.05,
+            rootMargin: '0px 0px -30px 0px'
+        });
+
+        document.querySelectorAll('.reveal-element').forEach(el => {
+            observer.observe(el);
+        });
+    });</script>
 
 </body>
 </html>

@@ -1,302 +1,198 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Mahasiswa')
-@section('header', 'Dashboard Mahasiswa')
+@section('title', 'Dashboard Anggota')
+@section('header', 'Dashboard Anggota')
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/member.css') }}">
+<style>
+    .member-stat-card {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        border-radius: 16px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 0 !important;
+    }
+    .member-stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    .member-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+    }
+    .grid-3-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
 
-<!-- Hero Banner (Aesthetic Student Dashboard Header) -->
-<div class="card member-hero-banner" style="margin-bottom: 1.5rem !important;">
-    <div style="position: absolute; right: -50px; top: -50px; width: 250px; height: 250px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); filter: blur(30px); pointer-events: none;"></div>
-    <div style="position: absolute; left: 10%; bottom: -80px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255, 255, 255, 0.03); filter: blur(20px); pointer-events: none;"></div>
-    
-    <div class="member-hero-container">
-        <!-- Student Photo/Avatar -->
-        <div class="member-avatar-wrapper">
-            @if(auth()->user()->photo)
-                <img src="{{ filter_var(auth()->user()->photo, FILTER_VALIDATE_URL) ? auth()->user()->photo : asset('storage/' . auth()->user()->photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
-            @else
-                <div style="font-size: 2.5rem; font-weight: 800; color: white; text-transform: uppercase; font-family: 'Outfit';">
-                    {{ substr(auth()->user()->name, 0, 2) }}
-                </div>
-            @endif
+<!-- Welcome & Voice Classification Card -->
+<div class="card mb-6" style="padding: 2rem; background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%); color: white; border-radius: 16px; margin-bottom: 1.5rem;">
+    <h2 style="margin: 0; font-size: 1.75rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: #ffffff !important;">Selamat Datang, {{ auth()->user()->name }}!</h2>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 600; color: #ffffff !important;">
+        NPM: {{ $member->npm ?? '-' }} | Klasifikasi Suara: 
+        <span style="background: rgba(255,255,255,0.25); padding: 0.25rem 0.55rem; border-radius: 6px; font-weight: 800; color: #ffffff !important;">
+            {{ $voice }}
+        </span>
+    </p>
+</div>
+
+<!-- Stats Row -->
+<div class="grid-3-stats">
+    <!-- Klasifikasi Suara -->
+    <div class="card member-stat-card">
+        <div class="member-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+            <i class="ph ph-microphone"></i>
         </div>
+        <div>
+            <h4 style="margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Klasifikasi Suara</h4>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); margin-top: 0.15rem;">{{ $voice }}</div>
+        </div>
+    </div>
+
+    <!-- Classroom Saya -->
+    <div class="card member-stat-card">
+        <div class="member-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+            <i class="ph ph-chalkboard"></i>
+        </div>
+        <div>
+            <h4 style="margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Classroom Saya</h4>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin-top: 0.15rem;">{{ count($classrooms) }} Kelas</div>
+        </div>
+    </div>
+
+    <!-- Penampilan yang Diikuti -->
+    <div class="card member-stat-card">
+        <div class="member-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+            <i class="ph ph-microphone-stage"></i>
+        </div>
+        <div>
+            <h4 style="margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Penampilan Diikuti</h4>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin-top: 0.15rem;">{{ count($activeJobs) }} Acara</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Left column: Classroom & Penampilan -->
+    <div class="md:col-span-2" style="display: flex; flex-direction: column;">
         
-        <!-- Student Info -->
-        <div class="member-hero-text">
-            <div class="member-hero-title-container">
-                <h2 class="member-hero-title">{{ auth()->user()->name }}</h2>
-                <span style="background: rgba(254, 191, 36, 0.25); color: #fbbf24; border: 1px solid rgba(254, 191, 36, 0.4); padding: 0.4rem 0.8rem; border-radius: 12px; font-weight: 800; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; backdrop-filter: blur(5px);">
-                    <i class="ph-fill ph-student" style="font-size: 0.95rem;"></i> Mahasiswa Aktif
-                </span>
-            </div>
+        <!-- Classroom Saya -->
+        <div class="card" style="padding: 1.75rem; border-radius: 16px; border: 1px solid var(--border-color); background: var(--surface-color);">
+            <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                <i class="ph ph-chalkboard" style="color: var(--accent-color);"></i> Classroom Saya
+            </h3>
             
-            <p style="margin: 0 0 1.5rem 0; color: rgba(255, 255, 255, 0.85); line-height: 1.6; font-size: 0.95rem; font-weight: 500; max-width: 700px;">
-                {{ auth()->user()->npm ? 'NPM ' . auth()->user()->npm : '' }} 
-                {{ auth()->user()->major ? '• ' . auth()->user()->major : '' }}
-                {{ auth()->user()->faculty ? '• Fakultas ' . auth()->user()->faculty : '' }}
-            </p>
-            
-            <!-- Quick Info Metrics -->
-            <div class="member-hero-stats">
-                <div style="padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; backdrop-filter: blur(5px);">
-                    <i class="ph-fill ph-house-line" style="color: rgba(255, 255, 255, 0.7);"></i> {{ $ukmJoinedCount }} UKM Diikuti
-                </div>
-                <div style="padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; backdrop-filter: blur(5px);">
-                    <i class="ph-fill ph-check-square" style="color: rgba(255, 255, 255, 0.7);"></i> {{ $totalPresence }} Sesi Hadir
-                </div>
-                <div style="padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 12px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; backdrop-filter: blur(5px);">
-                    <i class="ph-fill ph-calendar-blank" style="color: rgba(255, 255, 255, 0.7);"></i> {{ $upcomingEvents->count() }} Agenda Terdekat
-                </div>
-            </div>
-        </div>
-        
-        <!-- Primary Action Buttons -->
-        <div class="member-hero-actions">
-            <a href="/member/join" class="btn" style="background: white; color: var(--accent-color); padding: 0.85rem 1.75rem; border-radius: 14px; font-weight: 800; font-size: 0.95rem; border: none; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; text-decoration: none;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.1)';">
-                <i class="ph-bold ph-plus-circle" style="font-size: 1.2rem;"></i> CARI & DAFTAR UKM
-            </a>
-            <a href="/member/profile" class="btn" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.85rem 1.75rem; border-radius: 14px; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; backdrop-filter: blur(5px); text-decoration: none;" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='none';">
-                <i class="ph ph-user-gear" style="font-size: 1.2rem;"></i> PENGATURAN PROFIL
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Aggregated Student Stats Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 0.5rem;">
-    <div class="card stat-card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 0 !important;">
-        <div class="stat-label" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph ph-house-line"></i> UKM Diikuti
-        </div>
-        <div class="stat-value" style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-top: 0.5rem;">{{ $ukmJoinedCount }}</div>
-        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Unit organisasi aktif</div>
-    </div>
-
-    <div class="card stat-card" style="border-top: 3px solid var(--warning-color); padding: 1.25rem; margin-bottom: 0 !important;">
-        <div class="stat-label" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph ph-hourglass"></i> Pengajuan Pending
-        </div>
-        <div class="stat-value text-warning" style="font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem;">{{ $ukmPendingCount }}</div>
-        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Pendaftaran dalam review</div>
-    </div>
-
-    <div class="card stat-card" style="border-top: 3px solid var(--success-color); padding: 1.25rem; margin-bottom: 0 !important;">
-        <div class="stat-label" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph ph-check-square"></i> Kehadiran Kegiatan
-        </div>
-        <div class="stat-value text-success" style="font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem;">{{ $totalPresence }} Sesi</div>
-        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Presensi mandiri disetujui</div>
-    </div>
-
-    <div class="card stat-card" style="border-top: 3px solid var(--accent-color); padding: 1.25rem; margin-bottom: 0 !important;">
-        <div class="stat-label" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph ph-calendar-blank"></i> Agenda Terdekat
-        </div>
-        <div class="stat-value" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-color); margin-top: 0.5rem;">{{ $upcomingEvents->count() }}</div>
-        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">Jadwal dalam waktu dekat</div>
-    </div>
-</div>
-
-<!-- Notifications Feed from UKMs -->
-<div class="card animate-fade-in" style="border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); background: var(--surface-color); padding: 1.5rem; border-top: 3px solid var(--accent-color); margin-top: 1.5rem; margin-bottom: 0 !important;">
-    <h3 style="font-size: 1.1rem; font-weight: 750; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); margin: 0 0 1rem 0;">
-        <i class="ph-fill ph-bell" style="color: var(--accent-color); font-size: 1.25rem;"></i> Notifikasi & Update UKM Saya
-    </h3>
-    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        @forelse($notifications as $notif)
-            @if($notif->notification_type === 'announcement')
-                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; background: var(--bg-color); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem; min-width: 250px; flex: 1;">
-                        <div style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.15rem;">
-                            <i class="ph-fill ph-megaphone"></i>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                                <span style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">Pengumuman Baru</span>
-                                <span style="font-size: 0.725rem; background: var(--border-color); color: var(--text-secondary); padding: 0.15rem 0.4rem; border-radius: 6px; font-weight: 700;">{{ $notif->ukm->name }}</span>
-                            </div>
-                            <p style="font-size: 0.85rem; color: var(--text-primary); margin: 0.35rem 0 0 0; line-height: 1.4;">
-                                {{ Str::limit(strip_tags($notif->content), 150) }}
-                            </p>
-                            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.35rem;">
-                                <i class="ph ph-clock"></i> {{ $notif->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                    @php
-                        $targetUrl = $notif->event_id ? route('classroom.show', [$notif->ukm_id, $notif->event_id]) : "/room/{$notif->ukm_id}/classroom";
-                    @endphp
-                    <a href="{{ $targetUrl }}" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
-                        Lihat <i class="ph ph-arrow-right"></i>
-                    </a>
-                </div>
-            @elseif($notif->notification_type === 'event')
-                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; background: var(--bg-color); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap;">
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem; min-width: 250px; flex: 1;">
-                        <div style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.15rem;">
-                            <i class="ph-fill ph-calendar"></i>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                                <span style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">Agenda Baru: {{ $notif->title }}</span>
-                                <span style="font-size: 0.725rem; background: var(--border-color); color: var(--text-secondary); padding: 0.15rem 0.4rem; border-radius: 6px; font-weight: 700;">{{ $notif->ukm->name }}</span>
-                            </div>
-                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <span style="display: inline-flex; align-items: center; gap: 0.2rem;"><i class="ph ph-calendar-blank"></i> {{ \Carbon\Carbon::parse($notif->start_date)->format('d M Y, H:i') }}</span>
-                                @if($notif->location)
-                                    <span>•</span>
-                                    <span style="display: inline-flex; align-items: center; gap: 0.2rem;"><i class="ph ph-map-pin"></i> {{ $notif->location }}</span>
-                                @endif
-                            </div>
-                            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.35rem;">
-                                <i class="ph ph-clock"></i> {{ $notif->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                    <a href="{{ route('classroom.show', [$notif->ukm_id, $notif->id]) }}" class="btn btn-primary" style="padding: 0.45rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
-                        Ikuti Sesi <i class="ph ph-arrow-right"></i>
-                    </a>
-                </div>
-            @endif
-        @empty
-            <div style="text-align: center; padding: 2rem 1rem; background: var(--bg-color); border: 1px dashed var(--border-color); border-radius: 12px;">
-                <i class="ph ph-bell-slash" style="font-size: 2rem; opacity: 0.2; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;"></i>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Belum ada update atau pengumuman terbaru dari UKM yang Anda ikuti.</p>
-            </div>
-        @endforelse
-    </div>
-</div>
-
-<!-- Grid Layout: Rooms & Timeline -->
-<div class="member-grid-layout">
-    <!-- Left Column: Active Rooms -->
-    <div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem; margin-bottom: 0 !important;">
-        <h3 class="mb-4" style="font-size: 1.1rem; font-weight: 750; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-            <i class="ph ph-door-open" style="color: var(--accent-color); font-size: 1.25rem;"></i> Pusat Kegiatan UKM Saya
-        </h3>
-        
-        <div style="display: grid; gap: 1rem;">
-            @foreach($approvedMemberships as $membership)
-            <div class="ukm-room-card">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div class="ukm-mini-logo">
-                        @if($membership->ukm->logo)
-                            <img src="{{ filter_var($membership->ukm->logo, FILTER_VALIDATE_URL) ? $membership->ukm->logo : asset('storage/' . $membership->ukm->logo) }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        @else
-                            <i class="ph ph-buildings" style="font-size: 1.5rem; color: var(--accent-color);"></i>
-                        @endif
-                    </div>
-                    <div>
-                        <h4 style="margin: 0; font-weight: 750; font-size: 1rem; color: var(--text-primary);">{{ $membership->ukm->name }}</h4>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-                            <span class="badge badge-approved" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; font-weight: 700; text-transform: uppercase;">
-                                {{ $membership->classification->name ?? 'Anggota' }}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
+                @forelse($classrooms as $room)
+                    <a href="{{ route('member.classrooms.show', $room->id) }}" style="text-decoration: none; padding: 1rem; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-color); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.transform='none';">
+                        <div>
+                            <span style="font-size: 0.65rem; font-weight: bold; background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block;">
+                                {{ $room->performance && is_null($room->performance->program_id) ? 'Job' : 'Performance' }}
                             </span>
-                            <span>•</span>
-                            <span>Bergabung {{ $membership->created_at ? $membership->created_at->format('d M Y') : '-' }}</span>
+                            <h4 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); line-height: 1.3;">{{ $room->name }}</h4>
+                            <p style="margin: 0.35rem 0 0 0; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                {{ $room->description ?? 'Tidak ada deskripsi kelas.' }}
+                            </p>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Masuk Kelas</span>
+                            <i class="ph ph-caret-right" style="color: var(--accent-color); font-weight: bold;"></i>
+                        </div>
+                    </a>
+                @empty
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 0; color: var(--text-secondary); font-size: 0.85rem;">
+                        <p>Anda belum bergabung di classroom manapun.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Penampilan yang Diikuti -->
+        <div class="card" style="padding: 1.75rem; border-radius: 16px; border: 1px solid var(--border-color); background: var(--surface-color);">
+            <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                <i class="ph ph-microphone-stage" style="color: var(--accent-color);"></i> Penampilan yang Diikuti
+            </h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                @forelse($activeJobs as $job)
+                    <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h4 style="margin: 0; font-weight: 700; font-size: 0.9rem; color: var(--text-primary);">{{ $job->title }}</h4>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: var(--text-secondary);">
+                                <i class="ph ph-map-pin" style="margin-right: 0.25rem;"></i>{{ $job->location }}
+                            </p>
+                        </div>
+                        <div style="font-size: 0.8rem; font-weight: bold; color: var(--accent-color); background: rgba(59, 130, 246, 0.1); padding: 0.35rem 0.65rem; border-radius: 8px;">
+                            <i class="ph ph-calendar" style="margin-right: 0.25rem;"></i>{{ date('d-m-Y', strtotime($job->date)) }}
                         </div>
                     </div>
-                </div>
-                <a href="/room/{{ $membership->ukm_id }}/classroom" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 10px;">
-                    Masuk Room <i class="ph ph-arrow-right"></i>
-                </a>
+                @empty
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin: 2rem 0;">Belum ada penugasan penampilan mendatang.</p>
+                @endforelse
             </div>
-            @endforeach
-            
-            @if($approvedMemberships->isEmpty())
-            <div style="text-align: center; padding: 3rem 1.5rem; background: var(--bg-color); border: 1px dashed var(--border-color); border-radius: 16px;">
-                <i class="ph ph-student text-secondary" style="font-size: 2.5rem; opacity: 0.3; margin-bottom: 0.75rem; display: block;"></i>
-                <p class="text-secondary" style="font-size: 0.875rem; margin: 0;">Anda belum bergabung secara aktif di UKM manapun.</p>
-                <a href="/member/join" class="btn" style="margin-top: 1rem; font-size: 0.8rem; font-weight: 700; background: var(--accent-light); color: var(--accent-color); border: 1px solid var(--border-color); border-radius: 8px;">Cari UKM &rarr;</a>
-            </div>
-            @endif
         </div>
+
     </div>
 
-    <!-- Right Column: Upcoming Schedules -->
-    <div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem; margin-bottom: 0 !important;">
-        <h3 class="mb-4" style="font-size: 1.1rem; font-weight: 750; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-            <i class="ph ph-clock" style="color: var(--accent-color); font-size: 1.25rem;"></i> Agenda & Jadwal Terdekat
-        </h3>
+    <!-- Right column: Rehearsal schedule & Announcements -->
+    <div class="md:col-span-1" style="display: flex; flex-direction: column;">
         
-        <div style="display: grid; gap: 0.5rem; position: relative;">
-            @foreach($upcomingEvents as $event)
-            <div class="timeline-item">
-                <div style="font-weight: 700; font-size: 0.925rem; color: var(--text-primary); line-height: 1.4;">{{ $event->title }}</div>
-                <div style="font-size: 0.75rem; color: var(--accent-color); font-weight: 700; margin-top: 0.15rem;">
-                    {{ optional($event->ukm)->name }}
-                </div>
-                <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-                    <span style="display: inline-flex; align-items: center; gap: 0.15rem;">
-                        <i class="ph ph-calendar"></i> {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}
-                    </span>
-                    @if($event->location)
-                        <span>•</span>
-                        <span style="display: inline-flex; align-items: center; gap: 0.15rem;">
-                            <i class="ph ph-map-pin"></i> {{ $event->location }}
-                        </span>
-                    @endif
-                </div>
-            </div>
-            @endforeach
+        <!-- Jadwal Latihan Terdekat -->
+        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); background: var(--surface-color);">
+            <h3 style="margin: 0 0 1rem 0; font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                <i class="ph ph-calendar-blank" style="color: var(--accent-color);"></i> Latihan Terdekat
+            </h3>
             
-            @if($upcomingEvents->isEmpty())
-            <div style="text-align: center; padding: 3rem 1.5rem; background: var(--bg-color); border: 1px dashed var(--border-color); border-radius: 16px;">
-                <i class="ph ph-calendar-blank text-secondary" style="font-size: 2.5rem; opacity: 0.3; margin-bottom: 0.75rem; display: block;"></i>
-                <p class="text-secondary" style="font-size: 0.875rem; margin: 0;">Tidak ada agenda kegiatan terdekat.</p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                @forelse($upcomingAgendas as $agenda)
+                    <div style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                        <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">{{ $agenda->title }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            <i class="ph ph-clock" style="margin-right: 0.25rem;"></i>{{ date('d-m-Y', strtotime($agenda->date)) }}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.1rem;">
+                            Waktu: {{ date('H:i', strtotime($agenda->start_time)) }} WIB
+                        </div>
+                    </div>
+                @empty
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 1rem 0;">Belum ada jadwal latihan terdekat.</p>
+                @endforelse
             </div>
-            @endif
         </div>
-    </div>
-</div>
 
-<!-- Bottom Panel: Application Status -->
-<div class="card" style="border-top: 3px solid var(--warning-color); padding: 1.5rem; margin-top: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
-        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 750; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-            <i class="ph ph-hourglass-low" style="color: var(--warning-color); font-size: 1.25rem;"></i> Status Pengajuan Gabung UKM Baru
-        </h3>
-    </div>
+        <!-- Pengumuman Terbaru -->
+        <div class="card" style="padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); background: var(--surface-color);">
+            <h3 style="margin: 0 0 1rem 0; font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                <i class="ph ph-megaphone" style="color: var(--accent-color);"></i> Pengumuman Terbaru
+            </h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                @forelse($announcements as $announce)
+                    <div style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                        <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">{{ $announce->title }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.3;">{{ Str::limit(strip_tags($announce->content), 80) }}</div>
+                        <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.5rem; text-align: right;">{{ $announce->created_at->diffForHumans() }}</div>
+                    </div>
+                @empty
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 1rem 0;">Belum ada pengumuman terbaru.</p>
+                @endforelse
+            </div>
+        </div>
 
-    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-        <table class="table" style="font-size: 0.85rem;">
-            <thead>
-                <tr>
-                    <th>Nama UKM</th>
-                    <th>Peran Dituju</th>
-                    <th>Tanggal Pengajuan</th>
-                    <th>Status Review</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($pendingMemberships as $membership)
-                <tr>
-                    <td style="font-weight: 750; color: var(--text-primary);">{{ $membership->ukm->name }}</td>
-                    <td>
-                        <span class="badge badge-info" style="font-size: 0.7rem; font-weight: 700;">Anggota</span>
-                    </td>
-                    <td style="color: var(--text-secondary);">
-                        {{ $membership->created_at ? $membership->created_at->format('d M Y') : '-' }}
-                    </td>
-                    <td>
-                        <span class="badge badge-warning" style="font-size: 0.7rem; font-weight: 700; background: #fff8e6; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);">
-                            Dalam Review Pengurus
-                        </span>
-                    </td>
-                </tr>
-                @endforeach
-                
-                @if($pendingMemberships->isEmpty())
-                <tr>
-                    <td colspan="4" class="text-secondary text-center py-6" style="font-style: italic;">
-                        Tidak ada pendaftaran UKM yang sedang ditinjau.
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
     </div>
 </div>
 @endsection

@@ -4,13 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
     public function showRegister()
     {
+        if (Auth::check()) {
+            return redirect('/');
+        }
         return view('auth.register');
     }
 
@@ -19,19 +24,20 @@ class RegisterController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'faculty' => 'required|string',
             'password' => 'required|min:6|confirmed',
         ]);
+
+        $anggotaRole = Role::where('name', 'anggota')->first();
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'faculty' => $data['faculty'],
             'password' => Hash::make($data['password']),
-            'role' => 'user',
+            'role_id' => $anggotaRole->id,
+            'status' => 'active',
         ]);
 
-        auth()->login($user);
+        Auth::login($user);
 
         return redirect('/member/dashboard');
     }

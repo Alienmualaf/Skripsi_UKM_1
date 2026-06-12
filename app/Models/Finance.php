@@ -2,92 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Finance extends Model
 {
-    use HasFactory;
-
-    /**
-     * Mass assignable
-     */
     protected $fillable = [
-        'ukm_id',
-        'created_by',
-        'title',
+        'finance_category_id',
         'type',
         'amount',
+        'title',
         'description',
         'transaction_date',
-        'event_id',
-        'validation_status',
-        'validation_notes',
+        'receipt_file',
+        'used_for',
+        'program_id',
     ];
 
-    /**
-     * Casting
-     */
-    protected $casts = [
-        'transaction_date' => 'date',
-        'amount' => 'decimal:2',
-    ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
-
-    // transaksi milik 1 UKM
-    public function ukm()
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(UKM::class, 'ukm_id');
+        return $this->belongsTo(FinanceCategory::class, 'finance_category_id');
     }
 
-    public function creator()
+    public function program(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function event()
-    {
-        return $this->belongsTo(Event::class);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | HELPER METHODS
-    |--------------------------------------------------------------------------
-    */
-
-    // cek pemasukan
-    public function isIncome()
-    {
-        return $this->type === 'income';
-    }
-
-    // cek pengeluaran
-    public function isExpense()
-    {
-        return $this->type === 'expense';
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES (BIAR QUERY MUDAH)
-    |--------------------------------------------------------------------------
-    */
-
-    // hanya pemasukan
-    public function scopeIncome($query)
-    {
-        return $query->where('type', 'income');
-    }
-
-    // hanya pengeluaran
-    public function scopeExpense($query)
-    {
-        return $query->where('type', 'expense');
+        return $this->belongsTo(Program::class);
     }
 }

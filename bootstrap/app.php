@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'membership' => \App\Http\Middleware\CheckMembership::class,
             'admin_ukm' => \App\Http\Middleware\AdminUKMMiddleware::class,
         ]);
+        $middleware->appendToGroup('web', \App\Http\Middleware\SmartRedirect::class);
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

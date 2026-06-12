@@ -14,7 +14,7 @@
     </a>
 </div>
 
-<div class="card" style="border-top: 3px solid var(--accent-color); padding: 1.5rem;">
+<div class="card" style="padding: 1.5rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
         <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-house-line" style="color: var(--accent-color);"></i> Keseluruhan UKM Terdaftar
