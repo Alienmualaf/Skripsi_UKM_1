@@ -122,9 +122,10 @@
                             <i class="ph ph-gear"></i> Pengaturan Website
                         </a>
                     </li>
+                @endif
 
                 <!-- 2. ADMIN UKM SIDEBAR -->
-                @elseif($u->isAdminUkm())
+                @if($u->isAdminUkm() || $u->isSuperAdmin())
                     <li class="nav-section-title">Menu Admin UKM</li>
                     <li class="nav-item">
                         <a href="/ukm/dashboard" class="{{ request()->is('ukm/dashboard') ? 'active' : '' }}">
@@ -194,9 +195,10 @@
                             <i class="ph ph-folders"></i> Materi Latihan
                         </a>
                     </li>
+                @endif
 
                 <!-- 3. PENGURUS SIDEBAR (Dinamis berdasarkan Divisi) -->
-                @elseif($u->isPengurus())
+                @if($u->isPengurus() && !$u->isSuperAdmin() && !$u->isAdminUkm())
                     <li class="nav-section-title">Menu Pengurus</li>
                     <li class="nav-item">
                         <a href="/pengurus/dashboard" class="{{ request()->is('pengurus/dashboard') ? 'active' : '' }}">
@@ -244,9 +246,10 @@
                     {{-- Selalu tampil (laporan) --}}
                     <li class="nav-section-title">Laporan</li>
                     <li class="nav-item"><a href="/ukm/reports" class="{{ request()->is('ukm/reports*') ? 'active' : '' }}"><i class="ph ph-file-chart-bar"></i> Pusat Laporan</a></li>
+                @endif
 
                 <!-- 4. ANGGOTA SIDEBAR -->
-                @elseif($u->isAnggota())
+                @if($u->isAnggota() && !$u->isSuperAdmin() && !$u->isAdminUkm() && !$u->isPengurus())
                     <li class="nav-section-title">Menu Anggota</li>
                     <li class="nav-item">
                         <a href="/member/dashboard" class="{{ request()->is('member/dashboard') ? 'active' : '' }}">

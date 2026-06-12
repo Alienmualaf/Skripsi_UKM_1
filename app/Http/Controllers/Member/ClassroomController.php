@@ -24,6 +24,10 @@ class ClassroomController extends Controller
         $member = $user->member;
 
         if (!$member) {
+            if ($user->isSuperAdmin()) {
+                $classrooms = Classroom::with(['performance'])->get();
+                return view('member.classroom.index', compact('classrooms'));
+            }
             return redirect()->route('member.dashboard')->with('error', 'Profil anggota tidak ditemukan.');
         }
 
@@ -41,7 +45,7 @@ class ClassroomController extends Controller
         $user = Auth::user();
         $member = $user->member;
 
-        if (!$member) {
+        if (!$member && !$user->isSuperAdmin()) {
             abort(403, 'Akses ditolak.');
         }
 
@@ -49,7 +53,7 @@ class ClassroomController extends Controller
             ->findOrFail($classroomId);
 
         // Validasi keikutsertaan anggota di classroom tersebut
-        if (!$classroom->members()->where('member_id', $member->id)->exists()) {
+        if (!$user->isSuperAdmin() && (!$member || !$classroom->members()->where('member_id', $member->id)->exists())) {
             abort(403, 'Anda bukan peserta di classroom ini.');
         }
 
@@ -73,7 +77,9 @@ class ClassroomController extends Controller
         // Load absensi khusus untuk member ini
         $attendances = $classroom->attendances()
             ->with(['details' => function ($q) use ($member) {
-                $q->where('member_id', $member->id);
+                if ($member) {
+                    $q->where('member_id', $member->id);
+                }
             }])
             ->orderBy('date', 'desc')
             ->get();

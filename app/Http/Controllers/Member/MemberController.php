@@ -23,7 +23,18 @@ class MemberController extends Controller
         $member = $user->member;
 
         if (!$member) {
-            return redirect('/')->with('error', 'Profil anggota tidak ditemukan.');
+            if ($user->isSuperAdmin()) {
+                $member = Member::first() ?? new Member([
+                    'name' => $user->name,
+                    'birth_place' => 'Jakarta',
+                    'birth_date' => '2000-01-01',
+                    'address' => 'Pancasila University',
+                    'phone' => '08123456789',
+                    'status' => 'Anggota Aktif'
+                ]);
+            } else {
+                return redirect('/')->with('error', 'Profil anggota tidak ditemukan.');
+            }
         }
 
         $classroomIds = $member->classrooms()->pluck('classrooms.id')->toArray();
@@ -63,14 +74,29 @@ class MemberController extends Controller
      */
     public function profile()
     {
-        $member = auth()->user()->member;
+        $user = auth()->user();
+        $member = $user->member;
+        if (!$member && $user->isSuperAdmin()) {
+            $member = Member::first() ?? new Member([
+                'name' => $user->name,
+                'birth_place' => 'Jakarta',
+                'birth_date' => '2000-01-01',
+                'address' => 'Pancasila University',
+                'phone' => '08123456789',
+                'status' => 'Anggota Aktif'
+            ]);
+        }
         $classifications = VoiceClassification::all();
         return view('member.profile', compact('member', 'classifications'));
     }
 
     public function updateProfile(Request $request)
     {
-        $member = auth()->user()->member;
+        $user = auth()->user();
+        $member = $user->member;
+        if (!$member && $user->isSuperAdmin()) {
+            $member = Member::first();
+        }
 
         $data = $request->validate([
             'birth_place' => 'required|string|max:100',
@@ -85,7 +111,9 @@ class MemberController extends Controller
             $data['photo'] = $path;
         }
 
-        $member->update($data);
+        if ($member) {
+            $member->update($data);
+        }
 
         return back()->with('success', 'Profil Anda berhasil diperbarui.');
     }

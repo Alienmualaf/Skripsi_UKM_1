@@ -65,7 +65,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 | Administrator Routes (Role: administrator)
 |--------------------------------------------------------------------------
 */
+Route::redirect('/admin', '/admin/dashboard');
 Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.')->group(function () {
+    Route::get('/', function() { return redirect()->route('admin.dashboard'); });
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     
     // User management
@@ -114,7 +116,9 @@ Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.
 | Admin UKM Routes (Role: admin_ukm)
 |--------------------------------------------------------------------------
 */
+Route::redirect('/ukm', '/ukm/dashboard');
 Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name('ukm.')->group(function () {
+    Route::get('/', function() { return redirect()->route('ukm.dashboard'); });
     Route::get('/dashboard', [UKMAdminController::class, 'dashboard'])->name('dashboard');
     
     // Profil UKM
@@ -187,7 +191,9 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator,pengurus
 | Pengurus UKM Routes (Role: pengurus, admin_ukm, administrator)
 |--------------------------------------------------------------------------
 */
+Route::redirect('/pengurus', '/pengurus/dashboard');
 Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administrator'])->name('pengurus.')->group(function () {
+    Route::get('/', function() { return redirect()->route('pengurus.dashboard'); });
     Route::get('/dashboard', [UKMDashboard::class, 'dashboard'])->name('dashboard');
 
     // Pelatih — Pengurus bisa tambah, edit, dan hapus
