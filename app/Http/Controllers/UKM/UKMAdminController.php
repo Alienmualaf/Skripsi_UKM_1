@@ -343,13 +343,9 @@ class UKMAdminController extends Controller
             $voiceClass = VoiceClassification::find($voiceClassId);
             $voiceClassName = $voiceClass ? $voiceClass->name : 'Sopran';
 
-            // Generate temporary password
-            $tempPassword = 'PSUP-' . strtoupper(\Illuminate\Support\Str::random(6));
-
-            // Update user status & password
+            // Update user status
             if ($user) {
                 $user->update([
-                    'password' => Hash::make($tempPassword),
                     'status' => 'active',
                 ]);
             }
@@ -361,10 +357,10 @@ class UKMAdminController extends Controller
             ]);
 
             // 2. Send WhatsApp Notification
-            $waMessage = "Halo {$member->name}, Selamat bergabung di Paduan Suara Universitas Pancasila (PSUP)! Anda diterima sebagai anggota dengan klasifikasi suara: {$voiceClassName}. Silakan login ke sistem menggunakan email: {$member->email} dan password sementara: {$tempPassword} di " . url('/login') . ". Harap segera lengkapi profil Anda setelah login pertama. Terima kasih.";
+            $waMessage = "Halo {$member->name}, Selamat bergabung di Paduan Suara Universitas Pancasila (PSUP)! Anda diterima sebagai anggota dengan klasifikasi suara: {$voiceClassName}. Silakan login ke sistem menggunakan email: {$member->email} dan password yang telah Anda daftarkan saat pendaftaran di " . url('/login') . ". Harap segera lengkapi profil Anda setelah login pertama. Terima kasih.";
             NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
 
-            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota aktif & notifikasi WhatsApp dikirim.");
+            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota diaktifkan & notifikasi WhatsApp dikirim.");
         } else {
             // Update user status
             if ($user) {

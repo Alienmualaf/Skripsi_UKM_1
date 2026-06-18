@@ -85,7 +85,14 @@ class RecruitmentNotificationTest extends TestCase
         $this->assertEquals('success', $waLog->status);
         $this->assertEquals('081234567899', $waLog->recipient);
         $this->assertStringContainsString('Tenor', $waLog->content);
-        $this->assertStringContainsString('PSUP-', $waLog->content); // Temporary password format
+        $this->assertStringContainsString('password yang telah Anda daftarkan', $waLog->content);
+
+        // Verify we can log in using the original password
+        $loginResponse = $this->post(route('login'), [
+            'email' => 'budi.prasetyo@example.com',
+            'password' => 'password',
+        ]);
+        $loginResponse->assertRedirect();
     }
 
     /** @test */
