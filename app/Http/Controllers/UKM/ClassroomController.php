@@ -427,7 +427,7 @@ class ClassroomController extends Controller
 
     public function showJobAttendance($jobId, $attendanceId)
     {
-        $job = Job::findOrFail($jobId);
+        $job = Performance::whereNull('program_id')->findOrFail($jobId);
         $classroom = $job->classroom;
         $attendance = Attendance::with('details.member')->where('classroom_id', $classroom->id)->findOrFail($attendanceId);
 

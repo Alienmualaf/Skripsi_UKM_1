@@ -166,65 +166,39 @@ td {
 </div>
 
 <div class="section">
-    <div class="section-title">Detail Pemasukan</div>
+    <div class="section-title">Detail Transaksi Keuangan</div>
     <table>
         <thead>
             <tr>
                 <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 20%;">Tanggal</th>
-                <th>Keterangan Transaksi / Kegiatan</th>
-                <th class="text-right" style="width: 25%;">Jumlah</th>
+                <th style="width: 12%;">Tanggal</th>
+                <th style="width: 12%;">Jenis</th>
+                <th style="width: 20%;">Transaksi</th>
+                <th style="width: 12%;">Kategori</th>
+                <th style="width: 15%;">Digunakan Untuk</th>
+                <th>Deskripsi</th>
+                <th class="text-right" style="width: 15%;">Jumlah</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($finances->where('type','income') as $i => $f)
+            @forelse($finances as $index => $f)
             <tr>
-                <td style="text-align: center;">{{ $loop->iteration }}</td>
+                <td style="text-align: center;">{{ $index + 1 }}</td>
                 <td>{{ date('d-m-Y', strtotime($f->transaction_date)) }}</td>
+                <td>{{ $f->type === 'income' ? 'Pemasukan' : 'Pengeluaran' }}</td>
                 <td>{{ $f->title }}</td>
-                <td class="text-right" style="font-weight: bold;">Rp {{ number_format($f->amount, 0, ',', '.') }}</td>
+                <td>{{ $f->category->name ?? '-' }}</td>
+                <td>{{ $f->used_for === 'Program Kerja' ? ($f->program->name ?? '-') : 'Umum' }}</td>
+                <td>{{ $f->description ?? '-' }}</td>
+                <td class="text-right" style="font-weight: bold;">
+                    {{ $f->type === 'income' ? '+' : '-' }}Rp {{ number_format($f->amount, 0, ',', '.') }}
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" style="text-align: center; font-style: italic;">Tidak ada data pemasukan.</td>
+                <td colspan="8" style="text-align: center; font-style: italic;">Tidak ada data transaksi keuangan.</td>
             </tr>
             @endforelse
-            <tr style="background: #f2f2f2; font-weight: bold;">
-                <td colspan="3">Total Pemasukan</td>
-                <td class="text-right">Rp {{ number_format($income, 0, ',', '.') }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<div class="section">
-    <div class="section-title">Detail Pengeluaran</div>
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 20%;">Tanggal</th>
-                <th>Keterangan Transaksi / Kegiatan</th>
-                <th class="text-right" style="width: 25%;">Jumlah</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($finances->where('type','expense') as $f)
-            <tr>
-                <td style="text-align: center;">{{ $loop->iteration }}</td>
-                <td>{{ date('d-m-Y', strtotime($f->transaction_date)) }}</td>
-                <td>{{ $f->title }}</td>
-                <td class="text-right" style="font-weight: bold;">Rp {{ number_format($f->amount, 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="4" style="text-align: center; font-style: italic;">Tidak ada data pengeluaran.</td>
-            </tr>
-            @endforelse
-            <tr style="background: #f2f2f2; font-weight: bold;">
-                <td colspan="3">Total Pengeluaran</td>
-                <td class="text-right">Rp {{ number_format($expense, 0, ',', '.') }}</td>
-            </tr>
         </tbody>
     </table>
 </div>

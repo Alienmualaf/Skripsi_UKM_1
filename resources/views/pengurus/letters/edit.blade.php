@@ -22,11 +22,9 @@
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Jenis / Tipe Surat</label>
             <select name="type" class="form-control" required style="padding: 0.65rem;">
                 <option value="">-- Pilih Jenis Surat --</option>
-                <option value="Surat Tugas" {{ old('type', $letter->type) === 'Surat Tugas' ? 'selected' : '' }}>Surat Tugas</option>
-                <option value="Surat Permohonan" {{ old('type', $letter->type) === 'Surat Permohonan' ? 'selected' : '' }}>Surat Permohonan</option>
-                <option value="Surat Undangan" {{ old('type', $letter->type) === 'Surat Undangan' ? 'selected' : '' }}>Surat Undangan</option>
-                <option value="Surat Peminjaman" {{ old('type', $letter->type) === 'Surat Peminjaman' ? 'selected' : '' }}>Surat Peminjaman</option>
-                <option value="Surat Keterangan" {{ old('type', $letter->type) === 'Surat Keterangan' ? 'selected' : '' }}>Surat Keterangan</option>
+                @foreach($types as $t)
+                    <option value="{{ $t }}" {{ old('type', $letter->type) === $t ? 'selected' : '' }}>{{ $t }}</option>
+                @endforeach
             </select>
             @error('type') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>

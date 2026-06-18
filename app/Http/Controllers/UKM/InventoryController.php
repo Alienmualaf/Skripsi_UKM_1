@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UKM;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\InventoryLoan;
+use App\Models\InventoryCategory;
 use App\Models\Member;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,8 @@ class InventoryController extends Controller
     public function create()
     {
         $programs = \App\Models\Program::active()->get();
-        return view('pengurus.inventories.create', compact('programs'));
+        $categories = InventoryCategory::pluck('name')->toArray();
+        return view('pengurus.inventories.create', compact('programs', 'categories'));
     }
 
     public function store(Request $request)
@@ -27,7 +29,7 @@ class InventoryController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:inventories,code',
-            'category' => 'required|in:Kostum,Alat Musik,Sound System,Perlengkapan Latihan,Perlengkapan Acara',
+            'category' => 'required|exists:inventory_categories,name',
             'condition' => 'required|in:Baik,Rusak,Hilang',
             'quantity' => 'required|integer|min:1',
             'storage_location' => 'required|string|max:255',
@@ -48,7 +50,8 @@ class InventoryController extends Controller
     {
         $inventory = Inventory::findOrFail($id);
         $programs = \App\Models\Program::active()->get();
-        return view('pengurus.inventories.edit', compact('inventory', 'programs'));
+        $categories = InventoryCategory::pluck('name')->toArray();
+        return view('pengurus.inventories.edit', compact('inventory', 'programs', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -58,7 +61,7 @@ class InventoryController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:inventories,code,'.$id,
-            'category' => 'required|in:Kostum,Alat Musik,Sound System,Perlengkapan Latihan,Perlengkapan Acara',
+            'category' => 'required|exists:inventory_categories,name',
             'condition' => 'required|in:Baik,Rusak,Hilang',
             'quantity' => 'required|integer|min:1',
             'storage_location' => 'required|string|max:255',

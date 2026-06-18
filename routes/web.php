@@ -22,10 +22,10 @@ use App\Http\Controllers\UKM\DashboardController as UKMDashboard;
 use App\Http\Controllers\UKM\ProgramController;
 use App\Http\Controllers\UKM\TrainerController;
 use App\Http\Controllers\UKM\JobController;
-use App\Http\Controllers\UKM\AttendanceController;
 use App\Http\Controllers\UKM\InventoryController;
 use App\Http\Controllers\UKM\FinanceController;
 use App\Http\Controllers\UKM\LetterController;
+use App\Http\Controllers\UKM\CategoryController;
 use App\Http\Controllers\UKM\MaterialController;
 use App\Http\Controllers\UKM\PerformanceController;
 use App\Http\Controllers\UKM\ClassroomController;
@@ -95,12 +95,12 @@ Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.
     Route::get('/logs/login', [AdminDashboard::class, 'loginHistory'])->name('logs.login');
     Route::get('/logs/audit', [AdminDashboard::class, 'auditTrail'])->name('logs.audit');
     
-    // Monitoring Data Organisasi
     Route::get('/monitor/members', [AdminDashboard::class, 'monitorMembers'])->name('monitor.members');
     Route::get('/monitor/agendas', [AdminDashboard::class, 'monitorAgendas'])->name('monitor.agendas');
     Route::get('/monitor/keuangan', [AdminDashboard::class, 'monitorKeuangan'])->name('monitor.keuangan');
+    Route::get('/monitor/letters', [AdminDashboard::class, 'monitorLetters'])->name('monitor.letters');
     Route::get('/monitor/inventaris', [AdminDashboard::class, 'monitorInventaris'])->name('monitor.inventaris');
-    Route::get('/monitor/jobs', [AdminDashboard::class, 'monitorJobs'])->name('monitor.jobs');
+    Route::get('/monitor/materials', [AdminDashboard::class, 'monitorMaterials'])->name('monitor.materials');
     
     // Override Actions
     Route::post('/monitor/override/{model}/{id}', [AdminDashboard::class, 'overrideUpdate'])->name('monitor.override.update');
@@ -134,6 +134,10 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name
     // Registrasi Anggota (Recruitment)
     Route::get('/registrations', [UKMAdminController::class, 'registrations'])->name('registrations');
     Route::post('/registrations/{id}/verify', [UKMAdminController::class, 'verifyRegistration'])->name('registrations.verify');
+    
+    // Riwayat Email
+    Route::get('/email-logs', [UKMAdminController::class, 'emailLogs'])->name('email-logs');
+    Route::post('/email-logs/{id}/resend', [UKMAdminController::class, 'resendEmail'])->name('email-logs.resend');
     
     // Pelatih — Admin UKM hanya bisa lihat & edit (tidak bisa tambah/hapus)
     Route::get('/trainers', [UKMAdminController::class, 'index'])->name('trainers.index');
@@ -266,11 +270,6 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
     
     // Keuangan
     Route::resource('finances', FinanceController::class);
-    Route::resource('finance-categories', FinanceController::class)->names([
-        'index'   => 'finance-categories.index',
-        'store'   => 'finance-categories.store',
-        'destroy' => 'finance-categories.destroy'
-    ]);
     
     // Persuratan
     Route::resource('letters', LetterController::class);
@@ -289,6 +288,20 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
     Route::post('/materials', [MaterialController::class, 'storeMaterial'])->name('materials.store');
     Route::delete('/materials/{id}', [MaterialController::class, 'deleteMaterial'])->name('materials.destroy');
     Route::get('/materials/{id}/download', [MaterialController::class, 'download'])->name('materials.download');
+
+    // Category Management
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories/finance', [CategoryController::class, 'storeFinance'])->name('categories.finance.store');
+    Route::put('/categories/finance/{id}', [CategoryController::class, 'updateFinance'])->name('categories.finance.update');
+    Route::delete('/categories/finance/{id}', [CategoryController::class, 'destroyFinance'])->name('categories.finance.destroy');
+
+    Route::post('/categories/letter', [CategoryController::class, 'storeLetter'])->name('categories.letter.store');
+    Route::put('/categories/letter/{id}', [CategoryController::class, 'updateLetter'])->name('categories.letter.update');
+    Route::delete('/categories/letter/{id}', [CategoryController::class, 'destroyLetter'])->name('categories.letter.destroy');
+
+    Route::post('/categories/inventory', [CategoryController::class, 'storeInventory'])->name('categories.inventory.store');
+    Route::put('/categories/inventory/{id}', [CategoryController::class, 'updateInventory'])->name('categories.inventory.update');
+    Route::delete('/categories/inventory/{id}', [CategoryController::class, 'destroyInventory'])->name('categories.inventory.destroy');
 });
 
 /*

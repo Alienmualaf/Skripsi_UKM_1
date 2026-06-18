@@ -58,16 +58,22 @@
                     </td>
                     <td>
                         @if($reg->status === 'Pending')
-                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                            <form action="{{ route('ukm.registrations.verify', $reg->id) }}" method="POST" style="display: inline-block;">
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem; justify-content: center; align-items: stretch; width: 100%;">
+                            <form action="{{ route('ukm.registrations.verify', $reg->id) }}" method="POST" style="display: flex; flex-direction: column; gap: 0.25rem;">
                                 @csrf
                                 <input type="hidden" name="action" value="Terima">
-                                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-check"></i> Terima</button>
+                                <select name="voice_classification_id" required style="padding: 0.4rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.75rem; background: var(--surface-color); color: var(--text-primary); font-weight: 600; width: 100%; cursor: pointer;">
+                                    <option value="" disabled selected>Pilih Suara</option>
+                                    @foreach($voiceClassifications as $vc)
+                                        <option value="{{ $vc->id }}">{{ $vc->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700;"><i class="ph ph-check"></i> Setujui</button>
                             </form>
-                            <form action="{{ route('ukm.registrations.verify', $reg->id) }}" method="POST" style="display: inline-block;">
+                            <form action="{{ route('ukm.registrations.verify', $reg->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="action" value="Tolak">
-                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-x"></i> Tolak</button>
+                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 700; width: 100%;"><i class="ph ph-x"></i> Tolak</button>
                             </form>
                         </div>
                         @else

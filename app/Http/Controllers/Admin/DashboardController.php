@@ -424,17 +424,22 @@ class DashboardController extends Controller
     {
         $inventories = Inventory::paginate(10, ['*'], 'inventories_page');
         $loans = InventoryLoan::with(['inventory', 'member'])->paginate(10, ['*'], 'loans_page');
-        $materials = Material::with('uploader')->paginate(10, ['*'], 'materials_page');
-        return view('admin.monitor.inventaris', compact('inventories', 'loans', 'materials'));
+        return view('admin.monitor.inventaris', compact('inventories', 'loans'));
     }
 
-    public function monitorJobs()
+    public function monitorMaterials()
     {
-        $jobs = Job::paginate(10, ['*'], 'jobs_page');
-        $letters = Letter::paginate(10, ['*'], 'letters_page');
-        $attendances = Attendance::withCount('details')->paginate(10, ['*'], 'attendances_page');
-        return view('admin.monitor.jobs', compact('jobs', 'letters', 'attendances'));
+        $materials = Material::with('uploader')->paginate(10, ['*'], 'materials_page');
+        return view('admin.monitor.materials', compact('materials'));
     }
+
+    public function monitorLetters()
+    {
+        $letters = Letter::paginate(10, ['*'], 'letters_page');
+        return view('admin.monitor.letters', compact('letters'));
+    }
+
+
 
     // Master Override Actions
     public function overrideDelete($model, $id)

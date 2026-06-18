@@ -16,6 +16,8 @@ use App\Models\Registration;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Announcement;
+use App\Models\EmailLog;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -322,7 +324,8 @@ class UKMAdminController extends Controller
     public function registrations()
     {
         $registrations = Registration::latest()->paginate(15);
-        return view('ukm.registrations.index', compact('registrations'));
+        $voiceClassifications = VoiceClassification::all();
+        return view('ukm.registrations.index', compact('registrations', 'voiceClassifications'));
     }
 
     public function verifyRegistration(Request $request, $id)
@@ -331,15 +334,22 @@ class UKMAdminController extends Controller
         $action = $request->input('action'); // Terima, Tolak
 
         if ($action === 'Terima') {
+            $voiceClassId = $request->input('voice_classification_id');
+            $voiceClass = VoiceClassification::find($voiceClassId);
+            $voiceClassName = $voiceClass ? $voiceClass->name : 'Sopran';
+
             $registration->status = 'Terima';
             $registration->save();
+
+            // Password sementara
+            $tempPassword = 'PSUP-' . strtoupper(\Illuminate\Support\Str::random(6));
 
             // Create user
             $roleAnggota = Role::where('name', 'anggota')->first();
             $user = User::create([
                 'name' => $registration->name,
                 'email' => $registration->email,
-                'password' => $registration->password ?? Hash::make('password'),
+                'password' => Hash::make($tempPassword),
                 'role_id' => $roleAnggota->id,
                 'status' => 'active',
             ]);
@@ -360,14 +370,136 @@ class UKMAdminController extends Controller
                 'email' => $registration->email,
                 'photo' => $registration->photo,
                 'status' => 'Anggota Aktif',
+                'voice_classification_id' => $voiceClassId,
             ]);
 
-            return back()->with('success', "Pendaftaran {$registration->name} diterima. Akun anggota telah dibuat.");
+            // Prepare Email Data
+            $emailData = [
+                'name' => $registration->name,
+                'voice_classification' => $voiceClassName,
+                'email' => $registration->email,
+                'password' => $tempPassword,
+                'login_url' => url('/login'),
+            ];
+
+            $subject = 'Selamat bergabung di Paduan Suara Universitas Pancasila!';
+
+            // Render email content to save in log
+            try {
+                $content = view('emails.accepted', $emailData)->render();
+
+                // Send email
+                Mail::send('emails.accepted', $emailData, function($message) use ($registration, $subject) {
+                    $message->to($registration->email, $registration->name)
+                            ->subject($subject);
+                });
+
+                // Log email
+                EmailLog::create([
+                    'registration_id' => $registration->id,
+                    'recipient_email' => $registration->email,
+                    'recipient_name' => $registration->name,
+                    'subject' => $subject,
+                    'content' => $content,
+                    'status' => 'success',
+                ]);
+
+                $emailMsg = "Email pemberitahuan berhasil dikirim.";
+            } catch (\Exception $e) {
+                $content = isset($content) ? $content : 'Failed to render email accepted template.';
+
+                EmailLog::create([
+                    'registration_id' => $registration->id,
+                    'recipient_email' => $registration->email,
+                    'recipient_name' => $registration->name,
+                    'subject' => $subject,
+                    'content' => $content,
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                ]);
+
+                $emailMsg = "Gagal mengirim email: " . $e->getMessage();
+            }
+
+            return back()->with('success', "Pendaftaran {$registration->name} diterima. Akun anggota telah dibuat. {$emailMsg}");
         } else {
             $registration->status = 'Tolak';
             $registration->save();
 
-            return back()->with('success', "Pendaftaran {$registration->name} ditolak.");
+            // Prepare Rejection Email
+            $emailData = [
+                'name' => $registration->name,
+            ];
+
+            $subject = 'Pemberitahuan Hasil Pendaftaran - Paduan Suara Universitas Pancasila';
+
+            try {
+                $content = view('emails.rejected', $emailData)->render();
+
+                Mail::send('emails.rejected', $emailData, function($message) use ($registration, $subject) {
+                    $message->to($registration->email, $registration->name)
+                            ->subject($subject);
+                });
+
+                EmailLog::create([
+                    'registration_id' => $registration->id,
+                    'recipient_email' => $registration->email,
+                    'recipient_name' => $registration->name,
+                    'subject' => $subject,
+                    'content' => $content,
+                    'status' => 'success',
+                ]);
+
+                $emailMsg = "Email penolakan berhasil dikirim.";
+            } catch (\Exception $e) {
+                $content = isset($content) ? $content : 'Failed to render email rejected template.';
+
+                EmailLog::create([
+                    'registration_id' => $registration->id,
+                    'recipient_email' => $registration->email,
+                    'recipient_name' => $registration->name,
+                    'subject' => $subject,
+                    'content' => $content,
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                ]);
+
+                $emailMsg = "Gagal mengirim email penolakan: " . $e->getMessage();
+            }
+
+            return back()->with('success', "Pendaftaran {$registration->name} ditolak. {$emailMsg}");
+        }
+    }
+
+    public function emailLogs()
+    {
+        $logs = EmailLog::latest()->paginate(15);
+        return view('ukm.email_logs.index', compact('logs'));
+    }
+
+    public function resendEmail($id)
+    {
+        $log = EmailLog::findOrFail($id);
+
+        try {
+            Mail::html($log->content, function($message) use ($log) {
+                $message->to($log->recipient_email, $log->recipient_name)
+                        ->subject($log->subject);
+            });
+
+            $log->update([
+                'status' => 'success',
+                'error_message' => null,
+            ]);
+
+            return back()->with('success', 'Email berhasil dikirim ulang.');
+        } catch (\Exception $e) {
+            $log->update([
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Gagal mengirim ulang email: ' . $e->getMessage());
         }
     }
 

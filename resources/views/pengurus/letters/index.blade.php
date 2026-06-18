@@ -37,11 +37,9 @@
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Jenis Surat</label>
             <select name="type" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
                 <option value="">Semua Jenis</option>
-                <option value="Surat Tugas" {{ request('type') === 'Surat Tugas' ? 'selected' : '' }}>Surat Tugas</option>
-                <option value="Surat Permohonan" {{ request('type') === 'Surat Permohonan' ? 'selected' : '' }}>Surat Permohonan</option>
-                <option value="Surat Undangan" {{ request('type') === 'Surat Undangan' ? 'selected' : '' }}>Surat Undangan</option>
-                <option value="Surat Peminjaman" {{ request('type') === 'Surat Peminjaman' ? 'selected' : '' }}>Surat Peminjaman</option>
-                <option value="Surat Keterangan" {{ request('type') === 'Surat Keterangan' ? 'selected' : '' }}>Surat Keterangan</option>
+                @foreach($types as $t)
+                    <option value="{{ $t }}" {{ request('type') === $t ? 'selected' : '' }}>{{ $t }}</option>
+                @endforeach
             </select>
         </div>
 

@@ -96,41 +96,63 @@
     </div>
 </div>
 
-{{-- Transaction Tables --}}
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-    {{-- Income --}}
-    <div class="card" style="padding:1.25rem;">
-        <h5 style="font-weight:800;font-size:0.95rem;margin:0 0 1rem;color:#10b981;"><i class="ph ph-trend-up"></i> Pemasukan</h5>
-        <table class="table" style="font-size:0.8rem;">
-            <thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right;">Jumlah</th></tr></thead>
-            <tbody>
-                @forelse($finances->where('type','income') as $f)
+{{-- Transaction Table --}}
+<div class="card" style="padding:1.5rem;">
+    <h5 style="font-weight:800;font-size:1.1rem;margin:0 0 1.25rem;display:flex;align-items:center;gap:0.5rem;color:var(--text-primary);">
+        <i class="ph ph-list-bullets" style="color:var(--accent-color);"></i> Daftar Transaksi Keuangan
+    </h5>
+    <div class="table-wrapper" style="margin-bottom:0;border:none;padding:0;box-shadow:none;">
+        <table class="table" style="font-size:0.875rem;">
+            <thead>
                 <tr>
-                    <td>{{ date('d/m/Y', strtotime($f->transaction_date)) }}</td>
-                    <td>{{ $f->title }}</td>
-                    <td style="text-align:right;font-weight:700;color:#10b981;">Rp {{ number_format($f->amount, 0, ',', '.') }}</td>
+                    <th>Tanggal</th>
+                    <th>Jenis</th>
+                    <th>Transaksi</th>
+                    <th>Kategori</th>
+                    <th>Digunakan Untuk</th>
+                    <th>Deskripsi</th>
+                    <th style="text-align:right;">Nominal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($finances as $f)
+                <tr>
+                    <td style="color:var(--text-secondary);">{{ date('d/m/Y', strtotime($f->transaction_date)) }}</td>
+                    <td>
+                        @if($f->type === 'income')
+                            <span class="badge" style="background:rgba(16, 185, 129, 0.1);color:var(--success-color);border:1.5px solid rgba(16, 185, 129, 0.2);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">Pemasukan</span>
+                        @else
+                            <span class="badge" style="background:rgba(239, 68, 68, 0.1);color:var(--danger-color);border:1.5px solid rgba(239, 68, 68, 0.2);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">Pengeluaran</span>
+                        @endif
+                    </td>
+                    <td style="font-weight:700;color:var(--text-primary);">{{ $f->title }}</td>
+                    <td>
+                        <span class="badge" style="background:var(--bg-color);border:1px solid var(--border-color);color:var(--text-secondary);font-weight:600;font-size:0.7rem;padding:0.25rem 0.5rem;">
+                            {{ $f->category->name ?? '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        @if($f->used_for === 'Program Kerja')
+                            <span class="badge" style="background:rgba(30,64,175,0.06);color:var(--accent-color);border:1px solid rgba(30,64,175,0.12);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">
+                                Proker: {{ $f->program->name ?? '-' }}
+                            </span>
+                        @else
+                            <span class="badge" style="background:rgba(100,116,139,0.06);color:var(--text-secondary);border:1px solid rgba(100,116,139,0.12);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">
+                                Umum
+                            </span>
+                        @endif
+                    </td>
+                    <td style="color:var(--text-secondary);max-width:250px;white-space:normal;word-break:break-word;font-size:0.8125rem;">
+                        {{ $f->description ?? '-' }}
+                    </td>
+                    <td style="text-align:right;font-weight:800;color:{{ $f->type === 'income' ? 'var(--success-color)' : 'var(--danger-color)' }};">
+                        {{ $f->type === 'income' ? '+' : '-' }}Rp {{ number_format($f->amount, 0, ',', '.') }}
+                    </td>
                 </tr>
                 @empty
-                <tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Tidak ada data.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Expense --}}
-    <div class="card" style="padding:1.25rem;">
-        <h5 style="font-weight:800;font-size:0.95rem;margin:0 0 1rem;color:#ef4444;"><i class="ph ph-trend-down"></i> Pengeluaran</h5>
-        <table class="table" style="font-size:0.8rem;">
-            <thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right;">Jumlah</th></tr></thead>
-            <tbody>
-                @forelse($finances->where('type','expense') as $f)
                 <tr>
-                    <td>{{ date('d/m/Y', strtotime($f->transaction_date)) }}</td>
-                    <td>{{ $f->title }}</td>
-                    <td style="text-align:right;font-weight:700;color:#ef4444;">Rp {{ number_format($f->amount, 0, ',', '.') }}</td>
+                    <td colspan="7" style="text-align:center;color:var(--text-secondary);padding:2rem;">Tidak ada data transaksi keuangan yang sesuai filter.</td>
                 </tr>
-                @empty
-                <tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Tidak ada data.</td></tr>
                 @endforelse
             </tbody>
         </table>

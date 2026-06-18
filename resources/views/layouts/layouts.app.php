@@ -66,11 +66,6 @@
                             <i class="ph ph-users"></i> Manajemen Pengguna
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="/admin/roles-permissions" class="{{ request()->is('admin/roles-permissions') ? 'active' : '' }}">
-                            <i class="ph ph-key"></i> Role & Permission
-                        </a>
-                    </li>
                     
                     <li class="nav-section-title">Monitoring Sistem</li>
                     <li class="nav-item">
@@ -81,11 +76,6 @@
                     <li class="nav-item">
                         <a href="/admin/logs/login" class="{{ request()->is('admin/logs/login') ? 'active' : '' }}">
                             <i class="ph ph-sign-in"></i> Login History
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/logs/audit" class="{{ request()->is('admin/logs/audit') ? 'active' : '' }}">
-                            <i class="ph ph-list-checks"></i> Audit Trail
                         </a>
                     </li>
 
@@ -106,26 +96,31 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/admin/monitor/inventaris" class="{{ request()->is('admin/monitor/inventaris') ? 'active' : '' }}">
-                            <i class="ph ph-package"></i> Aset & Materi Latihan
+                        <a href="/admin/monitor/letters" class="{{ request()->is('admin/monitor/letters') ? 'active' : '' }}">
+                            <i class="ph ph-envelope"></i> Persuratan
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/admin/monitor/jobs" class="{{ request()->is('admin/monitor/jobs') ? 'active' : '' }}">
-                            <i class="ph ph-microphone-stage"></i> Gigs & Presensi
+                        <a href="/admin/monitor/inventaris" class="{{ request()->is('admin/monitor/inventaris') ? 'active' : '' }}">
+                            <i class="ph ph-package"></i> Inventaris
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/monitor/materials" class="{{ request()->is('admin/monitor/materials') ? 'active' : '' }}">
+                            <i class="ph ph-folders"></i> Materi Latihan
                         </a>
                     </li>
 
                     <li class="nav-section-title">Maintenance</li>
                     <li class="nav-item">
-                        <a href="/admin/settings" class="{{ request()->is('admin/settings') ? 'active' : '' }}">
-                            <i class="ph ph-gear"></i> Pengaturan Website
+                        <a href="/pengurus/categories" class="{{ request()->is('pengurus/categories*') ? 'active' : '' }}">
+                            <i class="ph ph-list-bullets"></i> Kelola Kategori
                         </a>
                     </li>
                 @endif
 
                 <!-- 2. ADMIN UKM SIDEBAR -->
-                @if($u->isAdminUkm() || $u->isSuperAdmin())
+                @if($u->isAdminUkm())
                     <li class="nav-section-title">Menu Admin UKM</li>
                     <li class="nav-item">
                         <a href="/ukm/dashboard" class="{{ request()->is('ukm/dashboard') ? 'active' : '' }}">
@@ -145,6 +140,11 @@
                     <li class="nav-item">
                         <a href="/ukm/registrations" class="{{ request()->is('ukm/registrations*') ? 'active' : '' }}">
                             <i class="ph ph-user-plus"></i> Pendaftaran Calon
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/ukm/email-logs" class="{{ request()->is('ukm/email-logs*') ? 'active' : '' }}">
+                            <i class="ph ph-paper-plane-tilt"></i> Riwayat Email
                         </a>
                     </li>
                     <li class="nav-item">
@@ -195,6 +195,11 @@
                             <i class="ph ph-folders"></i> Materi Latihan
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/pengurus/categories" class="{{ request()->is('pengurus/categories*') ? 'active' : '' }}">
+                            <i class="ph ph-list-bullets"></i> Kelola Kategori
+                        </a>
+                    </li>
                 @endif
 
                 <!-- 3. PENGURUS SIDEBAR (Dinamis berdasarkan Divisi) -->
@@ -203,6 +208,11 @@
                     <li class="nav-item">
                         <a href="/pengurus/dashboard" class="{{ request()->is('pengurus/dashboard') ? 'active' : '' }}">
                             <i class="ph ph-squares-four"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/pengurus/categories" class="{{ request()->is('pengurus/categories*') ? 'active' : '' }}">
+                            <i class="ph ph-list-bullets"></i> Kelola Kategori
                         </a>
                     </li>
 
@@ -503,6 +513,17 @@
             const sidebarClose = document.getElementById('sidebar-close');
             const sidebar = document.querySelector('.sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu) {
+                const savedScroll = localStorage.getItem('sidebar-scroll');
+                if (savedScroll) {
+                    navMenu.scrollTop = parseInt(savedScroll, 10);
+                }
+                navMenu.addEventListener('scroll', function() {
+                    localStorage.setItem('sidebar-scroll', navMenu.scrollTop);
+                });
+            }
 
             if (menuToggle && sidebar) {
                 menuToggle.addEventListener('click', function() {

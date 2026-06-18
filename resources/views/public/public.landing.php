@@ -202,7 +202,7 @@
         <div class="bg-navy-950/85 border-l-[6px] border-gold-500 py-16 px-10 md:px-16 lg:py-24 w-full text-left reveal-element">
             <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[4.5rem] text-white leading-[1.1] font-normal">
                 Paduan Suara<br>
-                <span class="text-gold-400">Universitas Pancasila.</span>
+                <span class="text-gold-400">Universitas Pancasila</span>
             </h1>
         </div>
         
@@ -282,7 +282,7 @@
         <div class="relative w-full reveal-element">
             <!-- Image on the right -->
             <div class="w-full md:w-4/5 ml-auto h-[400px] md:h-[550px] relative shadow-xl">
-                 <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Kemitraan" class="w-full h-full object-cover">
+                 <img src="{{ asset('images/kontan.jpg') }}" alt="Kemitraan" class="w-full h-full object-cover">
             </div>
 
             <!-- Overlapping White Box on the left -->
@@ -315,7 +315,7 @@
 <!-- 🌟 VISI MISI -->
 <section id="vision-mission" class="py-28 bg-white overflow-hidden">
     <div class="max-w-[1240px] mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
             
             <!-- Visi (Left Column) -->
             <div class="lg:col-span-5 space-y-8 reveal-element">
@@ -454,35 +454,68 @@
             </p>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-8">
-            @forelse($trainers as $trainer)
-                <div class="bg-white border border-slate-100 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-[280px] card-hover-navy reveal-element">
-                    <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-gold-400 p-1 mb-6 shrink-0 relative bg-slate-50">
+        @if($trainers->count() === 1)
+            @php 
+                $trainer = $trainers->first(); 
+            @endphp
+            <div class="max-w-[850px] mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16 relative reveal-element">
+                <!-- Coach Image -->
+                <div class="relative shrink-0">
+                    <div class="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-gold-400 p-1.5 relative bg-slate-50 shadow-md">
                         @if($trainer->photo)
                             <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}" class="w-full h-full object-cover rounded-full">
                         @else
-                            <div class="w-full h-full rounded-full bg-navy-50 flex items-center justify-center font-bold text-navy-800 text-2xl">
+                            <div class="w-full h-full rounded-full bg-navy-50 flex items-center justify-center font-bold text-navy-800 text-5xl">
                                 {{ substr($trainer->name, 0, 1) }}
                             </div>
                         @endif
                     </div>
-                    <h4 class="font-serif font-normal text-base text-navy-900 mb-1 leading-tight">{{ $trainer->name }}</h4>
-                    <span class="inline-block px-3 py-1 rounded-full text-[9px] font-bold bg-gold-50 text-gold-700 border border-gold-100/50 mb-4">{{ $trainer->specialty }}</span>
-                    <p class="text-slate-400 text-[11px] leading-relaxed mb-6">
-                        Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.
+                </div>
+
+                <!-- Coach Details -->
+                <div class="flex-1 text-center md:text-left">
+                    <span class="inline-block px-4 py-1.5 rounded-full text-[10px] font-black bg-gold-50 text-gold-700 border border-gold-100/50 mb-3 uppercase tracking-widest">
+                        {{ $trainer->specialty }}
+                    </span>
+                    <h4 class="font-serif font-normal text-3xl sm:text-4xl text-navy-900 mb-4 leading-tight">
+                        {{ $trainer->name }}
+                    </h4>
+                    <p class="text-slate-500 text-sm sm:text-base leading-relaxed max-w-xl">
+                        Berdedikasi tinggi dalam membimbing teknik vokal, pembawaan lagu, serta musikalitas Paduan Suara Universitas Pancasila untuk terus mengukir berbagai prestasi gemilang di tingkat nasional maupun internasional.
                     </p>
-                    @if($trainer->phone)
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $trainer->phone) }}" target="_blank" class="text-xs text-navy-900 hover:text-gold-600 font-bold flex items-center gap-1.5 transition-colors">
-                            <i class="ph ph-whatsapp-logo text-base"></i> Hubungi WhatsApp
-                        </a>
-                    @endif
                 </div>
-            @empty
-                <div class="w-full text-center py-16 text-slate-400 text-xs">
-                    Belum ada data pelatih terdaftar.
-                </div>
-            @endforelse
-        </div>
+            </div>
+        @else
+            <div class="flex flex-wrap justify-center gap-8">
+                @forelse($trainers as $trainer)
+                    <div class="bg-white border border-slate-100 rounded-[32px] p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-[280px] card-hover-navy reveal-element">
+                        <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-gold-400 p-1 mb-6 shrink-0 relative bg-slate-50">
+                            @if($trainer->photo)
+                                <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}" class="w-full h-full object-cover rounded-full">
+                            @else
+                                <div class="w-full h-full rounded-full bg-navy-50 flex items-center justify-center font-bold text-navy-800 text-2xl">
+                                    {{ substr($trainer->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
+                        <h4 class="font-serif font-normal text-base text-navy-900 mb-1 leading-tight">{{ $trainer->name }}</h4>
+                        <span class="inline-block px-3 py-1 rounded-full text-[9px] font-bold bg-gold-50 text-gold-700 border border-gold-100/50 mb-4">{{ $trainer->specialty }}</span>
+                        <p class="text-slate-400 text-[11px] leading-relaxed mb-6">
+                            Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.
+                        </p>
+                        @if($trainer->phone)
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $trainer->phone) }}" target="_blank" class="text-xs text-navy-900 hover:text-gold-600 font-bold flex items-center gap-1.5 transition-colors">
+                                <i class="ph ph-whatsapp-logo text-base"></i> Hubungi WhatsApp
+                            </a>
+                        @endif
+                    </div>
+                @empty
+                    <div class="w-full text-center py-16 text-slate-400 text-xs">
+                        Belum ada data pelatih terdaftar.
+                    </div>
+                @endforelse
+            </div>
+        @endif
     </div>
 </section>
 
@@ -684,35 +717,46 @@
                 <div class="w-16 h-1 bg-gradient-gold mx-auto mt-4 rounded-full"></div>
             </div>
 
-            <div class="bg-gradient-navy text-white rounded-[40px] p-8 sm:p-12 shadow-2xl relative overflow-hidden">
-                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute -left-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-                
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-                    <div class="lg:col-span-8">
-                        <div class="flex items-center gap-2.5 text-gold-400 mb-6">
-                            <i class="ph ph-calendar-blank text-xl"></i>
-                            <span class="text-xs font-bold uppercase tracking-widest">
-                                Periode: 
-                                {{ $profile->recruitment_start_date ? $profile->recruitment_start_date->format('d M Y') : '' }} 
-                                s/d 
-                                {{ $profile->recruitment_end_date ? $profile->recruitment_end_date->format('d M Y') : '' }}
-                            </span>
+            <div class="bg-slate-50 border border-slate-100 rounded-[40px] p-8 sm:p-12 shadow-sm relative overflow-hidden">
+                <div class="relative z-10">
+                    <!-- Top section: Title, Date and Action Button -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-8 border-b border-slate-200 mb-8">
+                        <div class="max-w-2xl">
+                            <div class="flex items-center gap-2.5 text-gold-600 mb-3">
+                                <i class="ph ph-calendar-blank text-lg"></i>
+                                <span class="text-xs font-black uppercase tracking-widest">
+                                    Periode Pendaftaran: 
+                                    {{ $profile->recruitment_start_date ? $profile->recruitment_start_date->format('d M Y') : '' }} 
+                                    s/d 
+                                    {{ $profile->recruitment_end_date ? $profile->recruitment_end_date->format('d M Y') : '' }}
+                                </span>
+                            </div>
+                            <h4 class="font-serif font-normal text-2xl sm:text-3xl text-navy-900 leading-tight">
+                                Jadilah bagian dari generasi harmoni paduan suara Universitas Pancasila selanjutnya.
+                            </h4>
                         </div>
-                        
-                        <h4 class="font-serif font-normal text-2xl mb-8 leading-tight">Jadilah bagian dari generasi harmoni paduan suara Universitas Pancasila selanjutnya.</h4>
-                        
-                        <!-- Requirements -->
-                        <div class="mb-8">
-                            <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-4">Persyaratan Utama</h5>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="shrink-0 w-full lg:w-auto">
+                            <a href="/daftar" class="inline-flex items-center justify-center gap-2 w-full lg:w-auto bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 text-navy-950 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:shadow-gold-500/20 transition-all duration-300 transform hover:-translate-y-0.5">
+                                Gabung PSUP Sekarang <i class="ph ph-arrow-right text-base"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Bottom section: Requirements and Stages in 2 columns -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <!-- Left Column: Requirements -->
+                        <div class="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8">
+                            <h5 class="text-navy-900 font-extrabold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                                <i class="ph ph-list-checks text-lg text-gold-500"></i> Persyaratan Utama
+                            </h5>
+                            <div class="space-y-4">
                                 @php
                                     $reqs = array_filter(explode("\n", $profile->recruitment_requirements));
                                 @endphp
                                 @forelse($reqs as $req)
-                                    <div class="flex gap-3 text-xs sm:text-sm text-slate-300">
-                                        <i class="ph ph-check-circle text-gold-400 text-base shrink-0"></i>
-                                        <span>{{ trim($req) }}</span>
+                                    <div class="flex gap-3 text-sm text-slate-600">
+                                        <i class="ph ph-check-circle text-gold-500 text-lg shrink-0"></i>
+                                        <span class="leading-relaxed">{{ trim($req) }}</span>
                                     </div>
                                 @empty
                                     <p class="text-slate-400 text-xs">Persyaratan belum ditentukan.</p>
@@ -720,29 +764,25 @@
                             </div>
                         </div>
 
-                        <!-- Stages -->
-                        <div>
-                            <h5 class="text-gold-400 font-bold text-xs uppercase tracking-wider mb-4">Tahapan Registrasi & Audisi</h5>
-                            <div class="space-y-3">
+                        <!-- Right Column: Stages -->
+                        <div class="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8">
+                            <h5 class="text-navy-900 font-extrabold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                                <i class="ph ph-steps text-lg text-gold-500"></i> Tahapan Registrasi & Audisi
+                            </h5>
+                            <div class="space-y-4">
                                 @php
                                     $stages = array_filter(explode("\n", $profile->recruitment_stages));
                                 @endphp
                                 @forelse($stages as $stage)
-                                    <div class="flex gap-3 text-xs sm:text-sm text-slate-300">
-                                        <i class="ph ph-caret-right text-gold-500 font-bold text-sm"></i>
-                                        <span>{{ trim($stage) }}</span>
+                                    <div class="flex gap-3 text-sm text-slate-600">
+                                        <i class="ph ph-arrow-circle-right text-gold-500 text-lg shrink-0"></i>
+                                        <span class="leading-relaxed">{{ trim($stage) }}</span>
                                     </div>
                                 @empty
                                     <p class="text-slate-400 text-xs">Tahapan seleksi belum ditentukan.</p>
                                 @endforelse
                             </div>
                         </div>
-                    </div>
-
-                    <div class="lg:col-span-4 text-center">
-                        <a href="/daftar" class="inline-block w-full bg-gradient-gold text-navy-900 px-6 py-4.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:opacity-95 transition-all hover:-translate-y-0.5">
-                            Gabung PSUP Sekarang
-                        </a>
                     </div>
                 </div>
             </div>

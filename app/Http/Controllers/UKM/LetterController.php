@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UKM;
 
 use App\Http\Controllers\Controller;
 use App\Models\Letter;
+use App\Models\LetterCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,13 +28,15 @@ class LetterController extends Controller
         }
 
         $letters = $query->orderBy('date', 'desc')->paginate(10);
-        return view('pengurus.letters.index', compact('letters'));
+        $types = LetterCategory::pluck('name')->toArray();
+        return view('pengurus.letters.index', compact('letters', 'types'));
     }
 
     public function create()
     {
         $programs = \App\Models\Program::active()->get();
-        return view('pengurus.letters.create', compact('programs'));
+        $types = LetterCategory::pluck('name')->toArray();
+        return view('pengurus.letters.create', compact('programs', 'types'));
     }
 
     public function store(Request $request)
@@ -43,7 +46,7 @@ class LetterController extends Controller
             'date' => 'required|date',
             'subject' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
-            'type' => 'required|in:Surat Tugas,Surat Permohonan,Surat Undangan,Surat Peminjaman,Surat Keterangan',
+            'type' => 'required|exists:letter_categories,name',
             'file_path' => 'required|file|mimes:pdf|max:5120', // Max 5MB
             'related_to' => 'required|in:Umum,Program Kerja',
             'program_id' => 'required_if:related_to,Program Kerja|nullable|exists:programs,id',
@@ -67,7 +70,8 @@ class LetterController extends Controller
     {
         $letter = Letter::findOrFail($id);
         $programs = \App\Models\Program::active()->get();
-        return view('pengurus.letters.edit', compact('letter', 'programs'));
+        $types = LetterCategory::pluck('name')->toArray();
+        return view('pengurus.letters.edit', compact('letter', 'programs', 'types'));
     }
 
     public function update(Request $request, $id)
@@ -79,7 +83,7 @@ class LetterController extends Controller
             'date' => 'required|date',
             'subject' => 'required|string|max:255',
             'destination' => 'required|string|max:255',
-            'type' => 'required|in:Surat Tugas,Surat Permohonan,Surat Undangan,Surat Peminjaman,Surat Keterangan',
+            'type' => 'required|exists:letter_categories,name',
             'file_path' => 'nullable|file|mimes:pdf|max:5120',
             'related_to' => 'required|in:Umum,Program Kerja',
             'program_id' => 'required_if:related_to,Program Kerja|nullable|exists:programs,id',

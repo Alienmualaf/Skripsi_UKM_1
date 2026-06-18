@@ -32,11 +32,10 @@
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Kategori Barang</label>
             <select name="category" class="form-control" required style="padding: 0.65rem;">
-                <option value="Alat Musik" {{ old('category') === 'Alat Musik' ? 'selected' : '' }}>Alat Musik (Piano, Keyboard, dll)</option>
-                <option value="Kostum" {{ old('category') === 'Kostum' ? 'selected' : '' }}>Kostum (Jas, Kebaya, Seragam, dll)</option>
-                <option value="Sound System" {{ old('category') === 'Sound System' ? 'selected' : '' }}>Sound System / Audio (Mic, Kabel, dll)</option>
-                <option value="Perlengkapan Latihan" {{ old('category') === 'Perlengkapan Latihan' ? 'selected' : '' }}>Perlengkapan Latihan (Stand Partitur, Map, dll)</option>
-                <option value="Perlengkapan Acara" {{ old('category') === 'Perlengkapan Acara' ? 'selected' : '' }}>Perlengkapan Acara (Dekorasi, dll)</option>
+                <option value="">-- Pilih Kategori --</option>
+                @foreach($categories as $c)
+                    <option value="{{ $c }}" {{ old('category') === $c ? 'selected' : '' }}>{{ $c }}</option>
+                @endforeach
             </select>
             @error('category') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>

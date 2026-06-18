@@ -108,15 +108,15 @@
                     <td>
                         @if($user->status === 'active')
                             <span style="color: var(--success-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span> Aktif
+                                Aktif
                             </span>
                         @elseif($user->status === 'suspended')
                             <span style="color: var(--danger-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger-color); display: inline-block;"></span> Suspended
+                                Suspended
                             </span>
                         @else
                             <span style="color: var(--text-muted); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span> Nonaktif
+                                Nonaktif
                             </span>
                         @endif
                     </td>
@@ -137,19 +137,6 @@
                         <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center; flex-wrap: wrap;">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit Akun"><i class="ph ph-pencil-simple"></i> Edit</a>
                             
-                            <!-- Toggle Status Actions -->
-                            @if($user->id !== auth()->id())
-                                <form action="{{ route('admin.users.toggle-status', $user->id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    @if($user->status === 'active')
-                                        <button type="submit" name="status" value="suspended" class="btn" style="background: #fff5f5; border: 1px solid #feb2b2; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #c53030; border-radius: 6px;" onclick="return confirm('Suspend akun pengguna ini?');" title="Suspend Akun">Suspend</button>
-                                        <button type="submit" name="status" value="inactive" class="btn" style="background: #f7fafc; border: 1px solid #e2e8f0; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #4a5568; border-radius: 6px;" onclick="return confirm('Nonaktifkan akun pengguna ini?');" title="Nonaktifkan Akun">Matikan</button>
-                                    @else
-                                        <button type="submit" name="status" value="active" class="btn" style="background: #f0fff4; border: 1px solid #9ae6b4; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: #22543d; border-radius: 6px;" onclick="return confirm('Aktifkan kembali akun pengguna ini?');" title="Aktivasi Akun">Aktivasi</button>
-                                    @endif
-                                </form>
-                            @endif
-
                             <!-- Force Reset Password -->
                             <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Reset sandi akun ini? Sandi baru otomatis menjadi \'password\'.');">
                                 @csrf
