@@ -79,17 +79,7 @@ class RecruitmentNotificationTest extends TestCase
         $this->assertEquals('Anggota Aktif', $member->status);
         $this->assertEquals($voiceClass->id, $member->voice_classification_id);
 
-        // Check Notification Logs (Email + WA)
-        $emailLog = NotificationLog::where('user_id', $user->id)->where('type', 'email')->first();
-        $this->assertNotNull($emailLog);
-        if ($emailLog->status !== 'success') {
-            dump($emailLog->error_message);
-        }
-        $this->assertEquals('success', $emailLog->status);
-        $this->assertStringContainsString('budi.prasetyo@example.com', $emailLog->recipient);
-        $this->assertStringContainsString('Budi Prasetyo', $emailLog->recipient_name);
-        $this->assertStringContainsString('Tenor', $emailLog->content);
-
+        // Check Notification Logs (WA only)
         $waLog = NotificationLog::where('user_id', $user->id)->where('type', 'whatsapp')->first();
         $this->assertNotNull($waLog);
         $this->assertEquals('success', $waLog->status);
@@ -138,13 +128,7 @@ class RecruitmentNotificationTest extends TestCase
         $this->assertEquals('inactive', $user->status);
         $this->assertEquals('Ditolak', $member->status);
 
-        // Check Notification Logs (Email + WA)
-        $emailLog = NotificationLog::where('user_id', $user->id)->where('type', 'email')->first();
-        $this->assertNotNull($emailLog);
-        $this->assertEquals('success', $emailLog->status);
-        $this->assertStringContainsString('budi.prasetyo@example.com', $emailLog->recipient);
-        $this->assertStringContainsString('Pemberitahuan Hasil Pendaftaran', $emailLog->subject);
-
+        // Check Notification Logs (WA only)
         $waLog = NotificationLog::where('user_id', $user->id)->where('type', 'whatsapp')->first();
         $this->assertNotNull($waLog);
         $this->assertEquals('success', $waLog->status);

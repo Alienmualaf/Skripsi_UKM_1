@@ -360,22 +360,11 @@ class UKMAdminController extends Controller
                 'voice_classification_id' => $voiceClassId,
             ]);
 
-            // 1. Send Email Notification
-            $emailData = [
-                'name' => $member->name,
-                'voice_classification' => $voiceClassName,
-                'email' => $member->email,
-                'password' => $tempPassword,
-                'login_url' => url('/login'),
-            ];
-            $subject = 'Selamat bergabung di Paduan Suara Universitas Pancasila!';
-            NotificationService::sendEmail($user?->id, $member->email, $member->name, $subject, 'emails.accepted', $emailData);
-
             // 2. Send WhatsApp Notification
             $waMessage = "Halo {$member->name}, Selamat bergabung di Paduan Suara Universitas Pancasila (PSUP)! Anda diterima sebagai anggota dengan klasifikasi suara: {$voiceClassName}. Silakan login ke sistem menggunakan email: {$member->email} dan password sementara: {$tempPassword} di " . url('/login') . ". Harap segera lengkapi profil Anda setelah login pertama. Terima kasih.";
             NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
 
-            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota aktif & notifikasi (Email + WhatsApp) dikirim.");
+            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota aktif & notifikasi WhatsApp dikirim.");
         } else {
             // Update user status
             if ($user) {
@@ -389,24 +378,17 @@ class UKMAdminController extends Controller
                 'status' => 'Ditolak',
             ]);
 
-            // 1. Send Email Notification
-            $emailData = [
-                'name' => $member->name,
-            ];
-            $subject = 'Pemberitahuan Hasil Pendaftaran - Paduan Suara Universitas Pancasila';
-            NotificationService::sendEmail($user?->id, $member->email, $member->name, $subject, 'emails.rejected', $emailData);
-
             // 2. Send WhatsApp Notification
             $waMessage = "Halo {$member->name}, Terima kasih atas ketertarikan Anda untuk bergabung dengan PSUP. Setelah melalui proses evaluasi berkas dan klasifikasi suara, dengan menyesal kami informasikan bahwa pendaftaran Anda belum dapat kami terima untuk periode ini. Tetap semangat dan silakan mendaftar kembali di rekrutmen berikutnya!";
             NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
 
-            return back()->with('success', "Pendaftaran {$member->name} ditolak. Notifikasi penolakan (Email + WhatsApp) dikirim.");
+            return back()->with('success', "Pendaftaran {$member->name} ditolak. Notifikasi penolakan WhatsApp dikirim.");
         }
     }
 
     public function emailLogs()
     {
-        $logs = NotificationLog::latest()->paginate(15);
+        $logs = NotificationLog::where('type', 'whatsapp')->latest()->paginate(15);
         return view('ukm.email_logs.index', compact('logs'));
     }
 
