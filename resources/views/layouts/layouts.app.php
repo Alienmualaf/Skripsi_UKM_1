@@ -144,7 +144,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="/ukm/email-logs" class="{{ request()->is('ukm/email-logs*') ? 'active' : '' }}">
-                            <i class="ph ph-paper-plane-tilt"></i> Riwayat Email
+                            <i class="ph ph-paper-plane-tilt"></i> Riwayat Notifikasi
                         </a>
                     </li>
                     <li class="nav-item">

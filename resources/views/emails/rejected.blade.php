@@ -66,10 +66,14 @@
 <body>
     <div class="container">
         <div class="header">
-            @if(file_exists(public_path('images/logo_PSUP.jpeg')))
+            @if(isset($message) && file_exists(public_path('images/logo_PSUP.jpeg')))
                 <img src="{{ $message->embed(public_path('images/logo_PSUP.jpeg')) }}" alt="Logo PSUP">
-            @elseif(file_exists(public_path('images/logoup.png')))
+            @elseif(isset($message) && file_exists(public_path('images/logoup.png')))
                 <img src="{{ $message->embed(public_path('images/logoup.png')) }}" alt="Logo PSUP">
+            @elseif(file_exists(public_path('images/logo_PSUP.jpeg')))
+                <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP">
+            @elseif(file_exists(public_path('images/logoup.png')))
+                <img src="{{ asset('images/logoup.png') }}" alt="Logo PSUP">
             @endif
             <h1>PADUAN SUARA UNIVERSITAS PANCASILA</h1>
         </div>

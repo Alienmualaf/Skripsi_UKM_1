@@ -73,6 +73,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('email')->unique();
             $table->string('photo')->nullable();
+            $table->text('choir_experience')->nullable();
             $table->string('status')->default('Calon Anggota'); // Calon Anggota, Anggota Aktif, Alumni, Nonaktif
             $table->foreignId('voice_classification_id')->nullable()->constrained('voice_classifications')->onDelete('set null');
             $table->timestamps();
@@ -91,22 +92,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 7. Registrations
-        Schema::create('registrations', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('npm')->unique();
-            $table->string('gender'); // L, P
-            $table->string('faculty');
-            $table->string('major');
-            $table->string('class_year');
-            $table->string('phone');
-            $table->string('email');
-            $table->text('choir_experience')->nullable();
-            $table->string('photo')->nullable();
-            $table->string('status')->default('Pending'); // Pending, Verifikasi, Terima, Tolak
-            $table->timestamps();
-        });
 
         // 8. Agendas
         Schema::create('agendas', function (Blueprint $table) {
@@ -312,7 +297,6 @@ return new class extends Migration
         Schema::dropIfExists('jobs');
         Schema::dropIfExists('programs');
         Schema::dropIfExists('agendas');
-        Schema::dropIfExists('registrations');
         Schema::dropIfExists('trainers');
         Schema::dropIfExists('members');
         Schema::dropIfExists('voice_classifications');

@@ -25,8 +25,17 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
             $user = Auth::user();
+            if ($user->status !== 'active') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => $user->status === 'pending'
+                        ? 'Akun Anda masih dalam status pendaftaran. Silakan tunggu verifikasi dari Admin.'
+                        : 'Akun Anda ditolak atau dinonaktifkan.',
+                ]);
+            }
+
+            $request->session()->regenerate();
             SystemLogger::logLogin($user->id, $user->name, 'Success');
             SystemLogger::logActivity('Melakukan login ke sistem', 'Autentikasi');
             return $this->redirectUser($user);

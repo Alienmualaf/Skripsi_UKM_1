@@ -6,7 +6,8 @@ use App\Models\Trainer;
 use App\Models\Performance;
 use App\Models\Gallery;
 use App\Models\Achievement;
-use App\Models\Registration;
+use App\Models\User;
+use App\Models\Role;
 use App\Models\Member;
 use App\Models\Program;
 use App\Models\OrganizationProfile;
@@ -144,27 +145,51 @@ class PublicController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'npm' => 'required|string|max:50|unique:registrations,npm|unique:members,npm',
+            'npm' => 'required|string|max:50|unique:members,npm',
             'gender' => 'required|in:L,P',
             'faculty' => 'required|string|max:100',
             'major' => 'required|string|max:100',
             'class_year' => 'required|string|max:4',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
             'choir_experience' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
             'password' => 'required|min:6|confirmed',
         ]);
 
+        $photoPath = null;
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('registrations', 'public');
-            $data['photo'] = $path;
+            $photoPath = $request->file('photo')->store('registrations', 'public');
         }
 
-        $data['status'] = 'Pending';
-        $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
+        // Create User
+        $roleAnggota = Role::where('name', 'anggota')->first();
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'role_id' => $roleAnggota->id,
+            'status' => 'pending', // Pending approval
+        ]);
 
-        Registration::create($data);
+        // Create Member profile with status 'Calon Anggota'
+        Member::create([
+            'user_id' => $user->id,
+            'npm' => $data['npm'],
+            'name' => $data['name'],
+            'gender' => $data['gender'],
+            'faculty' => $data['faculty'],
+            'major' => $data['major'],
+            'class_year' => $data['class_year'],
+            'birth_place' => '-',
+            'birth_date' => now()->toDateString(),
+            'address' => '-',
+            'phone' => $data['phone'],
+            'email' => $data['email'],
+            'photo' => $photoPath,
+            'choir_experience' => $data['choir_experience'],
+            'status' => 'Calon Anggota',
+        ]);
 
         return redirect()->route('register-candidate')->with('success', 'Pendaftaran berhasil dikirim. Tunggu verifikasi admin.');
     }

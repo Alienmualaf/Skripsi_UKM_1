@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmailLog extends Model
+class NotificationLog extends Model
 {
     protected $fillable = [
-        'registration_id',
-        'recipient_email',
+        'user_id',
+        'type', // email, whatsapp
+        'recipient', // email or phone number
         'recipient_name',
         'subject',
         'content',
-        'status',
+        'status', // success, failed
         'error_message',
     ];
 
-    public function registration(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Registration::class);
+        return $this->belongsTo(User::class);
     }
 }

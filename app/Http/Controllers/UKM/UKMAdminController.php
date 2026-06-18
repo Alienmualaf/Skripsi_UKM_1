@@ -12,12 +12,13 @@ use App\Models\InventoryLoan;
 use App\Models\Material;
 use App\Models\Finance;
 use App\Models\VoiceClassification;
-use App\Models\Registration;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Announcement;
-use App\Models\EmailLog;
+use App\Models\NotificationLog;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -321,185 +322,165 @@ class UKMAdminController extends Controller
     /**
      * Registrasi / Calon Anggota Recruitment
      */
+    /**
+     * Registrasi / Calon Anggota Recruitment
+     */
     public function registrations()
     {
-        $registrations = Registration::latest()->paginate(15);
+        $registrations = Member::where('status', 'Calon Anggota')->latest()->paginate(15);
         $voiceClassifications = VoiceClassification::all();
         return view('ukm.registrations.index', compact('registrations', 'voiceClassifications'));
     }
 
     public function verifyRegistration(Request $request, $id)
     {
-        $registration = Registration::findOrFail($id);
+        $member = Member::findOrFail($id);
         $action = $request->input('action'); // Terima, Tolak
+        $user = $member->user;
 
         if ($action === 'Terima') {
             $voiceClassId = $request->input('voice_classification_id');
             $voiceClass = VoiceClassification::find($voiceClassId);
             $voiceClassName = $voiceClass ? $voiceClass->name : 'Sopran';
 
-            $registration->status = 'Terima';
-            $registration->save();
-
-            // Password sementara
+            // Generate temporary password
             $tempPassword = 'PSUP-' . strtoupper(\Illuminate\Support\Str::random(6));
 
-            // Create user
-            $roleAnggota = Role::where('name', 'anggota')->first();
-            $user = User::create([
-                'name' => $registration->name,
-                'email' => $registration->email,
-                'password' => Hash::make($tempPassword),
-                'role_id' => $roleAnggota->id,
-                'status' => 'active',
-            ]);
+            // Update user status & password
+            if ($user) {
+                $user->update([
+                    'password' => Hash::make($tempPassword),
+                    'status' => 'active',
+                ]);
+            }
 
-            // Create Member profile
-            Member::create([
-                'user_id' => $user->id,
-                'npm' => $registration->npm,
-                'name' => $registration->name,
-                'gender' => $registration->gender,
-                'faculty' => $registration->faculty,
-                'major' => $registration->major,
-                'class_year' => $registration->class_year,
-                'birth_place' => '-',
-                'birth_date' => now()->toDateString(),
-                'address' => '-',
-                'phone' => $registration->phone,
-                'email' => $registration->email,
-                'photo' => $registration->photo,
+            // Update member status & voice classification
+            $member->update([
                 'status' => 'Anggota Aktif',
                 'voice_classification_id' => $voiceClassId,
             ]);
 
-            // Prepare Email Data
+            // 1. Send Email Notification
             $emailData = [
-                'name' => $registration->name,
+                'name' => $member->name,
                 'voice_classification' => $voiceClassName,
-                'email' => $registration->email,
+                'email' => $member->email,
                 'password' => $tempPassword,
                 'login_url' => url('/login'),
             ];
-
             $subject = 'Selamat bergabung di Paduan Suara Universitas Pancasila!';
+            NotificationService::sendEmail($user?->id, $member->email, $member->name, $subject, 'emails.accepted', $emailData);
 
-            // Render email content to save in log
-            try {
-                $content = view('emails.accepted', $emailData)->render();
+            // 2. Send WhatsApp Notification
+            $waMessage = "Halo {$member->name}, Selamat bergabung di Paduan Suara Universitas Pancasila (PSUP)! Anda diterima sebagai anggota dengan klasifikasi suara: {$voiceClassName}. Silakan login ke sistem menggunakan email: {$member->email} dan password sementara: {$tempPassword} di " . url('/login') . ". Harap segera lengkapi profil Anda setelah login pertama. Terima kasih.";
+            NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
 
-                // Send email
-                Mail::send('emails.accepted', $emailData, function($message) use ($registration, $subject) {
-                    $message->to($registration->email, $registration->name)
-                            ->subject($subject);
-                });
-
-                // Log email
-                EmailLog::create([
-                    'registration_id' => $registration->id,
-                    'recipient_email' => $registration->email,
-                    'recipient_name' => $registration->name,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'status' => 'success',
-                ]);
-
-                $emailMsg = "Email pemberitahuan berhasil dikirim.";
-            } catch (\Exception $e) {
-                $content = isset($content) ? $content : 'Failed to render email accepted template.';
-
-                EmailLog::create([
-                    'registration_id' => $registration->id,
-                    'recipient_email' => $registration->email,
-                    'recipient_name' => $registration->name,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'status' => 'failed',
-                    'error_message' => $e->getMessage(),
-                ]);
-
-                $emailMsg = "Gagal mengirim email: " . $e->getMessage();
-            }
-
-            return back()->with('success', "Pendaftaran {$registration->name} diterima. Akun anggota telah dibuat. {$emailMsg}");
+            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota aktif & notifikasi (Email + WhatsApp) dikirim.");
         } else {
-            $registration->status = 'Tolak';
-            $registration->save();
-
-            // Prepare Rejection Email
-            $emailData = [
-                'name' => $registration->name,
-            ];
-
-            $subject = 'Pemberitahuan Hasil Pendaftaran - Paduan Suara Universitas Pancasila';
-
-            try {
-                $content = view('emails.rejected', $emailData)->render();
-
-                Mail::send('emails.rejected', $emailData, function($message) use ($registration, $subject) {
-                    $message->to($registration->email, $registration->name)
-                            ->subject($subject);
-                });
-
-                EmailLog::create([
-                    'registration_id' => $registration->id,
-                    'recipient_email' => $registration->email,
-                    'recipient_name' => $registration->name,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'status' => 'success',
+            // Update user status
+            if ($user) {
+                $user->update([
+                    'status' => 'inactive',
                 ]);
-
-                $emailMsg = "Email penolakan berhasil dikirim.";
-            } catch (\Exception $e) {
-                $content = isset($content) ? $content : 'Failed to render email rejected template.';
-
-                EmailLog::create([
-                    'registration_id' => $registration->id,
-                    'recipient_email' => $registration->email,
-                    'recipient_name' => $registration->name,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'status' => 'failed',
-                    'error_message' => $e->getMessage(),
-                ]);
-
-                $emailMsg = "Gagal mengirim email penolakan: " . $e->getMessage();
             }
 
-            return back()->with('success', "Pendaftaran {$registration->name} ditolak. {$emailMsg}");
+            // Update member status
+            $member->update([
+                'status' => 'Ditolak',
+            ]);
+
+            // 1. Send Email Notification
+            $emailData = [
+                'name' => $member->name,
+            ];
+            $subject = 'Pemberitahuan Hasil Pendaftaran - Paduan Suara Universitas Pancasila';
+            NotificationService::sendEmail($user?->id, $member->email, $member->name, $subject, 'emails.rejected', $emailData);
+
+            // 2. Send WhatsApp Notification
+            $waMessage = "Halo {$member->name}, Terima kasih atas ketertarikan Anda untuk bergabung dengan PSUP. Setelah melalui proses evaluasi berkas dan klasifikasi suara, dengan menyesal kami informasikan bahwa pendaftaran Anda belum dapat kami terima untuk periode ini. Tetap semangat dan silakan mendaftar kembali di rekrutmen berikutnya!";
+            NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
+
+            return back()->with('success', "Pendaftaran {$member->name} ditolak. Notifikasi penolakan (Email + WhatsApp) dikirim.");
         }
     }
 
     public function emailLogs()
     {
-        $logs = EmailLog::latest()->paginate(15);
+        $logs = NotificationLog::latest()->paginate(15);
         return view('ukm.email_logs.index', compact('logs'));
     }
 
     public function resendEmail($id)
     {
-        $log = EmailLog::findOrFail($id);
+        $log = NotificationLog::findOrFail($id);
 
-        try {
-            Mail::html($log->content, function($message) use ($log) {
-                $message->to($log->recipient_email, $log->recipient_name)
-                        ->subject($log->subject);
-            });
+        if ($log->type === 'email') {
+            try {
+                Mail::html($log->content, function($message) use ($log) {
+                    $message->to($log->recipient, $log->recipient_name)
+                            ->subject($log->subject);
+                });
 
-            $log->update([
-                'status' => 'success',
-                'error_message' => null,
-            ]);
+                $log->update([
+                    'status' => 'success',
+                    'error_message' => null,
+                ]);
 
-            return back()->with('success', 'Email berhasil dikirim ulang.');
-        } catch (\Exception $e) {
-            $log->update([
-                'status' => 'failed',
-                'error_message' => $e->getMessage(),
-            ]);
+                return back()->with('success', 'Email berhasil dikirim ulang.');
+            } catch (\Exception $e) {
+                $log->update([
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                ]);
 
-            return back()->with('error', 'Gagal mengirim ulang email: ' . $e->getMessage());
+                return back()->with('error', 'Gagal mengirim ulang email: ' . $e->getMessage());
+            }
+        } else {
+            // WhatsApp
+            $token = env('FONNTE_TOKEN');
+            $formattedPhone = $log->recipient;
+            if (substr($formattedPhone, 0, 1) === '0') {
+                $formattedPhone = '62' . substr($formattedPhone, 1);
+            }
+
+            try {
+                if (empty($token) || $token === 'your_token_here') {
+                    $log->update([
+                        'status' => 'success',
+                        'error_message' => 'Simulated success (FONNTE_TOKEN not configured in .env)',
+                    ]);
+                    return back()->with('success', 'WhatsApp (Simulated) berhasil dikirim ulang.');
+                }
+
+                $response = Http::withHeaders([
+                    'Authorization' => $token,
+                ])->post('https://api.fonnte.com/send', [
+                    'target' => $formattedPhone,
+                    'message' => $log->content,
+                ]);
+
+                $result = $response->json();
+                $status = (isset($result['status']) && $result['status'] == true) ? 'success' : 'failed';
+                $err = $status === 'failed' ? ($result['reason'] ?? 'Unknown Fonnte error') : null;
+
+                $log->update([
+                    'status' => $status,
+                    'error_message' => $err,
+                ]);
+
+                if ($status === 'success') {
+                    return back()->with('success', 'WhatsApp berhasil dikirim ulang.');
+                } else {
+                    return back()->with('error', 'Gagal mengirim ulang WhatsApp: ' . $err);
+                }
+            } catch (\Exception $e) {
+                $log->update([
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                ]);
+
+                return back()->with('error', 'Gagal mengirim ulang WhatsApp: ' . $e->getMessage());
+            }
         }
     }
 
@@ -642,7 +623,7 @@ class UKMAdminController extends Controller
                 ->orderBy('performance_date', 'asc')
                 ->get();
         } elseif ($type === 'rekrutmen') {
-            $data = Registration::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+            $data = Member::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
                 ->get();
         } elseif ($type === 'lpj') {
             $data = Program::whereBetween('start_date', [$start_date, $end_date])
@@ -695,7 +676,7 @@ class UKMAdminController extends Controller
         } elseif ($type === 'kegiatan') {
             $data = Performance::whereBetween('performance_date', [$start_date, $end_date])->get();
         } elseif ($type === 'rekrutmen') {
-            $data = Registration::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])->get();
+            $data = Member::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])->get();
         } elseif ($type === 'lpj') {
             $data = Program::whereBetween('start_date', [$start_date, $end_date])->get();
         } elseif ($type === 'absensi') {

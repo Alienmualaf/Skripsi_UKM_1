@@ -23,6 +23,7 @@ class Member extends Model
         'phone',
         'email',
         'photo',
+        'choir_experience',
         'status',
         'voice_classification_id',
     ];

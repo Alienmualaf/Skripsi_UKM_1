@@ -10,7 +10,6 @@ use App\Models\Member;
 use App\Models\Performance;
 use App\Models\Program;
 use App\Models\ProgramReport;
-use App\Models\Registration;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller

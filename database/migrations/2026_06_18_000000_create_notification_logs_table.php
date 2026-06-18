@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('email_logs', function (Blueprint $table) {
+        Schema::create('notification_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->nullable()->constrained('registrations')->onDelete('set null');
-            $table->string('recipient_email');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('type'); // email, whatsapp
+            $table->string('recipient'); // email or phone number
             $table->string('recipient_name');
-            $table->string('subject');
+            $table->string('subject')->nullable();
             $table->longText('content');
             $table->string('status'); // success, failed
             $table->text('error_message')->nullable();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('email_logs');
+        Schema::dropIfExists('notification_logs');
     }
 };
