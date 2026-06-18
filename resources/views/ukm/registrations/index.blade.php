@@ -48,16 +48,16 @@
                     </td>
                     <td style="color: var(--text-secondary); font-size: 0.75rem; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $reg->reason }}">{{ $reg->reason }}</td>
                     <td>
-                        @if($reg->status === 'Pending')
+                        @if($reg->status === 'Calon Anggota')
                             <span class="badge badge-warning" style="background: #fff8e6; color: #f59e0b; font-weight: bold; border: 1px solid rgba(245,158,11,0.15); padding: 0.25rem 0.5rem; border-radius: 6px;">Pending</span>
-                        @elseif($reg->status === 'Terima')
+                        @elseif($reg->status === 'Anggota Aktif')
                             <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); font-weight: bold; border: 1px solid rgba(16,185,129,0.15); padding: 0.25rem 0.5rem; border-radius: 6px;">Diterima</span>
                         @else
                             <span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color); font-weight: bold; border: 1px solid rgba(239,68,68,0.15); padding: 0.25rem 0.5rem; border-radius: 6px;">Ditolak</span>
                         @endif
                     </td>
                     <td>
-                        @if($reg->status === 'Pending')
+                        @if($reg->status === 'Calon Anggota')
                         <div style="display: flex; flex-direction: column; gap: 0.35rem; justify-content: center; align-items: stretch; width: 100%;">
                             <form action="{{ route('ukm.registrations.verify', $reg->id) }}" method="POST" style="display: flex; flex-direction: column; gap: 0.25rem;">
                                 @csrf

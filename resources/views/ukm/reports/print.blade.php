@@ -322,8 +322,8 @@
                     <td class="text-center">{{ $item->faculty ?? '-' }}</td>
                     <td class="text-center">{{ $item->voice_classification ?? '-' }}</td>
                     <td class="text-center font-bold">
-                        @if($item->status === 'Terima') Lulus Seleksi
-                        @elseif($item->status === 'Tolak') Tidak Lulus
+                        @if($item->status === 'Anggota Aktif') Lulus Seleksi
+                        @elseif($item->status === 'Ditolak') Tidak Lulus
                         @else Pending
                         @endif
                     </td>
