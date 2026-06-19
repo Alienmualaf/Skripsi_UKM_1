@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Finance extends Model
 {
     protected $fillable = [
-        'finance_category_id',
         'type',
         'amount',
         'title',
@@ -18,11 +17,6 @@ class Finance extends Model
         'used_for',
         'program_id',
     ];
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(FinanceCategory::class, 'finance_category_id');
-    }
 
     public function program(): BelongsTo
     {

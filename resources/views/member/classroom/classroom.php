@@ -20,7 +20,7 @@
             <span class="badge" style="background: rgba(255, 255, 255, 0.15); color: white; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.725rem; border: 1px solid rgba(255, 255, 255, 0.25); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.75rem;">
                 Classroom {{ $classroomType }}
             </span>
-            <h1 style="font-size: 2.25rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; color: #ffffff; font-family: 'Outfit', sans-serif;">{{ $classroomTitle }}</h1>
+            <h1 style="font-size: 2.25rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; color: #ffffff; font-family: 'Georgia', serif;">{{ $classroomTitle }}</h1>
             <p style="font-size: 1rem; opacity: 0.9; margin: 0.5rem 0 0 0; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
                 <i class="ph ph-calendar"></i> {{ date('d M Y', strtotime($classroomDate)) }} • 
                 <i class="ph ph-map-pin"></i> {{ $classroomVenue }}
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Navigation Tabs (Premium Segmented Pills) -->
-    <div style="display: flex; gap: 0.35rem; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px; margin-bottom: 2.25rem; width: max-content; overflow-x: auto; max-width: 100%; font-family: 'Outfit', sans-serif;">
+    <div style="display: flex; gap: 0.35rem; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px; margin-bottom: 2.25rem; width: max-content; overflow-x: auto; max-width: 100%; font-family: 'Plus Jakarta Sans', sans-serif;">
         <button onclick="switchClassroomTab('stream')" class="classroom-tab-btn {{ $tab === 'stream' ? 'active' : '' }}" data-tab="stream">
             <i class="ph ph-megaphone" style="font-size: 1rem;"></i> Pengumuman
         </button>
@@ -57,7 +57,7 @@
             <!-- Left Sidebar -->
             <div class="hidden-mobile" style="display: flex; flex-direction: column; gap: 1rem;">
                 <div class="card" style="padding: 1.25rem; border-radius: 12px;">
-                    <h4 style="font-weight: 800; font-size: 0.875rem; margin: 0 0 0.5rem 0; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Jadwal Latihan Terdekat</h4>
+                    <h4 style="font-weight: 800; font-size: 0.875rem; margin: 0 0 0.5rem 0; color: var(--text-primary); font-family: 'Georgia', serif;">Jadwal Latihan Terdekat</h4>
                     @if($schedules->where('date', '>=', date('Y-m-d'))->count() > 0)
                         @foreach($schedules->where('date', '>=', date('Y-m-d'))->take(2) as $sch)
                             <div style="border-left: 3px solid var(--accent-color); padding-left: 0.75rem; margin-top: 0.75rem;">
@@ -83,7 +83,7 @@
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
                             <div>
-                                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">{{ $ann->creator->name ?? 'Pengurus' }}</span>
+                                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif;">{{ $ann->creator->name ?? 'Pengurus' }}</span>
                                 <span style="color: var(--text-secondary); font-size: 0.775rem; margin-left: 0.5rem;">• {{ $ann->created_at->format('d M Y H:i') }}</span>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                         <i class="ph ph-file-text"></i>
                     </div>
                     <div style="min-width: 0; flex: 1;">
-                        <h4 style="font-weight: 700; margin: 0; font-size: 0.925rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Outfit', sans-serif;">{{ $material->title }}</h4>
+                        <h4 style="font-weight: 700; margin: 0; font-size: 0.925rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Georgia', serif;">{{ $material->title }}</h4>
                         <p style="margin: 0.25rem 0 0 0; font-size: 0.725rem; color: var(--text-secondary);">Kategori: {{ $material->category ?? 'Materi' }}</p>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                         <i class="ph-fill ph-music-notes"></i>
                     </div>
                     <div style="min-width: 0; flex: 1;">
-                        <h4 style="font-weight: 700; margin: 0; font-size: 0.95rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">{{ $target->song_title }}</h4>
+                        <h4 style="font-weight: 700; margin: 0; font-size: 0.95rem; color: var(--text-primary); font-family: 'Georgia', serif;">{{ $target->song_title }}</h4>
                         <p style="margin: 0.25rem 0 0 0; font-size: 0.775rem; color: var(--text-secondary);">
                             Komposer: {{ $target->composer ?? '-' }} | Bagian Suara: <strong>{{ $target->voice_part ?? 'Semua Vokal' }}</strong>
                         </p>
@@ -172,7 +172,7 @@
             <!-- Peserta -->
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
-                    <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0; font-family: 'Outfit', sans-serif;">Peserta Terdaftar</h4>
+                    <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0; font-family: 'Georgia', serif;">Peserta Terdaftar</h4>
                     <span style="font-size: 0.75rem; font-weight: 700; background: var(--bg-color); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color);">{{ count($participants) }} Orang</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -204,7 +204,7 @@
                         <i class="ph ph-chart-line-up"></i>
                     </div>
                     <div>
-                        <h4 style="font-weight: 800; margin: 0; font-size: 1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Rangkuman Kehadiran Anda</h4>
+                        <h4 style="font-weight: 800; margin: 0; font-size: 1rem; color: var(--text-primary); font-family: 'Georgia', serif;">Rangkuman Kehadiran Anda</h4>
                         <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0.25rem 0 0 0;">
                              Total Sesi Presensi: <strong style="color: var(--accent-color);">{{ $totalSessions }} Sesi</strong>
                         </p>
@@ -242,7 +242,7 @@
             </div>
 
             <div>
-                <h3 style="font-weight: 800; margin: 0 0 1.25rem 0; font-size: 1rem; color: var(--text-primary); font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+                <h3 style="font-weight: 800; margin: 0 0 1.25rem 0; font-size: 1rem; color: var(--text-primary); font-family: 'Georgia', serif; display: flex; align-items: center; gap: 0.5rem;">
                     <i class="ph ph-check-square" style="color: var(--accent-color); font-size: 1.25rem;"></i> 
                     Riwayat Kehadiran Presensi
                 </h3>
@@ -252,7 +252,7 @@
                     <div class="card" style="padding: 1.25rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0; height: 100%; border-radius: 12px;">
                         <div>
                             <div style="font-size: 0.725rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 0.5rem;">{{ date('d M Y', strtotime($session->date)) }}</div>
-                            <h4 style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin: 0 0 1rem 0; font-family: 'Outfit', sans-serif; min-height: 2.25rem; display: flex; align-items: center; justify-content: center;">{{ $session->title }}</h4>
+                            <h4 style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin: 0 0 1rem 0; font-family: 'Georgia', serif; min-height: 2.25rem; display: flex; align-items: center; justify-content: center;">{{ $session->title }}</h4>
                             
                             @php
                                 $detail = $session->details->first();

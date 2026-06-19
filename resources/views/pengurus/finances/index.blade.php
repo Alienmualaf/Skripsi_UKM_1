@@ -40,16 +40,6 @@
     <!-- Filter Form -->
     <form method="GET" action="{{ route('pengurus.finances.index') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.25rem;">
         <div style="width: 200px;">
-            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Kategori</label>
-            <select name="category_id" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
-                <option value="">Semua Kategori</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div style="width: 200px;">
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Jenis Aliran</label>
             <select name="type" class="form-control" style="padding: 0.5rem 0.75rem; width: 100%; border-radius: 8px; border: 1px solid var(--border-color);" onchange="this.form.submit()">
                 <option value="">Semua Jenis</option>
@@ -58,7 +48,7 @@
             </select>
         </div>
 
-        @if(request()->anyFilled(['category_id', 'type']))
+        @if(request()->anyFilled(['type']))
             <a href="{{ route('pengurus.finances.index') }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; text-decoration: none; color: var(--text-primary); font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; height: 2.5rem;"><i class="ph ph-x-circle"></i> Reset</a>
         @endif
     </form>
@@ -69,7 +59,7 @@
                 <tr>
                     <th>Tanggal</th>
                     <th>Transaksi</th>
-                    <th>Kategori & Deskripsi</th>
+                    <th>Deskripsi</th>
                     <th>Digunakan Untuk</th>
                     <th>Jenis</th>
                     <th>Nominal</th>
@@ -82,8 +72,7 @@
                     <td style="color: var(--text-secondary);">{{ date('d-m-Y', strtotime($fin->transaction_date)) }}</td>
                     <td style="font-weight: 600; color: var(--text-primary);">{{ $fin->title }}</td>
                     <td style="color: var(--text-secondary);">
-                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">{{ $fin->category->name ?? '-' }}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ $fin->description }}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ $fin->description ?: '-' }}</div>
                     </td>
                     <td>
                         @if($fin->used_for === 'Program Kerja')

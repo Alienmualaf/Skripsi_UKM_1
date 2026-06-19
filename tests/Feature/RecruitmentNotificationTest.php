@@ -79,13 +79,9 @@ class RecruitmentNotificationTest extends TestCase
         $this->assertEquals('Anggota Aktif', $member->status);
         $this->assertEquals($voiceClass->id, $member->voice_classification_id);
 
-        // Check Notification Logs (WA only)
+        // Check Notification Logs (WA only) - should be null now
         $waLog = NotificationLog::where('user_id', $user->id)->where('type', 'whatsapp')->first();
-        $this->assertNotNull($waLog);
-        $this->assertEquals('success', $waLog->status);
-        $this->assertEquals('081234567899', $waLog->recipient);
-        $this->assertStringContainsString('Tenor', $waLog->content);
-        $this->assertStringContainsString('password yang telah Anda daftarkan', $waLog->content);
+        $this->assertNull($waLog);
 
         // Verify we can log in using the original password
         $loginResponse = $this->post(route('login'), [
@@ -135,11 +131,8 @@ class RecruitmentNotificationTest extends TestCase
         $this->assertEquals('inactive', $user->status);
         $this->assertEquals('Ditolak', $member->status);
 
-        // Check Notification Logs (WA only)
+        // Check Notification Logs (WA only) - should be null now
         $waLog = NotificationLog::where('user_id', $user->id)->where('type', 'whatsapp')->first();
-        $this->assertNotNull($waLog);
-        $this->assertEquals('success', $waLog->status);
-        $this->assertEquals('081234567899', $waLog->recipient);
-        $this->assertStringContainsString('belum dapat kami terima', $waLog->content);
+        $this->assertNull($waLog);
     }
 }

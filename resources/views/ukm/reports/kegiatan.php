@@ -66,7 +66,7 @@
         </div>
 
         {{-- Content based on type --}}
-        @if($program->activity_type === 'Event')
+        @if(in_array(strtolower($program->activity_type), ['event', 'internal']))
             {{-- EVENT STRUCTURE --}}
             <div>
                 

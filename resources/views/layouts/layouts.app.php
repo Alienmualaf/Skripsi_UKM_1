@@ -7,7 +7,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Custom CSS -->
@@ -42,8 +42,8 @@
                         <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
                     <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                        <span style="font-weight: 800; font-size: 0.95rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--text-primary); font-family: 'Outfit', sans-serif;">{{ $websiteSettings['site_name'] ?? 'PSUP' }} Portal</span>
-                        <span style="font-size: 0.6rem; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1;">Univ Pancasila</span>
+                        <span style="font-weight: 800; font-size: 0.95rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--text-primary); font-family: 'Georgia', serif;">{{ $websiteSettings['site_name'] ?? 'PSUP' }} Portal</span>
+                        <span style="font-size: 0.6rem; font-weight: 700; color: #c5a059; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1;">Univ Pancasila</span>
                     </div>
                 </a>
             </div>
@@ -373,7 +373,7 @@
                             <i class="ph-fill ph-warning" style="font-size: 1.5rem;"></i>
                         </div>
                         <div style="flex: 1;">
-                            <h4 style="margin: 0 0 0.35rem 0; font-weight: 800; font-size: 1.05rem; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Konfirmasi Tindakan</h4>
+                            <h4 style="margin: 0 0 0.35rem 0; font-weight: 800; font-size: 1.05rem; color: var(--text-primary); font-family: 'Georgia', serif;">Konfirmasi Tindakan</h4>
                             <p id="confirm-modal-message" style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; font-weight: 500;"></p>
                         </div>
                     </div>

@@ -137,7 +137,7 @@ td {
 </div>
 <hr class="kop-line">
 
-@if($program->activity_type === 'Event')
+@if(in_array(strtolower($program->activity_type), ['event', 'internal']))
     {{-- EVENT STRUCTURE --}}
     <div class="report-title">
         LAPORAN KEGIATAN EVENT<br>

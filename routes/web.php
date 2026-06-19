@@ -139,10 +139,13 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name
     Route::get('/email-logs', [UKMAdminController::class, 'emailLogs'])->name('email-logs');
     Route::post('/email-logs/{id}/resend', [UKMAdminController::class, 'resendEmail'])->name('email-logs.resend');
     
-    // Pelatih — Admin UKM hanya bisa lihat & edit (tidak bisa tambah/hapus)
+    // Pelatih — Admin UKM bisa tambah, edit, dan hapus
     Route::get('/trainers', [UKMAdminController::class, 'index'])->name('trainers.index');
+    Route::get('/trainers/create', [UKMAdminController::class, 'create'])->name('trainers.create');
+    Route::post('/trainers', [UKMAdminController::class, 'store'])->name('trainers.store');
     Route::get('/trainers/{id}/edit', [UKMAdminController::class, 'edit'])->name('trainers.edit');
     Route::match(['POST','PUT'], '/trainers/{id}', [UKMAdminController::class, 'update'])->name('trainers.update');
+    Route::delete('/trainers/{id}', [UKMAdminController::class, 'destroy'])->name('trainers.destroy');
     
     // Klasifikasi Suara
     Route::get('/voice-classifications', [UKMAdminController::class, 'voiceClassifications'])->name('voice-classifications');
@@ -291,9 +294,6 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
 
     // Category Management
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories/finance', [CategoryController::class, 'storeFinance'])->name('categories.finance.store');
-    Route::put('/categories/finance/{id}', [CategoryController::class, 'updateFinance'])->name('categories.finance.update');
-    Route::delete('/categories/finance/{id}', [CategoryController::class, 'destroyFinance'])->name('categories.finance.destroy');
 
     Route::post('/categories/letter', [CategoryController::class, 'storeLetter'])->name('categories.letter.store');
     Route::put('/categories/letter/{id}', [CategoryController::class, 'updateLetter'])->name('categories.letter.update');

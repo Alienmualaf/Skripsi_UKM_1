@@ -174,7 +174,6 @@ td {
                 <th style="width: 12%;">Tanggal</th>
                 <th style="width: 12%;">Jenis</th>
                 <th style="width: 20%;">Transaksi</th>
-                <th style="width: 12%;">Kategori</th>
                 <th style="width: 15%;">Digunakan Untuk</th>
                 <th>Deskripsi</th>
                 <th class="text-right" style="width: 15%;">Jumlah</th>
@@ -187,7 +186,6 @@ td {
                 <td>{{ date('d-m-Y', strtotime($f->transaction_date)) }}</td>
                 <td>{{ $f->type === 'income' ? 'Pemasukan' : 'Pengeluaran' }}</td>
                 <td>{{ $f->title }}</td>
-                <td>{{ $f->category->name ?? '-' }}</td>
                 <td>{{ $f->used_for === 'Program Kerja' ? ($f->program->name ?? '-') : 'Umum' }}</td>
                 <td>{{ $f->description ?? '-' }}</td>
                 <td class="text-right" style="font-weight: bold;">
@@ -196,7 +194,7 @@ td {
             </tr>
             @empty
             <tr>
-                <td colspan="8" style="text-align: center; font-style: italic;">Tidak ada data transaksi keuangan.</td>
+                <td colspan="7" style="text-align: center; font-style: italic;">Tidak ada data transaksi keuangan.</td>
             </tr>
             @endforelse
         </tbody>

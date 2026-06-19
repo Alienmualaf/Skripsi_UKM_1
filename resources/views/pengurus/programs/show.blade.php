@@ -32,9 +32,15 @@
         <a href="{{ route('pengurus.programs.edit', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.35rem;">
             <i class="ph ph-pencil-simple"></i> Edit
         </a>
-        <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn btn-primary" style="padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
-            <i class="ph ph-file-text"></i> {{ $program->report ? 'Lihat LPJ' : 'Buat LPJ' }}
-        </a>
+        @if($program->report)
+            <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <i class="ph ph-file-text"></i> Lihat LPJ
+            </a>
+        @else
+            <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn btn-primary" style="padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <i class="ph ph-file-text"></i> Buat LPJ
+            </a>
+        @endif
     </div>
 </div>
 
@@ -106,9 +112,14 @@
                 @endif
             </div>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">{{ $program->report->title }}</p>
-            <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
-                <i class="ph ph-eye"></i> Lihat LPJ
-            </a>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
+                    <i class="ph ph-eye"></i> Lihat LPJ
+                </a>
+                <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px; color: var(--text-primary);">
+                    <i class="ph ph-pencil-simple"></i> Edit LPJ
+                </a>
+            </div>
         @else
             <div style="text-align: center; padding: 1.5rem 0;">
                 <i class="ph ph-file-plus" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>

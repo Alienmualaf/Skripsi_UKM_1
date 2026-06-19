@@ -41,7 +41,7 @@
 
 <!-- Welcome & Voice Classification Card -->
 <div class="card mb-6" style="padding: 2rem; background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%); color: white; border-radius: 16px; margin-bottom: 1.5rem;">
-    <h2 style="margin: 0; font-size: 1.75rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: #ffffff !important;">Selamat Datang, {{ auth()->user()->name }}!</h2>
+    <h2 style="margin: 0; font-size: 1.75rem; font-weight: 800; font-family: 'Georgia', serif; color: #ffffff !important;">Selamat Datang, {{ auth()->user()->name }}!</h2>
     <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 600; color: #ffffff !important;">
         NPM: {{ $member->npm ?? '-' }} | Klasifikasi Suara: 
         <span style="background: rgba(255,255,255,0.25); padding: 0.25rem 0.55rem; border-radius: 6px; font-weight: 800; color: #ffffff !important;">
@@ -54,7 +54,7 @@
 <div class="grid-3-stats">
     <!-- Klasifikasi Suara -->
     <div class="card member-stat-card">
-        <div class="member-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+        <div class="member-icon-box" style="background: rgba(30, 64, 175, 0.08); color: #1e40af;">
             <i class="ph ph-microphone"></i>
         </div>
         <div>
@@ -65,7 +65,7 @@
 
     <!-- Classroom Saya -->
     <div class="card member-stat-card">
-        <div class="member-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+        <div class="member-icon-box" style="background: rgba(197, 160, 89, 0.12); color: #c5a059;">
             <i class="ph ph-chalkboard"></i>
         </div>
         <div>
@@ -76,7 +76,7 @@
 
     <!-- Penampilan yang Diikuti -->
     <div class="card member-stat-card">
-        <div class="member-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+        <div class="member-icon-box" style="background: rgba(30, 64, 175, 0.08); color: #1e40af;">
             <i class="ph ph-microphone-stage"></i>
         </div>
         <div>

@@ -108,7 +108,6 @@
                     <th>Tanggal</th>
                     <th>Jenis</th>
                     <th>Transaksi</th>
-                    <th>Kategori</th>
                     <th>Digunakan Untuk</th>
                     <th>Deskripsi</th>
                     <th style="text-align:right;">Nominal</th>
@@ -126,11 +125,6 @@
                         @endif
                     </td>
                     <td style="font-weight:700;color:var(--text-primary);">{{ $f->title }}</td>
-                    <td>
-                        <span class="badge" style="background:var(--bg-color);border:1px solid var(--border-color);color:var(--text-secondary);font-weight:600;font-size:0.7rem;padding:0.25rem 0.5rem;">
-                            {{ $f->category->name ?? '-' }}
-                        </span>
-                    </td>
                     <td>
                         @if($f->used_for === 'Program Kerja')
                             <span class="badge" style="background:rgba(30,64,175,0.06);color:var(--accent-color);border:1px solid rgba(30,64,175,0.12);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">
@@ -151,7 +145,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align:center;color:var(--text-secondary);padding:2rem;">Tidak ada data transaksi keuangan yang sesuai filter.</td>
+                    <td colspan="6" style="text-align:center;color:var(--text-secondary);padding:2rem;">Tidak ada data transaksi keuangan yang sesuai filter.</td>
                 </tr>
                 @endforelse
             </tbody>

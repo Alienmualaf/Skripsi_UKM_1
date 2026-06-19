@@ -147,33 +147,9 @@ class DatabaseSeeder extends Seeder
         $pengurusMemberId = DB::table('members')->where('npm', '4520210002')->value('id');
         $anggotaMemberId = DB::table('members')->where('npm', '4520220003')->value('id');
 
-        // 5. Seed Finance Categories
-        $financeCategories = [
-            ['name' => 'Iuran Anggota', 'type' => 'income'],
-            ['name' => 'Fee Penampilan', 'type' => 'income'],
-            ['name' => 'Dana Kampus', 'type' => 'income'],
-            ['name' => 'Sponsor', 'type' => 'income'],
-            ['name' => 'Honor Pelatih', 'type' => 'expense'],
-            ['name' => 'Konsumsi', 'type' => 'expense'],
-            ['name' => 'Transportasi', 'type' => 'expense'],
-            ['name' => 'Peralatan', 'type' => 'expense'],
-            ['name' => 'Operasional', 'type' => 'expense'],
-        ];
-
-        foreach ($financeCategories as $fc) {
-            DB::table('finance_categories')->updateOrInsert(['name' => $fc['name']], $fc);
-        }
-
-        // Get Category IDs
-        $iuranId = DB::table('finance_categories')->where('name', 'Iuran Anggota')->value('id');
-        $feeId = DB::table('finance_categories')->where('name', 'Fee Penampilan')->value('id');
-        $honorId = DB::table('finance_categories')->where('name', 'Honor Pelatih')->value('id');
-        $konsumsiId = DB::table('finance_categories')->where('name', 'Konsumsi')->value('id');
-
         // 6. Seed Sample Finance Transactions
         $finances = [
             [
-                'finance_category_id' => $iuranId,
                 'type' => 'income',
                 'amount' => 500000.00,
                 'title' => 'Iuran Kas Bulan Mei 2026',
@@ -181,7 +157,6 @@ class DatabaseSeeder extends Seeder
                 'transaction_date' => '2026-05-15',
             ],
             [
-                'finance_category_id' => $feeId,
                 'type' => 'income',
                 'amount' => 3500000.00,
                 'title' => 'Fee Penampilan Wisuda UP Semester Genap',
@@ -189,7 +164,6 @@ class DatabaseSeeder extends Seeder
                 'transaction_date' => '2026-05-20',
             ],
             [
-                'finance_category_id' => $honorId,
                 'type' => 'expense',
                 'amount' => 1500000.00,
                 'title' => 'Honor Pelatih Bulan Mei 2026',
@@ -197,7 +171,6 @@ class DatabaseSeeder extends Seeder
                 'transaction_date' => '2026-05-28',
             ],
             [
-                'finance_category_id' => $konsumsiId,
                 'type' => 'expense',
                 'amount' => 300000.00,
                 'title' => 'Konsumsi Latihan Rutin',

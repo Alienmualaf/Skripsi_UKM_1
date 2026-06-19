@@ -15,7 +15,6 @@ use App\Models\Material;
 use App\Models\Inventory;
 use App\Models\InventoryLoan;
 use App\Models\Finance;
-use App\Models\FinanceCategory;
 use App\Models\Letter;
 use App\Models\Attendance;
 use App\Models\ActivityLog;
@@ -415,9 +414,8 @@ class DashboardController extends Controller
 
     public function monitorKeuangan()
     {
-        $finances = Finance::with('category')->paginate(10, ['*'], 'finances_page');
-        $categories = FinanceCategory::paginate(10, ['*'], 'categories_page');
-        return view('admin.monitor.keuangan', compact('finances', 'categories'));
+        $finances = Finance::paginate(10, ['*'], 'finances_page');
+        return view('admin.monitor.keuangan', compact('finances'));
     }
 
     public function monitorInventaris()

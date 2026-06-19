@@ -80,70 +80,100 @@
     </div>
 </div>
 
-{{-- Section 1: Program Kerja --}}
-<div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
-    <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph-fill ph-target" style="color:#3b82f6;"></i> Ringkasan Program Kerja
-    </h5>
-    <table class="table" style="font-size:0.85rem;">
-        <thead><tr><th>#</th><th>Nama Program</th><th>Divisi</th><th>Tipe</th><th>Tanggal</th><th>Status</th><th>Laporan</th></tr></thead>
-        <tbody>
-            @forelse($programs as $i => $prog)
-            <tr>
-                <td>{{ $i+1 }}</td>
-                <td style="font-weight:600;">{{ $prog->name }}</td>
-                <td>{{ $prog->division }}</td>
-                <td>
-                    @php $tc = ['Internal'=>'#6366f1','Event'=>'#0ea5e9','Competition'=>'#f59e0b','Performance'=>'#10b981']; $c = $tc[$prog->activity_type] ?? '#888'; @endphp
-                    <span style="background:{{ $c }}22;color:{{ $c }};padding:0.2rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:700;">{{ $prog->activity_type }}</span>
-                </td>
-                <td>{{ $prog->start_date ? date('d M Y', strtotime($prog->start_date)) : '-' }}</td>
-                <td><span class="badge" style="font-weight:700;">{{ $prog->status }}</span></td>
-                <td>
-                    @if($prog->report)
-                    <span class="badge" style="background:rgba(16,185,129,0.1);color:var(--success-color);font-weight:700;">Ada</span>
-                    @else
-                    <span class="badge" style="background:var(--border-color);color:var(--text-muted);">-</span>
-                    @endif
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:1.5rem;">Tidak ada program kerja pada periode ini.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+{{-- Section 1 & 2: Program Kerja & Penyanyi (repeating for each proker) --}}
+<h4 style="font-weight:800; font-size:1.15rem; margin:1.5rem 0 1rem 0; display:flex; align-items:center; gap:0.5rem; color:var(--text-primary);">
+    <i class="ph-fill ph-target" style="color:#3b82f6;"></i> Laporan Pelaksanaan Program Kerja (Proker)
+</h4>
 
-{{-- Section 2: Penampilan --}}
-<div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
-    <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph-fill ph-microphone-stage" style="color:#10b981;"></i> Ringkasan Penampilan
+@forelse($programs as $i => $prog)
+<div class="card" style="padding:1.75rem; margin-bottom:1.5rem; border-left:4px solid var(--accent-color);">
+    <h5 style="font-weight:800; font-size:1.1rem; margin:0 0 1.25rem 0; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center;">
+        <span>{{ $i+1 }}. {{ $prog->name }}</span>
+        @php 
+            $tc = ['Internal'=>'#6366f1','Event'=>'#0ea5e9','Competition'=>'#f59e0b','Performance'=>'#10b981']; 
+            $c = $tc[$prog->activity_type] ?? '#888'; 
+        @endphp
+        <span style="background:{{ $c }}22; color:{{ $c }}; padding:0.25rem 0.6rem; border-radius:6px; font-size:0.75rem; font-weight:700;">{{ $prog->activity_type }}</span>
     </h5>
-    <table class="table" style="font-size:0.85rem;">
-        <thead><tr><th>#</th><th>Judul</th><th>Venue</th><th>Tanggal</th><th>Status</th></tr></thead>
-        <tbody>
-            @forelse($performances as $i => $perf)
-            <tr>
-                <td>{{ $i+1 }}</td>
-                <td style="font-weight:600;">{{ $perf->title }}</td>
-                <td>{{ $perf->venue }}</td>
-                <td>{{ $perf->performance_date ? date('d M Y', strtotime($perf->performance_date)) : '-' }}</td>
-                <td>
-                    @php $sc = $perf->status === 'Selesai' ? '#10b981' : ($perf->status === 'Berlangsung' ? '#f59e0b' : '#6366f1'); @endphp
-                    <span style="background:{{ $sc }}22;color:{{ $sc }};padding:0.2rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:700;">{{ $perf->status }}</span>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;">Tidak ada penampilan pada periode ini.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+
+    {{-- 1. NAMA KEGIATAN, PENANGGUNG JAWAB, TANGGAL, & TEMPAT --}}
+    <div style="margin-bottom:1.5rem; background:var(--bg-color); border:1px solid var(--border-color); padding:1rem 1.25rem; border-radius:8px;">
+        <h6 style="font-weight:700; font-size:0.875rem; margin:0 0 0.75rem 0; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:0.35rem;">
+            <i class="ph ph-info"></i> 1. Detail Kegiatan
+        </h6>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.875rem;">
+            <div>
+                <span style="color:var(--text-secondary); display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase;">Nama Kegiatan</span>
+                <span style="font-weight:700; color:var(--text-primary);">{{ $prog->name }}</span>
+            </div>
+            <div>
+                <span style="color:var(--text-secondary); display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase;">Penanggung Jawab</span>
+                <span style="font-weight:700; color:var(--text-primary);">{{ $prog->pic ?? '-' }}</span>
+            </div>
+            <div>
+                <span style="color:var(--text-secondary); display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase;">Tanggal</span>
+                <span style="font-weight:700; color:var(--text-primary);">{{ $prog->start_date ? date('d M Y', strtotime($prog->start_date)) : '-' }} @if($prog->end_date && $prog->end_date !== $prog->start_date) s.d. {{ date('d M Y', strtotime($prog->end_date)) }} @endif</span>
+            </div>
+            <div>
+                <span style="color:var(--text-secondary); display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase;">Tempat</span>
+                <span style="font-weight:700; color:var(--text-primary);">{{ $prog->venue ?? '-' }}</span>
+            </div>
+        </div>
+        @if($prog->description)
+        <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-size: 0.85rem; line-height:1.6; color:var(--text-secondary);">
+            <strong>Deskripsi:</strong> {{ $prog->description }}
+        </div>
+        @endif
+    </div>
+
+    {{-- 2. DAFTAR PENYANYI YANG IKUT (Only if NOT Event) --}}
+    @if(in_array(strtolower($prog->activity_type), ['competition', 'performance']))
+    <div style="margin-bottom:0.5rem;">
+        <h6 style="font-weight:700; font-size:0.875rem; margin:0 0 0.75rem 0; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:0.35rem;">
+            <i class="ph ph-users"></i> 2. Daftar Penyanyi yang Ikut
+        </h6>
+        @php
+            $mems = null;
+            if ($prog->performance && $prog->performance->classroom) {
+                $mems = $prog->performance->classroom->members;
+            }
+        @endphp
+        @if($mems && $mems->count() > 0)
+            <div class="table-wrapper" style="margin:0; box-shadow:none; border:1px solid var(--border-color);">
+                <table class="table" style="font-size:0.825rem; margin:0;">
+                    <thead>
+                        <tr><th>#</th><th>Nama Penyanyi</th><th>Klasifikasi Suara</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($mems as $idx => $m)
+                        <tr>
+                            <td>{{ $idx+1 }}</td>
+                            <td style="font-weight:700; color:var(--text-primary);">{{ $m->name }}</td>
+                            <td style="font-weight:600; color:var(--text-primary);">{{ $m->voiceClassification->name ?? '-' }}</td>
+                            <td>
+                                <span class="badge" style="background:rgba(16,185,129,0.1); color:var(--success-color); font-weight:700;">{{ $m->status }}</span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <p style="font-size:0.825rem; color:var(--text-muted); font-style:italic; margin:0.5rem 0;">Belum ada daftar penyanyi yang ditentukan.</p>
+        @endif
+    </div>
+    @endif
 </div>
+@empty
+<div class="card" style="padding:2rem; text-align:center; color:var(--text-muted);">
+    Tidak ada program kerja pada periode ini.
+</div>
+@endforelse
 
 {{-- Section 3: Keuangan --}}
 <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph-fill ph-money" style="color:#10b981;"></i> Rekapitulasi Keuangan
+        <i class="ph-fill ph-money" style="color:#10b981;"></i> 3. Rekapitulasi Keuangan Selama Satu Periode
     </h5>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
         <div>
@@ -180,7 +210,7 @@
 {{-- Section 4: Inventaris --}}
 <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph-fill ph-package" style="color:#f59e0b;"></i> Rekapitulasi Inventaris
+        <i class="ph-fill ph-package" style="color:#f59e0b;"></i> 4. Rekapitulasi Inventaris
     </h5>
     <table class="table" style="font-size:0.85rem;">
         <thead><tr><th>#</th><th>Nama</th><th>Kode</th><th>Kategori</th><th>Kondisi</th><th>Jumlah</th><th>Lokasi</th></tr></thead>
@@ -205,7 +235,7 @@
 {{-- Section 5: Persuratan --}}
 <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph-fill ph-envelope" style="color:#06b6d4;"></i> Rekapitulasi Persuratan
+        <i class="ph-fill ph-envelope" style="color:#06b6d4;"></i> 5. Rekapitulasi Persuratan
     </h5>
     <table class="table" style="font-size:0.85rem;">
         <thead><tr><th>#</th><th>No. Surat</th><th>Tanggal</th><th>Perihal</th><th>Tujuan</th><th>Jenis</th></tr></thead>

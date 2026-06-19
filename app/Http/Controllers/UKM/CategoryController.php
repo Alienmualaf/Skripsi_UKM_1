@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\UKM;
 
 use App\Http\Controllers\Controller;
-use App\Models\FinanceCategory;
 use App\Models\LetterCategory;
 use App\Models\InventoryCategory;
-use App\Models\Finance;
 use App\Models\Letter;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
@@ -15,8 +13,6 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $financeCategories = FinanceCategory::withCount('finances')->get();
-        
         // Fetch letter categories and dynamically count their usages
         $letterCategories = LetterCategory::all()->map(function($cat) {
             $cat->letters_count = Letter::where('type', $cat->name)->count();
@@ -30,47 +26,9 @@ class CategoryController extends Controller
         });
 
         return view('pengurus.categories.index', compact(
-            'financeCategories', 
             'letterCategories', 
             'inventoryCategories'
         ));
-    }
-
-    // --- FINANCE CATEGORIES ---
-    public function storeFinance(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:finance_categories,name',
-            'type' => 'required|in:income,expense',
-        ]);
-
-        FinanceCategory::create($data);
-
-        return back()->with('success', 'Kategori keuangan berhasil ditambahkan.');
-    }
-
-    public function updateFinance(Request $request, $id)
-    {
-        $category = FinanceCategory::findOrFail($id);
-        
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:finance_categories,name,' . $id,
-            'type' => 'required|in:income,expense',
-        ]);
-
-        $category->update($data);
-
-        return back()->with('success', 'Kategori keuangan berhasil diperbarui.');
-    }
-
-    public function destroyFinance($id)
-    {
-        $category = FinanceCategory::findOrFail($id);
-        if ($category->finances()->exists()) {
-            return back()->with('error', 'Kategori keuangan tidak bisa dihapus karena sudah digunakan dalam transaksi.');
-        }
-        $category->delete();
-        return back()->with('success', 'Kategori keuangan berhasil dihapus.');
     }
 
     // --- LETTER CATEGORIES ---

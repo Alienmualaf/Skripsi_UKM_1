@@ -19,16 +19,13 @@
         @method('PUT')
         
         <div class="form-group mb-4">
-            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Jenis Kategori</label>
-            <select name="finance_category_id" class="form-control" required style="padding: 0.65rem;">
-                <option value="">-- Pilih Kategori --</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ old('finance_category_id', $finance->finance_category_id) == $cat->id ? 'selected' : '' }}>
-                        [{{ strtoupper($cat->type) }}] {{ $cat->name }}
-                    </option>
-                @endforeach
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Jenis Aliran</label>
+            <select name="type" class="form-control" required style="padding: 0.65rem;">
+                <option value="">-- Pilih Jenis Aliran --</option>
+                <option value="income" {{ old('type', $finance->type) === 'income' ? 'selected' : '' }}>Pemasukan (Income)</option>
+                <option value="expense" {{ old('type', $finance->type) === 'expense' ? 'selected' : '' }}>Pengeluaran (Expense)</option>
             </select>
-            @error('finance_category_id') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
+            @error('type') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>
 
         <div class="form-group mb-4">

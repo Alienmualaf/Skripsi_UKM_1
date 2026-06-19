@@ -43,7 +43,7 @@
 <div class="grid-4-stats">
     <!-- Total Anggota Aktif -->
     <div class="card ukm-stat-card">
-        <div class="ukm-icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+        <div class="ukm-icon-box" style="background: rgba(30, 64, 175, 0.08); color: #1e40af;">
             <i class="ph ph-users-three"></i>
         </div>
         <div>
@@ -54,7 +54,7 @@
 
     <!-- Total Program Kerja Aktif -->
     <div class="card ukm-stat-card">
-        <div class="ukm-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+        <div class="ukm-icon-box" style="background: rgba(197, 160, 89, 0.12); color: #c5a059;">
             <i class="ph ph-presentation-chart"></i>
         </div>
         <div>
@@ -65,7 +65,7 @@
 
     <!-- Total Penampilan -->
     <div class="card ukm-stat-card">
-        <div class="ukm-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+        <div class="ukm-icon-box" style="background: rgba(30, 64, 175, 0.08); color: #1e40af;">
             <i class="ph ph-microphone-stage"></i>
         </div>
         <div>
@@ -76,12 +76,12 @@
 
     <!-- Saldo Kas Saat Ini -->
     <div class="card ukm-stat-card">
-        <div class="ukm-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+        <div class="ukm-icon-box" style="background: rgba(197, 160, 89, 0.12); color: #c5a059;">
             <i class="ph ph-wallet"></i>
         </div>
         <div>
             <h4 style="margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Saldo Kas Saat Ini</h4>
-            <div style="font-size: 1.5rem; font-weight: 800; color: var(--success-color); margin-top: 0.15rem;">Rp{{ number_format($netBalance, 0, ',', '.') }}</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #c5a059; margin-top: 0.15rem;">Rp{{ number_format($netBalance, 0, ',', '.') }}</div>
         </div>
     </div>
 </div>

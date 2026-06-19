@@ -199,101 +199,70 @@ td {
     </p>
 </div>
 
-<!-- RINGKASAN STATISTIK -->
-<div class="section-divider">Ringkasan Pelaksanaan Program</div>
-<div class="summary-grid">
-    <div class="summary-box">
-        <div class="num">{{ $programs->count() }}</div>
-        <div class="lbl">Program Kerja</div>
-    </div>
-    <div class="summary-box">
-        <div class="num">{{ $performances->count() }}</div>
-        <div class="lbl">Penampilan</div>
-    </div>
-    <div class="summary-box">
-        <div class="num">{{ $members->count() }}</div>
-        <div class="lbl">Anggota Aktif</div>
-    </div>
-    <div class="summary-box">
-        <div class="num">{{ $letters->count() }}</div>
-        <div class="lbl">Surat Terarsip</div>
-    </div>
-    <div class="summary-box" style="grid-column: span 2;">
-        <div class="num">Rp {{ number_format($income, 0, ',', '.') }}</div>
-        <div class="lbl">Total Pemasukan</div>
-    </div>
-    <div class="summary-box" style="grid-column: span 2;">
-        <div class="num">Rp {{ number_format($saldo, 0, ',', '.') }}</div>
-        <div class="lbl">Saldo Akhir</div>
-    </div>
-</div>
 
-<!-- BAB I: PROGRAM KERJA -->
+
+<!-- BAB I: LAPORAN PROGRAM KERJA -->
 <div class="bab">
     <div class="bab-title">BAB I</div>
-    <div class="bab-subtitle">Rekapitulasi Program Kerja</div>
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center" style="width:5%">No</th>
-                <th style="width:30%">Nama Program</th>
-                <th style="width:20%">Divisi</th>
-                <th style="width:15%">Tipe</th>
-                <th style="width:15%">Tanggal</th>
-                <th style="width:15%">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($programs as $i => $prog)
-            <tr>
-                <td class="text-center">{{ $i+1 }}</td>
-                <td class="fw-bold">{{ $prog->name }}</td>
-                <td>{{ $prog->division }}</td>
-                <td>{{ $prog->activity_type }}</td>
-                <td>{{ $prog->start_date ? date('d-m-Y', strtotime($prog->start_date)) : '-' }}</td>
-                <td>{{ $prog->status }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="6" class="text-center" style="font-style: italic;">Tidak ada data program kerja.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="bab-subtitle">Laporan Pelaksanaan Program Kerja (Proker)</div>
+    
+    @forelse($programs as $i => $prog)
+    <div style="page-break-inside: avoid; margin-bottom: 25px; border-bottom: 1px dashed #000; padding-bottom: 15px;">
+        <p style="font-weight: bold; font-size: 11pt; margin-bottom: 8px;">{{ chr(65 + $i) }}. Program Kerja: {{ $prog->name }}</p>
+        
+        <!-- 1. NAMA KEGIATAN, PENANGGUNG JAWAB, TANGGAL, & TEMPAT -->
+        <p style="font-weight: bold; font-size: 10pt; margin-top: 5px; margin-bottom: 3px; text-transform: uppercase;">1. NAMA KEGIATAN, PENANGGUNG JAWAB, TANGGAL, & TEMPAT</p>
+        <table class="kv-table" style="margin-bottom: 10px; width: 100%;">
+            <tr><td style="width: 35%; font-weight: bold; padding: 2px 0; border: none;">Nama Kegiatan</td><td style="padding: 2px 0; border: none;">: {{ $prog->name }}</td></tr>
+            <tr><td style="width: 35%; font-weight: bold; padding: 2px 0; border: none;">Penanggung Jawab (PIC)</td><td style="padding: 2px 0; border: none;">: {{ $prog->pic ?? '-' }}</td></tr>
+            <tr><td style="width: 35%; font-weight: bold; padding: 2px 0; border: none;">Tanggal Pelaksanaan</td><td style="padding: 2px 0; border: none;">: {{ $prog->start_date ? date('d-m-Y', strtotime($prog->start_date)) : '-' }} @if($prog->end_date && $prog->end_date !== $prog->start_date) s.d. {{ date('d-m-Y', strtotime($prog->end_date)) }} @endif</td></tr>
+            <tr><td style="width: 35%; font-weight: bold; padding: 2px 0; border: none;">Tempat / Lokasi</td><td style="padding: 2px 0; border: none;">: {{ $prog->venue ?? '-' }}</td></tr>
+        </table>
+
+        {{-- 2. DAFTAR PENYANYI YANG IKUT --}}
+        @if(in_array(strtolower($prog->activity_type), ['competition', 'performance']))
+        <p style="font-weight: bold; font-size: 10pt; margin-top: 5px; margin-bottom: 3px; text-transform: uppercase;">2. DAFTAR PENYANYI YANG IKUT</p>
+        @php
+            $mems = null;
+            if ($prog->performance && $prog->performance->classroom) {
+                $mems = $prog->performance->classroom->members;
+            }
+        @endphp
+        @if($mems && $mems->count() > 0)
+        <table style="width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="width: 8%; text-align: center; border: 1px solid #000; padding: 4px;">No</th>
+                    <th style="border: 1px solid #000; padding: 4px;">Nama Penyanyi</th>
+                    <th style="border: 1px solid #000; padding: 4px;">Klasifikasi Suara</th>
+                    <th style="border: 1px solid #000; padding: 4px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($mems as $idx => $m)
+                <tr>
+                    <td class="text-center" style="border: 1px solid #000; padding: 4px;">{{ $idx+1 }}</td>
+                    <td style="border: 1px solid #000; padding: 4px;">{{ $m->name }}</td>
+                    <td style="border: 1px solid #000; padding: 4px;">{{ $m->voiceClassification->name ?? '-' }}</td>
+                    <td style="border: 1px solid #000; padding: 4px;">{{ $m->status }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @else
+        <p style="font-size: 10pt; font-style: italic; margin-left: 10px;">Belum ada daftar penyanyi yang ditentukan.</p>
+        @endif
+        @endif
+    </div>
+    @empty
+    <p style="text-align: center; font-style: italic;">Tidak ada program kerja pada periode ini.</p>
+    @endforelse
 </div>
 
-<!-- BAB II: PENAMPILAN -->
+<!-- BAB II: KEUANGAN -->
 <div class="bab">
     <div class="bab-title">BAB II</div>
-    <div class="bab-subtitle">Rekapitulasi Penampilan</div>
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center" style="width:5%">No</th>
-                <th style="width:35%">Judul Penampilan</th>
-                <th style="width:25%">Venue / Lokasi</th>
-                <th style="width:18%">Tanggal</th>
-                <th style="width:17%">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($performances as $i => $perf)
-            <tr>
-                <td class="text-center">{{ $i+1 }}</td>
-                <td class="fw-bold">{{ $perf->title }}</td>
-                <td>{{ $perf->venue }}</td>
-                <td>{{ $perf->performance_date ? date('d-m-Y', strtotime($perf->performance_date)) : '-' }}</td>
-                <td>{{ $perf->status }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="5" class="text-center" style="font-style: italic;">Tidak ada data penampilan.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-
-<!-- BAB III: KEUANGAN -->
-<div class="bab">
-    <div class="bab-title">BAB III</div>
-    <div class="bab-subtitle">Rekapitulasi Keuangan</div>
+    <div class="bab-subtitle">3. Daftar Keuangan Selama Satu Periode</div>
     <table>
         <thead>
             <tr>
@@ -336,10 +305,10 @@ td {
     </table>
 </div>
 
-<!-- BAB IV: INVENTARIS -->
+<!-- BAB III: INVENTARIS -->
 <div class="bab">
-    <div class="bab-title">BAB IV</div>
-    <div class="bab-subtitle">Rekapitulasi Inventaris Organisasi</div>
+    <div class="bab-title">BAB III</div>
+    <div class="bab-subtitle">4. Daftar Inventaris</div>
     <table>
         <thead>
             <tr>
@@ -370,10 +339,10 @@ td {
     </table>
 </div>
 
-<!-- BAB V: PERSURATAN -->
+<!-- BAB IV: PERSURATAN -->
 <div class="bab">
-    <div class="bab-title">BAB V</div>
-    <div class="bab-subtitle">Rekapitulasi Persuratan</div>
+    <div class="bab-title">BAB IV</div>
+    <div class="bab-subtitle">5. Persuratan</div>
     <table>
         <thead>
             <tr>

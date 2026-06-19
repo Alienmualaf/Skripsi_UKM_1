@@ -16,7 +16,6 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Announcement;
 use App\Models\NotificationLog;
-use App\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -356,11 +355,7 @@ class UKMAdminController extends Controller
                 'voice_classification_id' => $voiceClassId,
             ]);
 
-            // 2. Send WhatsApp Notification
-            $waMessage = "Halo {$member->name}, Selamat bergabung di Paduan Suara Universitas Pancasila (PSUP)! Anda diterima sebagai anggota dengan klasifikasi suara: {$voiceClassName}. Silakan login ke sistem menggunakan email: {$member->email} dan password yang telah Anda daftarkan saat pendaftaran di " . url('/login') . ". Harap segera lengkapi profil Anda setelah login pertama. Terima kasih.";
-            NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
-
-            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota diaktifkan & notifikasi WhatsApp dikirim.");
+            return back()->with('success', "Pendaftaran {$member->name} diterima. Akun anggota diaktifkan.");
         } else {
             // Update user status
             if ($user) {
@@ -374,11 +369,7 @@ class UKMAdminController extends Controller
                 'status' => 'Ditolak',
             ]);
 
-            // 2. Send WhatsApp Notification
-            $waMessage = "Halo {$member->name}, Terima kasih atas ketertarikan Anda untuk bergabung dengan PSUP. Setelah melalui proses evaluasi berkas dan klasifikasi suara, dengan menyesal kami informasikan bahwa pendaftaran Anda belum dapat kami terima untuk periode ini. Tetap semangat dan silakan mendaftar kembali di rekrutmen berikutnya!";
-            NotificationService::sendWhatsApp($user?->id, $member->phone, $member->name, $waMessage);
-
-            return back()->with('success', "Pendaftaran {$member->name} ditolak. Notifikasi penolakan WhatsApp dikirim.");
+            return back()->with('success', "Pendaftaran {$member->name} ditolak.");
         }
     }
 

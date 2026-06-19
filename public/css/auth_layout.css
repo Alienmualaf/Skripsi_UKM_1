@@ -1,9 +1,9 @@
 /* Extracted from layouts\auth.blade.php */
 
         :root {
-            --primary: #1d4ed8; /* Royal Blue matching landing/dashboards (Tailwind blue-700) */
-            --primary-hover: #1e40af; /* Tailwind blue-800 */
-            --secondary: #fbbf24;
+            --primary: #0a0b10; /* Corporate Navy */
+            --primary-hover: #1c1e29;
+            --secondary: #c5a059; /* Corporate Gold */
             --bg: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -82,7 +82,7 @@
         .welcome-text {
             font-size: 0.8rem;
             font-weight: 800;
-            color: #84cc16; /* Lime/Green Accent matching screenshot */
+            color: #c5a059; /* Corporate Gold Accent */
             text-transform: uppercase;
             letter-spacing: 0.15em;
             display: block;
@@ -90,9 +90,9 @@
         }
 
         .academic-system-title {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Georgia', serif;
             font-size: 1.75rem;
-            font-weight: 800;
+            font-weight: normal;
             line-height: 1.25;
             color: #ffffff;
             margin-bottom: 0.25rem;
@@ -100,10 +100,10 @@
         }
 
         .academic-univ-title {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Georgia', serif;
             font-size: 1.45rem;
-            font-weight: 800;
-            color: #ffffff;
+            font-weight: normal;
+            color: #c5a059; /* Gold */
             line-height: 1.2;
         }
 
@@ -144,9 +144,9 @@
         }
 
         .auth-title {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Georgia', serif;
             font-size: 1.45rem;
-            font-weight: 800;
+            font-weight: normal;
             margin-bottom: 0.5rem;
             color: var(--text-main);
             letter-spacing: -0.02em;
