@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'membership' => \App\Http\Middleware\CheckMembership::class,
             'admin_ukm' => \App\Http\Middleware\AdminUKMMiddleware::class,
+            'block_admin_ukm_create' => \App\Http\Middleware\BlockAdminUkmCreate::class,
+            'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
         $middleware->appendToGroup('web', \App\Http\Middleware\SmartRedirect::class);
         $middleware->validateCsrfTokens(except: [

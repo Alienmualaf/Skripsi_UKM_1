@@ -30,7 +30,12 @@
 
         <div class="form-group">
             <label class="form-label">Password <span style="color: #ef4444">*</span></label>
-            <input type="password" name="password" placeholder="Buat password minimal 6 karakter" class="form-control" required autocomplete="new-password">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="password" placeholder="Buat password minimal 6 karakter" class="form-control" required autocomplete="new-password" style="padding-right: 2.75rem;">
+                <button type="button" class="toggle-password-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem; z-index: 10;">
+                    <i class="ph ph-eye" style="font-size: 1.20rem;"></i>
+                </button>
+            </div>
             @error('password')
                 <div class="error-message">
                     <i class="ph ph-warning-circle"></i> {{ $message }}
@@ -40,7 +45,12 @@
 
         <div class="form-group">
             <label class="form-label">Konfirmasi Password <span style="color: #ef4444">*</span></label>
-            <input type="password" name="password_confirmation" placeholder="Masukkan kembali password Anda" class="form-control" required autocomplete="new-password">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="password_confirmation" placeholder="Masukkan kembali password Anda" class="form-control" required autocomplete="new-password" style="padding-right: 2.75rem;">
+                <button type="button" class="toggle-password-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem; z-index: 10;">
+                    <i class="ph ph-eye" style="font-size: 1.20rem;"></i>
+                </button>
+            </div>
         </div>
 
         <button type="submit" class="btn-submit">

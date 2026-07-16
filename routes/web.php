@@ -66,20 +66,17 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 |--------------------------------------------------------------------------
 */
 Route::redirect('/admin', '/admin/dashboard');
-Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'prevent-back', 'role:administrator'])->name('admin.')->group(function () {
     Route::get('/', function() { return redirect()->route('admin.dashboard'); });
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::get('/agenda', [AdminDashboard::class, 'agenda'])->name('agenda');
     
     // User management
     Route::resource('users', AdminUser::class);
     Route::post('/users/{id}/reset-password', [AdminUser::class, 'forceResetPassword'])->name('users.reset-password');
     Route::post('/users/{id}/toggle-status', [AdminUser::class, 'toggleStatus'])->name('users.toggle-status');
     
-    // Roles & Permissions
-    Route::get('/roles-permissions', [AdminDashboard::class, 'rolesPermissions'])->name('roles-permissions');
-    Route::post('/roles', [AdminDashboard::class, 'storeRole'])->name('roles.store');
-    Route::delete('/roles/{id}', [AdminDashboard::class, 'destroyRole'])->name('roles.destroy');
-    
+
     // Backup & Restore
     Route::post('/backup', [AdminDashboard::class, 'backup'])->name('backup');
     Route::post('/restore', [AdminDashboard::class, 'restore'])->name('restore');
@@ -90,10 +87,8 @@ Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.
     Route::post('/settings', [AdminDashboard::class, 'updateSettings'])->name('settings.update');
     Route::post('/settings/email-test', [AdminDashboard::class, 'testEmail'])->name('settings.email-test');
     
-    // Monitoring Sistem (Logs, Login History, Audit Trail)
     Route::get('/logs/activity', [AdminDashboard::class, 'activityLogs'])->name('logs.activity');
     Route::get('/logs/login', [AdminDashboard::class, 'loginHistory'])->name('logs.login');
-    Route::get('/logs/audit', [AdminDashboard::class, 'auditTrail'])->name('logs.audit');
     
     Route::get('/monitor/members', [AdminDashboard::class, 'monitorMembers'])->name('monitor.members');
     Route::get('/monitor/agendas', [AdminDashboard::class, 'monitorAgendas'])->name('monitor.agendas');
@@ -117,7 +112,7 @@ Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.
 |--------------------------------------------------------------------------
 */
 Route::redirect('/ukm', '/ukm/dashboard');
-Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name('ukm.')->group(function () {
+Route::prefix('ukm')->middleware(['auth', 'prevent-back', 'role:admin_ukm,administrator'])->name('ukm.')->group(function () {
     Route::get('/', function() { return redirect()->route('ukm.dashboard'); });
     Route::get('/dashboard', [UKMAdminController::class, 'dashboard'])->name('dashboard');
     
@@ -135,10 +130,6 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name
     Route::get('/registrations', [UKMAdminController::class, 'registrations'])->name('registrations');
     Route::post('/registrations/{id}/verify', [UKMAdminController::class, 'verifyRegistration'])->name('registrations.verify');
     
-    // Riwayat Email
-    Route::get('/email-logs', [UKMAdminController::class, 'emailLogs'])->name('email-logs');
-    Route::post('/email-logs/{id}/resend', [UKMAdminController::class, 'resendEmail'])->name('email-logs.resend');
-    
     // Pelatih — Admin UKM bisa tambah, edit, dan hapus
     Route::get('/trainers', [UKMAdminController::class, 'index'])->name('trainers.index');
     Route::get('/trainers/create', [UKMAdminController::class, 'create'])->name('trainers.create');
@@ -153,7 +144,7 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator'])->name
     Route::delete('/voice-classifications/{id}', [UKMAdminController::class, 'deleteVoiceClassification'])->name('voice-classifications.destroy');
 });
 
-Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator,pengurus'])->name('ukm.')->group(function () {
+Route::prefix('ukm')->middleware(['auth', 'prevent-back', 'role:admin_ukm,administrator,pengurus'])->name('ukm.')->group(function () {
     // Anggota
     Route::get('/members', [UKMAdminController::class, 'members'])->name('members');
     Route::get('/members/{id}/edit', [UKMAdminController::class, 'editMember'])->name('members.edit');
@@ -199,9 +190,10 @@ Route::prefix('ukm')->middleware(['auth', 'role:admin_ukm,administrator,pengurus
 |--------------------------------------------------------------------------
 */
 Route::redirect('/pengurus', '/pengurus/dashboard');
-Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administrator'])->name('pengurus.')->group(function () {
+Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,admin_ukm,administrator', 'block_admin_ukm_create'])->name('pengurus.')->group(function () {
     Route::get('/', function() { return redirect()->route('pengurus.dashboard'); });
     Route::get('/dashboard', [UKMDashboard::class, 'dashboard'])->name('dashboard');
+    Route::get('/agenda', [UKMDashboard::class, 'agenda'])->name('agenda');
 
     // Pelatih — Pengurus bisa tambah, edit, dan hapus
     Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
@@ -218,9 +210,9 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
     Route::resource('announcements', AnnouncementController::class);
     
     // Program Kerja - Laporan (LPJ)
-    Route::get('programs/{program}/report', [ProgramReportController::class, 'show'])->name('programs.report');
-    Route::post('programs/{program}/report', [ProgramReportController::class, 'store'])->name('programs.report.store');
-    Route::delete('programs/{program}/report', [ProgramReportController::class, 'destroy'])->name('programs.report.destroy');
+    Route::get('programs/{program}/report', function ($program) {
+        return redirect()->route('ukm.reports.kegiatan', $program);
+    })->name('programs.report');
     
     // Program Kerja - Penampilan (hanya tipe Performance)
     Route::get('programs/{program}/performance', [PerformanceController::class, 'show'])->name('programs.performance.show');
@@ -230,6 +222,8 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
     
     // Program Kerja - Classroom (via Performance)
     Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
+    Route::post('classrooms/{classroom}/archive', [ClassroomController::class, 'archive'])->name('classrooms.archive');
+    Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
     Route::get('programs/{program}/performance/{performance}/classroom', [ClassroomController::class, 'show'])->name('programs.performance.classroom.show');
     Route::post('programs/{program}/performance/{performance}/classroom/members', [ClassroomController::class, 'syncMembers'])->name('programs.performance.classroom.members');
     Route::post('programs/{program}/performance/{performance}/classroom/materials', [ClassroomController::class, 'addMaterial'])->name('programs.performance.classroom.materials.add');
@@ -246,9 +240,11 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
     Route::post('programs/{program}/performance/{performance}/classroom/attendances', [ClassroomController::class, 'storeAttendance'])->name('programs.performance.classroom.attendance.store');
     Route::get('programs/{program}/performance/{performance}/classroom/attendances/{attendance}', [ClassroomController::class, 'showAttendance'])->name('programs.performance.classroom.attendance');
     Route::post('programs/{program}/performance/{performance}/classroom/attendances/{attendance}/save', [ClassroomController::class, 'saveAttendance'])->name('programs.performance.classroom.attendance.save');
+    Route::post('programs/{program}/performance/{performance}/classroom/trainer', [ClassroomController::class, 'updateTrainer'])->name('programs.performance.classroom.trainer');
     
     // Job - Classroom
     Route::get('jobs/{job}/classroom', [ClassroomController::class, 'showJobClassroom'])->name('jobs.classroom.show');
+    Route::post('jobs/{job}/classroom/trainer', [ClassroomController::class, 'updateJobTrainer'])->name('jobs.classroom.trainer');
     Route::post('jobs/{job}/classroom/members', [ClassroomController::class, 'syncJobMembers'])->name('jobs.classroom.members');
     Route::post('jobs/{job}/classroom/materials', [ClassroomController::class, 'addJobMaterial'])->name('jobs.classroom.materials.add');
     Route::delete('jobs/{job}/classroom/materials/{material}', [ClassroomController::class, 'removeJobMaterial'])->name('jobs.classroom.materials.remove');
@@ -309,8 +305,9 @@ Route::prefix('pengurus')->middleware(['auth', 'role:pengurus,admin_ukm,administ
 | Member Routes (Role: anggota, pengurus, admin_ukm, administrator)
 |--------------------------------------------------------------------------
 */
-Route::prefix('member')->middleware(['auth', 'membership'])->name('member.')->group(function () {
+Route::prefix('member')->middleware(['auth', 'prevent-back', 'membership'])->name('member.')->group(function () {
     Route::get('/dashboard', [MemberController::class, 'dashboard'])->name('dashboard');
+    Route::get('/agenda', [MemberController::class, 'agenda'])->name('agenda');
     Route::get('/profile', [MemberController::class, 'profile'])->name('profile');
     Route::match(['POST', 'PUT'], '/profile', [MemberController::class, 'updateProfile'])->name('profile.update');
     

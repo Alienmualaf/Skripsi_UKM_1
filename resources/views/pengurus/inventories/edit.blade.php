@@ -18,11 +18,7 @@
         @csrf
         @method('PUT')
         
-        <div class="form-group mb-4">
-            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Kode Barang (SKU / Barcode)</label>
-            <input type="text" name="code" class="form-control" required value="{{ old('code', $inventory->code) }}" placeholder="Contoh: INV-KB-001" style="padding: 0.65rem;">
-            @error('code') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
-        </div>
+
 
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Nama Barang / Aset</label>

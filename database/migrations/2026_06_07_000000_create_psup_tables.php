@@ -167,7 +167,6 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
             $table->string('category'); // Kostum, Alat Musik, Sound System, Perlengkapan Latihan, Perlengkapan Acara
             $table->string('condition'); // Baik, Rusak, Hilang
             $table->integer('quantity');

@@ -8,15 +8,15 @@
 @section('header', 'Pengumuman Berbasis Agenda')
 
 @section('content')
-<div style="display: grid; grid-template-columns: 1fr 350px; gap: 1.5rem; align-items: start;">
+<div class="grid-sidebar-layout">
     <div class="card animate-fade-in">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <div>
                 <h3 style="font-weight: 700; font-size: 1.25rem;">Daftar Pengumuman</h3>
                 <p style="color: var(--text-secondary); font-size: 0.875rem;">Total: {{ $announcements->total() }} pengumuman diterbitkan.</p>
             </div>
             @if($isOperator)
-            <button onclick="document.getElementById('modal-add-announcement').style.display='flex'" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+            <button onclick="document.getElementById('modal-add-announcement').style.display='flex'" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                 <i class="ph ph-plus-circle"></i> Buat Pengumuman
             </button>
             @endif
@@ -24,11 +24,11 @@
 
         @foreach($announcements as $ann)
         <div style="padding: 1.25rem; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 1rem; position: relative;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
                 <div>
                     <span class="badge badge-primary" style="margin-bottom: 0.5rem; font-size: 0.65rem;">Umum</span>
                     <h4 style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ $ann->title }}</h4>
-                    <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem; flex-wrap: wrap;">
                         <span style="display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-user"></i> {{ $ann->creator->name }}</span>
                         <span style="display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-clock"></i> {{ $ann->created_at->format('d M Y, H:i') }}</span>
                     </div>

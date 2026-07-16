@@ -9,9 +9,11 @@
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Daftar Pelatih PSUP</h3>
         <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Kelola data instruktur vokal, dirigen, pianis, dan pelatih resmi Paduan Suara Universitas Pancasila.</p>
     </div>
+    @if(!auth()->user()->isAdminUkm())
     <a href="{{ route('pengurus.trainers.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
         <i class="ph ph-plus"></i> Tambah Pelatih
     </a>
+    @endif
 </div>
 
 <div class="card" style="padding: 1.5rem;">

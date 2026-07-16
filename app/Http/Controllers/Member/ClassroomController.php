@@ -20,19 +20,43 @@ class ClassroomController extends Controller
      */
     public function index()
     {
+        // Auto-archive past classrooms
+        Classroom::autoArchivePastClassrooms();
+
         $user = Auth::user();
         $member = $user->member;
 
         if (!$member) {
             if ($user->isSuperAdmin()) {
-                $classrooms = Classroom::with(['performance'])->get();
+                $classrooms = Classroom::where(function($query) {
+                    $query->where('status', 'Aktif')
+                          ->orWhere(function($q) {
+                              $q->where('status', 'Terarsip')
+                                ->whereHas('performance', function($qp) {
+                                    $qp->whereNotNull('performance_date')
+                                      ->where('performance_date', '>=', date('Y-m-d'));
+                                });
+                          });
+                })->with(['performance.program', 'members', 'attendances', 'songTargets'])->get();
                 return view('member.classroom.index', compact('classrooms'));
             }
             return redirect()->route('member.dashboard')->with('error', 'Profil anggota tidak ditemukan.');
         }
 
-        // Ambil daftar classroom yang diikuti oleh anggota
-        $classrooms = $member->classrooms()->with(['performance'])->get();
+        // Ambil daftar classroom aktif yang diikuti oleh anggota, ATAU yang statusnya Terarsip tapi tanggal penampilannya belum lewat (diarsipkan pengurus secara manual)
+        $classrooms = $member->classrooms()
+            ->where(function($query) {
+                $query->where('classrooms.status', 'Aktif')
+                      ->orWhere(function($q) {
+                          $q->where('classrooms.status', 'Terarsip')
+                            ->whereHas('performance', function($qp) {
+                                $qp->whereNotNull('performance_date')
+                                  ->where('performance_date', '>=', date('Y-m-d'));
+                            });
+                      });
+            })
+            ->with(['performance.program', 'members', 'attendances', 'songTargets'])
+            ->get();
 
         return view('member.classroom.index', compact('classrooms'));
     }
@@ -49,7 +73,8 @@ class ClassroomController extends Controller
             abort(403, 'Akses ditolak.');
         }
 
-        $classroom = Classroom::with(['performance', 'members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets'])
+        $classroom = Classroom::with(['performance', 'members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets', 'trainer'])
+            ->where('status', 'Aktif')
             ->findOrFail($classroomId);
 
         // Validasi keikutsertaan anggota di classroom tersebut

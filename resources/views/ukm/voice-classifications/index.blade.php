@@ -16,6 +16,32 @@
     <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Atur jenis klasifikasi suara (seperti Sopran, Alto, Tenor, Bass) untuk mengorganisasikan penyanyi dalam paduan suara.</p>
 </div>
 
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table td, .table th {
+            padding: 0.65rem 0.5rem !important;
+            font-size: 0.8rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+    }
+</style>
+
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <!-- Form Add -->
     <div class="card" style="padding: 1.5rem; height: fit-content;">
@@ -44,23 +70,23 @@
         </h4>
         
         <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-            <table class="table">
+            <table class="table" style="vertical-align: middle; width: 100%;">
                 <thead>
                     <tr>
                         <th>Nama Klasifikasi</th>
-                        <th style="width: 120px; text-align: center;">Aksi</th>
+                        <th style="width: 80px; text-align: right;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($classifications as $c)
                     <tr>
                         <td style="font-weight: 600; color: var(--text-primary);">{{ $c->name }}</td>
-                        <td style="text-align: center;">
-                            <form action="{{ route('ukm.voice-classifications.destroy', $c->id) }}" method="POST" onsubmit="return confirm('Hapus klasifikasi suara ini? Anggota yang menggunakan klasifikasi ini akan di-reset.')">
+                        <td style="text-align: right;">
+                            <form action="{{ route('ukm.voice-classifications.destroy', $c->id) }}" method="POST" onsubmit="return confirm('Hapus klasifikasi suara ini? Anggota yang menggunakan klasifikasi ini akan di-reset.')" style="margin: 0; display: inline-block;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;">
-                                    <i class="ph ph-trash"></i> Hapus
+                                <button type="submit" class="btn btn-danger" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border-radius: 6px; font-size: 0.95rem;" title="Hapus">
+                                    <i class="ph ph-trash"></i>
                                 </button>
                             </form>
                         </td>

@@ -23,20 +23,49 @@
     </div>
 </div>
 
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table td, .table th {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.725rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+        .th-action-compact {
+            width: 75px !important;
+        }
+    }
+</style>
+
 <div class="card" style="padding: 1.5rem;">
     <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
         <i class="ph ph-briefcase" style="color: var(--accent-color);"></i> Tim Pelatih & Pembina
     </h4>
 
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-        <table class="table">
+        <table class="table" style="vertical-align: middle;">
             <thead>
                 <tr>
-                    <th style="width: 80px;">Foto</th>
+                    <th style="width: 50px;">Foto</th>
                     <th>Nama Pelatih</th>
                     <th>Spesialisasi / Keahlian</th>
-                    <th>Nomor Telepon</th>
-                    <th style="width: 150px; text-align: center;">Aksi</th>
+                    <th class="hidden-mobile">Nomor Telepon</th>
+                    <th class="th-action-compact" style="width: 150px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,21 +73,25 @@
                 <tr>
                     <td>
                         @if($trainer->photo)
-                            <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage/' . $trainer->photo) }}" alt="{{ $trainer->name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                         @else
-                            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--accent-color);">{{ substr($trainer->name, 0, 1) }}</div>
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--accent-color); font-size: 0.875rem;">{{ substr($trainer->name, 0, 1) }}</div>
                         @endif
                     </td>
                     <td style="font-weight: 700; color: var(--text-primary);">{{ $trainer->name }}</td>
                     <td style="color: var(--text-primary); font-weight: 600;">{{ $trainer->specialty }}</td>
-                    <td style="color: var(--text-secondary);">{{ $trainer->phone ?? '-' }}</td>
+                    <td class="hidden-mobile" style="color: var(--text-secondary);">{{ $trainer->phone ?? '-' }}</td>
                     <td>
-                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                            <a href="{{ route('ukm.trainers.edit', $trainer->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;"><i class="ph ph-pencil-simple"></i> Edit</a>
-                            <form action="{{ route('ukm.trainers.destroy', $trainer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pelatih ini?');" style="display: inline;">
+                        <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                            <a href="{{ route('ukm.trainers.edit', $trainer->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;" title="Edit">
+                                <i class="ph ph-pencil-simple"></i><span class="hidden-mobile"> Edit</span>
+                            </a>
+                            <form action="{{ route('ukm.trainers.destroy', $trainer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pelatih ini?');" style="display: inline; margin: 0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-trash"></i> Hapus</button>
+                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.5rem; font-size: 0.8rem; font-weight: 600;" title="Hapus">
+                                    <i class="ph ph-trash"></i><span class="hidden-mobile"> Hapus</span>
+                                </button>
                             </form>
                         </div>
                     </td>

@@ -100,9 +100,24 @@
                 @forelse($classrooms as $room)
                     <a href="{{ route('member.classrooms.show', $room->id) }}" style="text-decoration: none; padding: 1rem; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-color); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--accent-color)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.transform='none';">
                         <div>
-                            <span style="font-size: 0.65rem; font-weight: bold; background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block;">
-                                {{ $room->performance && is_null($room->performance->program_id) ? 'Job' : 'Performance' }}
-                            </span>
+                            @php
+                                $roomPerf = $room->performance;
+                                $roomIsJob = $roomPerf && is_null($roomPerf->program_id);
+                                $roomIsComp = $roomPerf && $roomPerf->program && $roomPerf->program->activity_type === 'Competition';
+                            @endphp
+                            @if($roomIsJob)
+                                <span style="font-size: 0.65rem; font-weight: bold; background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block;">
+                                    Job
+                                </span>
+                            @elseif($roomIsComp)
+                                <span style="font-size: 0.65rem; font-weight: bold; background: rgba(245, 158, 11, 0.12); color: #d97706; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block;">
+                                    Competition
+                                </span>
+                            @else
+                                <span style="font-size: 0.65rem; font-weight: bold; background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block;">
+                                    Performance
+                                </span>
+                            @endif
                             <h4 style="margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); line-height: 1.3;">{{ $room->name }}</h4>
                             <p style="margin: 0.35rem 0 0 0; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                 {{ $room->description ?? 'Tidak ada deskripsi kelas.' }}

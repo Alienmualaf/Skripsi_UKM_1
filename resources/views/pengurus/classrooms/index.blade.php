@@ -1,9 +1,74 @@
 @extends('layouts.app')
-@section('title', 'Classroom')
-@section('header', 'Classroom PSUP')
+@section('title', 'Pusat Latihan')
+@section('header', 'Pusat Latihan PSUP')
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
+<style>
+    .classroom-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+        gap: 1.25rem !important;
+    }
+    .classroom-stats-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.5rem !important;
+        margin-top: 0.85rem !important;
+        margin-bottom: 1rem !important;
+    }
+    .cls-stat-box {
+        background: var(--surface-color);
+        border-radius: 8px;
+        padding: 0.6rem 0.25rem;
+        text-align: center;
+    }
+    .cls-stat-box .stat-num {
+        font-size: 1.2rem;
+        font-weight: 800;
+        display: block;
+        line-height: 1.2;
+    }
+    .cls-stat-box .stat-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        display: block;
+    }
+    .cls-action-row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        padding-top: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .classroom-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .classroom-header-btn {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+        .classroom-card-header {
+            padding: 0.9rem 1.1rem !important;
+        }
+        .classroom-card-body {
+            padding: 0.9rem 1.1rem !important;
+        }
+        /* Stats row stays horizontal on mobile */
+        .classroom-stats-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+        /* Info rows compact */
+        .classroom-card-body p {
+            margin-bottom: 0.4rem !important;
+            font-size: 0.8rem !important;
+        }
+    }
+</style>
 
 @if(session('success'))
 <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.85rem 1.25rem;border-radius:8px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
@@ -13,58 +78,65 @@
 
 <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
     <div>
-        <h3 style="font-size:1.25rem;font-weight:800;color:var(--text-primary);margin:0 0 0.25rem 0;">Daftar Classroom Aktif</h3>
-        <p style="margin:0;color:var(--text-secondary);font-size:0.875rem;">Classroom dibuat otomatis dari Program Kerja bertipe <strong>Performance</strong>. Setiap penampilan memiliki classroom sendiri.</p>
+        <h3 style="font-size:1.25rem;font-weight:800;color:var(--text-primary);margin:0 0 0.25rem 0;">Daftar Pusat Latihan Aktif</h3>
+        <p style="margin:0;color:var(--text-secondary);font-size:0.875rem;">Pusat Latihan dibuat otomatis dari Program Kerja bertipe <strong>Performance</strong> atau <strong>Competition</strong>. Setiap penampilan atau lomba memiliki Pusat Latihan sendiri.</p>
     </div>
-    <a href="{{ route('pengurus.programs.create') }}" class="btn btn-primary" style="padding:0.65rem 1.25rem;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:0.35rem;text-decoration:none;">
-        <i class="ph ph-plus"></i> Buat Program Kerja Penampilan
+    <a href="{{ route('pengurus.programs.create') }}" class="btn btn-primary classroom-header-btn" style="padding:0.65rem 1.25rem;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:0.35rem;text-decoration:none;">
+        <i class="ph ph-plus"></i> Buat Program Kerja Penampilan / Lomba
     </a>
 </div>
 
-@if($classrooms->count() > 0)
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:2rem;">
-        @foreach($classrooms as $cls)
+@php
+    $activeClassrooms = $classrooms->where('status', 'Aktif');
+    $archivedClassrooms = $classrooms->where('status', 'Terarsip');
+@endphp
+
+@if($activeClassrooms->count() > 0)
+    <div class="classroom-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:2rem;">
+        @foreach($activeClassrooms as $cls)
         @php
-            $isJob = (bool) $cls->job_id;
             $perf = $cls->performance;
+            $isJob = $perf && is_null($perf->program_id);
             $prog = $perf?->program;
-            $job = $cls->job;
         @endphp
         <div class="card" style="padding:0;overflow:hidden;border:1px solid var(--border-color);transition:box-shadow 0.2s,transform 0.2s;" onmouseenter="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';this.style.transform='translateY(-2px)';" onmouseleave="this.style.boxShadow='';this.style.transform='';">
             <!-- Header Gradient -->
-            <div style="background:linear-gradient(135deg,#10b981,#059669);padding:1.25rem 1.5rem;position:relative;">
+            <div class="classroom-card-header" style="background:linear-gradient(135deg,#00072D,#1a2556);padding:1.25rem 1.5rem;position:relative;">
                 <div style="position:absolute;top:0.75rem;right:0.75rem;">
                     <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:0.7rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:999px;">
                         {{ $cls->status }}
                     </span>
                 </div>
-                <i class="ph ph-chalkboard" style="font-size:1.75rem;color:rgba(255,255,255,0.7);display:block;margin-bottom:0.5rem;"></i>
+                <i class="ph {{ ($prog && $prog->activity_type === 'Competition') ? 'ph-trophy' : 'ph-chalkboard' }}" style="font-size:1.75rem;color:rgba(255,255,255,0.7);display:block;margin-bottom:0.5rem;"></i>
                 <h4 style="margin:0 0 0.25rem;font-weight:800;font-size:1rem;color:#fff;">{{ $cls->name }}</h4>
                 @if($isJob)
                 <p style="margin:0;font-size:0.8125rem;color:rgba(255,255,255,0.8);">
-                    <i class="ph ph-briefcase"></i> Job: {{ $job->title }}
+                    <i class="ph ph-briefcase"></i> Job: {{ $perf->title }}
                 </p>
                 @elseif($perf)
                 <p style="margin:0;font-size:0.8125rem;color:rgba(255,255,255,0.8);">
-                    <i class="ph ph-microphone-stage"></i> {{ $perf->title }}
+                    <i class="ph {{ ($prog && $prog->activity_type === 'Competition') ? 'ph-trophy' : 'ph-microphone-stage' }}"></i> {{ $perf->title }}
                 </p>
                 @endif
             </div>
 
             <!-- Body -->
-            <div style="padding:1.25rem 1.5rem;">
+            <div class="classroom-card-body" style="padding:1.25rem 1.5rem;">
                 @if($isJob)
                 <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
                     <i class="ph ph-tag"></i> Jenis: <strong style="color:var(--text-primary);">Penugasan Job / Delegasi</strong>
                 </p>
                 <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
-                    <i class="ph ph-calendar"></i> Tanggal: <strong style="color:var(--text-primary);">{{ date('d M Y', strtotime($job->date)) }}</strong>
+                    <i class="ph ph-calendar"></i> Tanggal: <strong style="color:var(--text-primary);">{{ $perf->performance_date ? date('d M Y', strtotime($perf->performance_date)) : '-' }}</strong>
                 </p>
                 <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
-                    <i class="ph ph-map-pin"></i> Lokasi: <strong style="color:var(--text-primary);">{{ $job->location }}</strong>
+                    <i class="ph ph-map-pin"></i> Lokasi: <strong style="color:var(--text-primary);">{{ $perf->venue ?? '-' }}</strong>
                 </p>
                 @else
                     @if($prog)
+                    <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                        <i class="ph ph-tag"></i> Jenis: <strong style="color:var(--text-primary);">{{ $prog->activity_type === 'Competition' ? 'Kompetisi / Lomba' : 'Penampilan' }}</strong>
+                    </p>
                     <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
                         <i class="ph ph-folder"></i> Program: <strong style="color:var(--text-primary);">{{ $prog->name }}</strong>
                     </p>
@@ -80,34 +152,55 @@
                 @endif
 
                 <!-- Stats -->
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:1rem;margin-bottom:1.25rem;">
-                    <div style="background:var(--surface-color);border-radius:8px;padding:0.75rem;text-align:center;">
-                        <span style="font-size:1.25rem;font-weight:800;color:var(--accent-color);display:block;">{{ $cls->members->count() }}</span>
-                        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Peserta</span>
+                <div class="classroom-stats-grid">
+                    <div class="cls-stat-box">
+                        <span class="stat-num" style="color:var(--accent-color);">{{ $cls->members->count() }}</span>
+                        <span class="stat-label">Peserta</span>
                     </div>
-                    <div style="background:var(--surface-color);border-radius:8px;padding:0.75rem;text-align:center;">
-                        <span style="font-size:1.25rem;font-weight:800;color:#f59e0b;display:block;">{{ $cls->attendances->count() }}</span>
-                        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Sesi</span>
+                    <div class="cls-stat-box">
+                        <span class="stat-num" style="color:#f59e0b;">{{ $cls->attendances->count() }}</span>
+                        <span class="stat-label">Sesi</span>
                     </div>
-                    <div style="background:var(--surface-color);border-radius:8px;padding:0.75rem;text-align:center;">
-                        <span style="font-size:1.25rem;font-weight:800;color:#10b981;display:block;">{{ $cls->songTargets()->count() }}</span>
-                        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Lagu</span>
+                    <div class="cls-stat-box">
+                        <span class="stat-num" style="color:#10b981;">{{ $cls->songTargets->count() }}</span>
+                        <span class="stat-label">Lagu</span>
                     </div>
                 </div>
 
-                @if($isJob)
-                <a href="{{ route('pengurus.jobs.classroom.show', $job->id) }}"
-                   class="btn btn-primary"
-                   style="width:100%;text-align:center;padding:0.65rem;font-weight:700;border-radius:8px;text-decoration:none;display:block;">
-                    <i class="ph ph-arrow-square-in"></i> Masuk Classroom
-                </a>
-                @elseif($perf && $prog)
-                <a href="{{ route('pengurus.programs.performance.classroom.show', [$prog->id, $perf->id]) }}"
-                   class="btn btn-primary"
-                   style="width:100%;text-align:center;padding:0.65rem;font-weight:700;border-radius:8px;text-decoration:none;display:block;">
-                    <i class="ph ph-arrow-square-in"></i> Masuk Classroom
-                </a>
-                @endif
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    @if($isJob)
+                    <a href="{{ route('pengurus.jobs.classroom.show', $perf->id) }}"
+                       class="btn btn-primary"
+                       style="flex:1;text-align:center;padding:0.65rem;font-weight:700;border-radius:8px;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;gap:0.25rem;">
+                        <i class="ph ph-arrow-square-in"></i> Masuk
+                    </a>
+                    @elseif($perf && $prog)
+                    <a href="{{ route('pengurus.programs.performance.classroom.show', [$prog->id, $perf->id]) }}"
+                       class="btn btn-primary"
+                       style="flex:1;text-align:center;padding:0.65rem;font-weight:700;border-radius:8px;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;gap:0.25rem;">
+                        <i class="ph ph-arrow-square-in"></i> Masuk
+                    </a>
+                    @endif
+
+                    <!-- Archive Form/Button -->
+                    <form action="{{ route('pengurus.classrooms.archive', $cls->id) }}" method="POST" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="btn" title="Arsipkan Kelas"
+                                style="background:var(--surface-color);border:1px solid var(--border-color);color:var(--text-secondary);padding:0.65rem;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <i class="ph ph-archive" style="font-size:1.1rem;"></i>
+                        </button>
+                    </form>
+
+                    <!-- Delete Form/Button -->
+                    <form action="{{ route('pengurus.classrooms.destroy', $cls->id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kelas ini beserta semua data di dalamnya secara permanen?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn" title="Hapus Kelas"
+                                style="background:#fef2f2;border:1px solid #fee2e2;color:#dc2626;padding:0.65rem;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <i class="ph ph-trash" style="font-size:1.1rem;"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         @endforeach
@@ -116,9 +209,9 @@
     <!-- Empty State -->
     <div class="card" style="padding:3rem;text-align:center;">
         <i class="ph ph-chalkboard" style="font-size:4rem;color:var(--text-muted);display:block;margin-bottom:1rem;"></i>
-        <h4 style="font-weight:800;color:var(--text-primary);margin:0 0 0.5rem;">Belum Ada Classroom</h4>
+        <h4 style="font-weight:800;color:var(--text-primary);margin:0 0 0.5rem;">Belum Ada Pusat Latihan Aktif</h4>
         <p style="color:var(--text-secondary);font-size:0.875rem;margin:0 0 1.5rem;max-width:420px;margin-left:auto;margin-right:auto;">
-            Classroom dibuat otomatis saat kamu membuat <strong>Program Kerja dengan tipe Performance</strong>, lalu menambahkan data Penampilan pada program tersebut.
+            Pusat Latihan dibuat otomatis saat kamu membuat <strong>Program Kerja dengan tipe Performance atau Competition</strong>, lalu menambahkan data Penampilan/Lomba pada program tersebut.
         </p>
 
         <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
@@ -127,27 +220,129 @@
                     <i class="ph ph-number-circle-one" style="font-size:1.25rem;color:#6366f1;"></i>
                 </div>
                 <p style="font-weight:700;font-size:0.875rem;margin:0 0 0.25rem;color:var(--text-primary);">Buat Program Kerja</p>
-                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Pilih jenis <strong>Performance</strong> saat membuat proker</p>
+                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Pilih jenis <strong>Performance</strong> atau <strong>Competition</strong> saat membuat proker</p>
             </div>
             <div style="background:var(--surface-color);border-radius:12px;padding:1.25rem;text-align:left;max-width:220px;border:1px solid var(--border-color);">
                 <div style="width:36px;height:36px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
                     <i class="ph ph-number-circle-two" style="font-size:1.25rem;color:#10b981;"></i>
                 </div>
                 <p style="font-weight:700;font-size:0.875rem;margin:0 0 0.25rem;color:var(--text-primary);">Isi Data Penampilan</p>
-                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Di halaman detail proker, isi form data penampilan</p>
+                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Di halaman detail proker, isi form data penampilan/lomba</p>
             </div>
             <div style="background:var(--surface-color);border-radius:12px;padding:1.25rem;text-align:left;max-width:220px;border:1px solid var(--border-color);">
                 <div style="width:36px;height:36px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
                     <i class="ph ph-number-circle-three" style="font-size:1.25rem;color:#f59e0b;"></i>
                 </div>
-                <p style="font-weight:700;font-size:0.875rem;margin:0 0 0.25rem;color:var(--text-primary);">Buka Classroom</p>
-                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Classroom otomatis terbentuk — kelola peserta, materi, absensi</p>
+                <p style="font-weight:700;font-size:0.875rem;margin:0 0 0.25rem;color:var(--text-primary);">Buka Pusat Latihan</p>
+                <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">Pusat Latihan otomatis terbentuk — kelola peserta, materi, absensi</p>
             </div>
         </div>
 
         <a href="{{ route('pengurus.programs.create') }}" class="btn btn-primary" style="padding:0.75rem 2rem;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:0.35rem;text-decoration:none;font-size:0.9375rem;">
-            <i class="ph ph-plus"></i> Buat Program Kerja Penampilan Sekarang
+            <i class="ph ph-plus"></i> Buat Program Kerja Penampilan / Lomba Sekarang
         </a>
+    </div>
+@endif
+
+@if($archivedClassrooms->count() > 0)
+    <div style="margin-top:3rem;margin-bottom:1.5rem;border-top:1px solid var(--border-color);padding-top:2rem;">
+        <h3 style="font-size:1.25rem;font-weight:800;color:var(--text-primary);margin:0 0 0.25rem 0;display:flex;align-items:center;gap:0.5rem;">
+            <i class="ph ph-archive" style="color:var(--text-secondary);"></i> Arsip Pusat Latihan
+        </h3>
+        <p style="margin:0;color:var(--text-secondary);font-size:0.875rem;">Daftar Pusat Latihan yang telah selesai, diarsipkan secara manual, atau otomatis karena penampilan telah lewat.</p>
+    </div>
+
+    <div class="classroom-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:2rem;opacity:0.85;">
+        @foreach($archivedClassrooms as $cls)
+        @php
+            $perf = $cls->performance;
+            $isJob = $perf && is_null($perf->program_id);
+            $prog = $perf?->program;
+        @endphp
+        <div class="card" style="padding:0;overflow:hidden;border:1px solid var(--border-color);transition:box-shadow 0.2s;" onmouseenter="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)';" onmouseleave="this.style.boxShadow='';">
+            <!-- Header Gradient -->
+            <div class="classroom-card-header" style="background:linear-gradient(135deg,#1f2937,#374151);padding:1.25rem 1.5rem;position:relative;">
+                <div style="position:absolute;top:0.75rem;right:0.75rem;">
+                    <span style="background:rgba(255,255,255,0.2);color:#fff;font-size:0.7rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:999px;">
+                        {{ $cls->status }}
+                    </span>
+                </div>
+                <i class="ph {{ ($prog && $prog->activity_type === 'Competition') ? 'ph-trophy' : 'ph-archive' }}" style="font-size:1.75rem;color:rgba(255,255,255,0.6);display:block;margin-bottom:0.5rem;"></i>
+                <h4 style="margin:0 0 0.25rem;font-weight:800;font-size:1rem;color:#e5e7eb;">{{ $cls->name }}</h4>
+                @if($isJob)
+                <p style="margin:0;font-size:0.8125rem;color:rgba(255,255,255,0.7);">
+                    <i class="ph ph-briefcase"></i> Job: {{ $perf->title }}
+                </p>
+                @elseif($perf)
+                <p style="margin:0;font-size:0.8125rem;color:rgba(255,255,255,0.7);">
+                    <i class="ph {{ ($prog && $prog->activity_type === 'Competition') ? 'ph-trophy' : 'ph-microphone-stage' }}"></i> {{ $perf->title }}
+                </p>
+                @endif
+            </div>
+
+            <!-- Body -->
+            <div class="classroom-card-body" style="padding:1.25rem 1.5rem;background:#fafafa;">
+                @if($isJob)
+                <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                    <i class="ph ph-tag"></i> Jenis: <strong style="color:var(--text-primary);">Penugasan Job / Delegasi</strong>
+                </p>
+                <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                    <i class="ph ph-calendar"></i> Tanggal: <strong style="color:var(--text-primary);">{{ $perf->performance_date ? date('d M Y', strtotime($perf->performance_date)) : '-' }}</strong>
+                </p>
+                @else
+                    @if($prog)
+                    <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                        <i class="ph ph-tag"></i> Jenis: <strong style="color:var(--text-primary);">{{ $prog->activity_type === 'Competition' ? 'Kompetisi / Lomba' : 'Penampilan' }}</strong>
+                    </p>
+                    <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                        <i class="ph ph-folder"></i> Program: <strong style="color:var(--text-primary);">{{ $prog->name }}</strong>
+                    </p>
+                    @endif
+                    @if($perf)
+                    <p style="margin:0 0 0.75rem;font-size:0.8125rem;color:var(--text-secondary);">
+                        <i class="ph ph-calendar"></i> Tanggal: <strong style="color:var(--text-primary);">{{ date('d M Y', strtotime($perf->performance_date)) }}</strong>
+                    </p>
+                    @endif
+                @endif
+
+                <!-- Stats -->
+                <div class="classroom-stats-grid">
+                    <div class="cls-stat-box" style="background:#f3f4f6;">
+                        <span class="stat-num" style="color:#6b7280;">{{ $cls->members->count() }}</span>
+                        <span class="stat-label">Peserta</span>
+                    </div>
+                    <div class="cls-stat-box" style="background:#f3f4f6;">
+                        <span class="stat-num" style="color:#6b7280;">{{ $cls->attendances->count() }}</span>
+                        <span class="stat-label">Sesi</span>
+                    </div>
+                    <div class="cls-stat-box" style="background:#f3f4f6;">
+                        <span class="stat-num" style="color:#6b7280;">{{ $cls->songTargets->count() }}</span>
+                        <span class="stat-label">Lagu</span>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <!-- Restore Form/Button -->
+                    <form action="{{ route('pengurus.classrooms.archive', $cls->id) }}" method="POST" style="margin:0;flex:1;">
+                        @csrf
+                        <button type="submit" class="btn btn-secondary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;display:inline-flex;justify-content:center;align-items:center;gap:0.25rem;cursor:pointer;">
+                            <i class="ph ph-archive-out"></i> Aktifkan Kembali
+                        </button>
+                    </form>
+
+                    <!-- Delete Form/Button -->
+                    <form action="{{ route('pengurus.classrooms.destroy', $cls->id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kelas terarsip ini beserta semua data di dalamnya secara permanen?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn" title="Hapus Kelas"
+                                style="background:#fef2f2;border:1px solid #fee2e2;color:#dc2626;padding:0.65rem;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <i class="ph ph-trash" style="font-size:1.1rem;"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endforeach
     </div>
 @endif
 
@@ -157,9 +352,9 @@
 @if($withoutClassroom->count() > 0)
 <div class="card" style="padding:1.5rem;margin-top:1.5rem;border:2px dashed var(--border-color);">
     <h5 style="font-weight:800;margin:0 0 1rem;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;">
-        <i class="ph ph-warning" style="color:#f59e0b;"></i> Penampilan Belum Memiliki Classroom
+        <i class="ph ph-warning" style="color:#f59e0b;"></i> Penampilan / Lomba Belum Memiliki Pusat Latihan
     </h5>
-    <p style="font-size:0.875rem;color:var(--text-secondary);margin:0 0 1rem;">Buka halaman penampilan berikut untuk mengakses classroomnya (akan dibuat otomatis):</p>
+    <p style="font-size:0.875rem;color:var(--text-secondary);margin:0 0 1rem;">Buka halaman penampilan/lomba berikut untuk mengakses Pusat Latihannya (akan dibuat otomatis):</p>
     @foreach($withoutClassroom as $perf)
     <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:var(--surface-color);border-radius:8px;margin-bottom:0.5rem;">
         <div>

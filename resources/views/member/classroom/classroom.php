@@ -1,29 +1,30 @@
 @extends('layouts.app')
 
 @php
-    $classroomTitle = $classroom->performance->title ?? 'Classroom';
+    $classroomTitle = $classroom->performance->title ?? 'Pusat Latihan';
     $classroomDate = $classroom->performance->performance_date ?? now();
     $classroomVenue = $classroom->performance->venue ?? '-';
-    $classroomType = ($classroom->performance && is_null($classroom->performance->program_id)) ? 'Job' : 'Penampilan';
+    $classroomType = ($classroom->performance ? (is_null($classroom->performance->program_id) ? 'Job' : ($classroom->performance->program && $classroom->performance->program->activity_type === 'Competition' ? 'Lomba' : 'Penampilan')) : 'Pusat Latihan');
 @endphp
 
-@section('title', 'Classroom: ' . $classroomTitle)
-@section('header', 'Classroom: ' . $classroomTitle)
+@section('title', 'Pusat Latihan: ' . $classroomTitle)
+@section('header', 'Pusat Latihan: ' . $classroomTitle)
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/member.css') }}">
 
 <div class="animate-fade-in">
-    <!-- Header / Banner Classroom -->
+    <!-- Header / Banner Pusat Latihan -->
     <div style="background: linear-gradient(135deg, var(--accent-color) 0%, #1d4ed8 100%); color: white; border-radius: 16px; padding: 2.5rem 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 20px -5px rgba(29, 78, 216, 0.15);">
         <div style="position: relative; z-index: 2;">
             <span class="badge" style="background: rgba(255, 255, 255, 0.15); color: white; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.725rem; border: 1px solid rgba(255, 255, 255, 0.25); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 0.75rem;">
-                Classroom {{ $classroomType }}
+                Pusat Latihan {{ $classroomType }}
             </span>
             <h1 style="font-size: 2.25rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; color: #ffffff; font-family: 'Georgia', serif;">{{ $classroomTitle }}</h1>
-            <p style="font-size: 1rem; opacity: 0.9; margin: 0.5rem 0 0 0; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
+            <p style="font-size: 1rem; opacity: 0.9; margin: 0.5rem 0 0 0; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <i class="ph ph-calendar"></i> {{ date('d M Y', strtotime($classroomDate)) }} • 
-                <i class="ph ph-map-pin"></i> {{ $classroomVenue }}
+                <i class="ph ph-map-pin"></i> {{ $classroomVenue }} •
+                <i class="ph ph-chalkboard-teacher"></i> Pelatih: <strong>{{ $classroom->trainer ? $classroom->trainer->name : 'Belum Ditentukan' }}</strong>
             </p>
         </div>
         <!-- Decorative Shapes -->

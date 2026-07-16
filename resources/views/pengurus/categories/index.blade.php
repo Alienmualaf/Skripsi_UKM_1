@@ -32,6 +32,7 @@
         </h4>
 
         <!-- Form Tambah -->
+        @if(!auth()->user()->isAdminUkm())
         <form action="{{ route('pengurus.categories.letter.store') }}" method="POST" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.75rem;">
             @csrf
             <div>
@@ -42,6 +43,7 @@
                 <i class="ph ph-plus"></i> Tambah Jenis Surat
             </button>
         </form>
+        @endif
 
         <!-- List Items -->
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -73,6 +75,7 @@
         </h4>
 
         <!-- Form Tambah -->
+        @if(!auth()->user()->isAdminUkm())
         <form action="{{ route('pengurus.categories.inventory.store') }}" method="POST" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.75rem;">
             @csrf
             <div>
@@ -83,6 +86,7 @@
                 <i class="ph ph-plus"></i> Tambah Kategori Aset
             </button>
         </form>
+        @endif
 
         <!-- List Items -->
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">

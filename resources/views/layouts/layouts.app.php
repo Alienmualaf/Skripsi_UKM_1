@@ -22,6 +22,75 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
+    <style>
+        .nav-section {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .nav-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0.85rem;
+            color: var(--text-secondary);
+            font-size: 0.725rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            cursor: pointer;
+            user-select: none;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+        .nav-section-header:hover {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+        .nav-section-header span {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+        .nav-section-header span i {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+        .section-caret {
+            font-size: 0.875rem;
+            transition: transform 0.25s ease;
+            color: var(--text-secondary);
+        }
+        .nav-section-content {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding-left: 0;
+            margin-top: 0.25rem;
+            border-left: 1.5px solid var(--border-color);
+            margin-left: 1.35rem;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        /* When expanded */
+        .nav-section.expanded .nav-section-content {
+            max-height: 500px; /* High enough to contain all submenus */
+            opacity: 1;
+            padding-bottom: 0.5rem;
+        }
+        .nav-section.expanded .section-caret {
+            transform: rotate(180deg);
+            color: var(--accent-color);
+        }
+        .nav-section.expanded .nav-section-header {
+            color: var(--text-primary);
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -55,78 +124,78 @@
 
                 <!-- 1. ADMINISTRATOR SIDEBAR -->
                 @if($u->isSuperAdmin())
-                    <li class="nav-section-title">Admin Utama</li>
-                    <li class="nav-item">
-                        <a href="/admin/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
-                            <i class="ph ph-squares-four"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/users" class="{{ request()->is('admin/users*') ? 'active' : '' }}">
-                            <i class="ph ph-users"></i> Manajemen Pengguna
-                        </a>
+                    <li class="nav-section">
+                        <div class="nav-section-header">
+                            <span><i class="ph ph-shield-star"></i> Admin Utama</span>
+                            <i class="ph ph-caret-down section-caret"></i>
+                        </div>
+                        <ul class="nav-section-content">
+                            <li class="nav-item">
+                                <a href="/admin/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                                    <i class="ph ph-squares-four"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/users" class="{{ request()->is('admin/users*') ? 'active' : '' }}">
+                                    <i class="ph ph-users"></i> Manajemen Pengguna
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/agenda" class="{{ request()->is('admin/agenda*') ? 'active' : '' }}">
+                                    <i class="ph ph-calendar-blank"></i> Agenda Kegiatan
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     
-                    <li class="nav-section-title">Monitoring Sistem</li>
-                    <li class="nav-item">
-                        <a href="/admin/logs/activity" class="{{ request()->is('admin/logs/activity') ? 'active' : '' }}">
-                            <i class="ph ph-clock-counter-clockwise"></i> Activity Log
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/logs/login" class="{{ request()->is('admin/logs/login') ? 'active' : '' }}">
-                            <i class="ph ph-sign-in"></i> Login History
-                        </a>
-                    </li>
-
-                    <li class="nav-section-title">Monitoring Data</li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/members" class="{{ request()->is('admin/monitor/members') ? 'active' : '' }}">
-                            <i class="ph ph-users-three"></i> Anggota & Pelatih
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/agendas" class="{{ request()->is('admin/monitor/agendas') ? 'active' : '' }}">
-                            <i class="ph ph-calendar"></i> Agenda & Proker
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/keuangan" class="{{ request()->is('admin/monitor/keuangan') ? 'active' : '' }}">
-                            <i class="ph ph-coins"></i> Keuangan Kas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/letters" class="{{ request()->is('admin/monitor/letters') ? 'active' : '' }}">
-                            <i class="ph ph-envelope"></i> Persuratan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/inventaris" class="{{ request()->is('admin/monitor/inventaris') ? 'active' : '' }}">
-                            <i class="ph ph-package"></i> Inventaris
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/monitor/materials" class="{{ request()->is('admin/monitor/materials') ? 'active' : '' }}">
-                            <i class="ph ph-folders"></i> Materi Latihan
-                        </a>
+                    <li class="nav-section">
+                        <div class="nav-section-header">
+                            <span><i class="ph ph-activity"></i> Monitoring Sistem</span>
+                            <i class="ph ph-caret-down section-caret"></i>
+                        </div>
+                        <ul class="nav-section-content">
+                            <li class="nav-item">
+                                <a href="/admin/logs/activity" class="{{ request()->is('admin/logs/activity') ? 'active' : '' }}">
+                                    <i class="ph ph-clock-counter-clockwise"></i> Activity Log
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/logs/login" class="{{ request()->is('admin/logs/login') ? 'active' : '' }}">
+                                    <i class="ph ph-sign-in"></i> Login History
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
-                    <li class="nav-section-title">Maintenance</li>
-                    <li class="nav-item">
-                        <a href="/pengurus/categories" class="{{ request()->is('pengurus/categories*') ? 'active' : '' }}">
-                            <i class="ph ph-list-bullets"></i> Kelola Kategori
-                        </a>
-                    </li>
+                    <!-- REMOVED REDUNDANT SECTIONS -->
                 @endif
 
                 <!-- 2. ADMIN UKM SIDEBAR -->
-                @if($u->isAdminUkm())
-                    <li class="nav-section-title">Menu Admin UKM</li>
+                @if($u->isAdminUkm() || $u->isSuperAdmin())
+                    @if($u->isSuperAdmin())
+                        <li class="nav-section">
+                            <div class="nav-section-header">
+                                <span><i class="ph ph-crown"></i> Menu Admin UKM</span>
+                                <i class="ph ph-caret-down section-caret"></i>
+                            </div>
+                            <ul class="nav-section-content">
+                    @else
+                        <li class="nav-section-title">Menu Admin UKM</li>
+                    @endif
+                    @if(!$u->isSuperAdmin())
                     <li class="nav-item">
                         <a href="/ukm/dashboard" class="{{ request()->is('ukm/dashboard') ? 'active' : '' }}">
                             <i class="ph ph-squares-four"></i> Dashboard
                         </a>
                     </li>
+                    @endif
+                    @if(!$u->isSuperAdmin())
+                    <li class="nav-item">
+                        <a href="/pengurus/agenda" class="{{ request()->is('pengurus/agenda*') ? 'active' : '' }}">
+                            <i class="ph ph-calendar-blank"></i> Agenda Kegiatan
+                        </a>
+                    </li>
+                    @endif
                     <li class="nav-item">
                         <a href="/ukm/profile" class="{{ request()->is('ukm/profile') ? 'active' : '' }}">
                             <i class="ph ph-identification-card"></i> Profil PSUP
@@ -140,11 +209,6 @@
                     <li class="nav-item">
                         <a href="/ukm/registrations" class="{{ request()->is('ukm/registrations*') ? 'active' : '' }}">
                             <i class="ph ph-user-plus"></i> Pendaftaran Calon
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/ukm/email-logs" class="{{ request()->is('ukm/email-logs*') ? 'active' : '' }}">
-                            <i class="ph ph-paper-plane-tilt"></i> Riwayat Notifikasi
                         </a>
                     </li>
                     <li class="nav-item">
@@ -173,13 +237,42 @@
                         </a>
                     </li>
 
-                    <li class="nav-section-title">Menu Pengurus</li>
+                    @if($u->isSuperAdmin())
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if($u->isSuperAdmin())
+                        <li class="nav-section">
+                            <div class="nav-section-header">
+                                <span><i class="ph ph-briefcase"></i> Menu Pengurus</span>
+                                <i class="ph ph-caret-down section-caret"></i>
+                            </div>
+                            <ul class="nav-section-content">
+                    @else
+                        <li class="nav-section-title">Menu Pengurus</li>
+                    @endif
+
                     <li class="nav-item">
                         <a href="/pengurus/programs" class="{{ request()->is('pengurus/programs*') ? 'active' : '' }}">
                             <i class="ph ph-calendar-blank"></i> Proker & Job
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a href="/pengurus/announcements" class="{{ request()->is('pengurus/announcements*') ? 'active' : '' }}">
+                            <i class="ph ph-megaphone"></i> Pengumuman
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/pengurus/classrooms" class="{{ request()->is('pengurus/classrooms*') ? 'active' : '' }}">
+                            <i class="ph ph-chalkboard"></i> Pusat Latihan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/pengurus/letters" class="{{ request()->is('pengurus/letters*') ? 'active' : '' }}">
+                            <i class="ph ph-envelope"></i> Persuratan
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="/pengurus/finances" class="{{ request()->is('pengurus/finances*') ? 'active' : '' }}">
                             <i class="ph ph-money"></i> Keuangan Kas
@@ -200,6 +293,11 @@
                             <i class="ph ph-list-bullets"></i> Kelola Kategori
                         </a>
                     </li>
+
+                    @if($u->isSuperAdmin())
+                            </ul>
+                        </li>
+                    @endif
                 @endif
 
                 <!-- 3. PENGURUS SIDEBAR (Dinamis berdasarkan Divisi) -->
@@ -211,12 +309,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="/pengurus/agenda" class="{{ request()->is('pengurus/agenda*') ? 'active' : '' }}">
+                            <i class="ph ph-calendar-blank"></i> Agenda Kegiatan
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="/pengurus/categories" class="{{ request()->is('pengurus/categories*') ? 'active' : '' }}">
                             <i class="ph ph-list-bullets"></i> Kelola Kategori
                         </a>
                     </li>
 
-                    @php $div = $u->division ?? ''; @endphp
+                    @php $div = ''; @endphp
 
                     {{-- Sekretaris --}}
                     @if(!$div || $div === 'Sekretaris')
@@ -236,8 +339,7 @@
                     <li class="nav-section-title">Divisi Latihan</li>
                     <li class="nav-item"><a href="/pengurus/trainers" class="{{ request()->is('pengurus/trainers*') ? 'active' : '' }}"><i class="ph ph-chalkboard-teacher"></i> Pelatih</a></li>
                     <li class="nav-item"><a href="/pengurus/materials" class="{{ request()->is('pengurus/materials*') ? 'active' : '' }}"><i class="ph ph-folders"></i> Materi Master</a></li>
-                    <li class="nav-item"><a href="/pengurus/classrooms" class="{{ request()->is('pengurus/classrooms*') ? 'active' : '' }}"><i class="ph ph-chalkboard"></i> Classroom</a></li>
-
+                    <li class="nav-item"><a href="/pengurus/classrooms" class="{{ request()->is('pengurus/classrooms*') ? 'active' : '' }}"><i class="ph ph-chalkboard"></i> Pusat Latihan</a></li>
                     @endif
 
                     {{-- Divisi Humas --}}
@@ -267,14 +369,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="/member/agenda" class="{{ request()->is('member/agenda*') ? 'active' : '' }}">
+                            <i class="ph ph-calendar-blank"></i> Agenda Saya
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="/member/materials" class="{{ request()->is('member/materials*') ? 'active' : '' }}">
                             <i class="ph ph-folders"></i> Materi Latihan
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a href="/member/classrooms" class="{{ request()->is('member/classrooms*') ? 'active' : '' }}">
-                            <i class="ph ph-chalkboard"></i> Classroom Saya
+                            <i class="ph ph-chalkboard"></i> Pusat Latihan Saya
                         </a>
                     </li>
                     <li class="nav-item">
@@ -314,8 +420,8 @@
                             <i class="ph ph-arrow-left" style="font-size: 1.1rem; font-weight: bold;"></i>
                         </a>
                     @endif
-                    <h2 style="font-weight: 600; font-size: 1.25rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem;" title="@yield('header')">
-                        @yield('header')
+                    <h2 style="font-weight: 600; font-size: 1.25rem; margin: 0; flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem;" title="@yield('header')">
+                        <span style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">@yield('header')</span>
                     </h2>
                 </div>
                 
@@ -525,6 +631,21 @@
                 });
             }
 
+            // Collapsible sidebar sections
+            document.querySelectorAll('.nav-section-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.parentElement;
+                    section.classList.toggle('expanded');
+                });
+            });
+
+            // Expand sections containing active links
+            document.querySelectorAll('.nav-section').forEach(section => {
+                if (section.querySelector('.active')) {
+                    section.classList.add('expanded');
+                }
+            });
+
             if (menuToggle && sidebar) {
                 menuToggle.addEventListener('click', function() {
                     sidebar.classList.add('active');
@@ -573,6 +694,22 @@
                         });
                     }
                 }
+            });
+
+            // Password visibility toggle handler
+            document.querySelectorAll('.toggle-password-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.className = 'ph ph-eye-slash';
+                    } else {
+                        input.type = 'password';
+                        icon.className = 'ph ph-eye';
+                    }
+                });
             });
 
             // Spawn session toasts if present

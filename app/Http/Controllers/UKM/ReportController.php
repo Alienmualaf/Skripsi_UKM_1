@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Performance;
 use App\Models\Program;
 use App\Models\ProgramReport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -29,6 +30,8 @@ class ReportController extends Controller
         $program = Program::with([
             'report.creator',
             'performance.classroom.members.voiceClassification',
+            'performance.classroom.trainer',
+            'performance.classroom.attendances.details',
         ])->findOrFail($programId);
 
         // Automatically create report if not exists (Laporan Kegiatan terbuat otomatis)
@@ -60,6 +63,8 @@ class ReportController extends Controller
             $program = Program::with([
                 'report.creator',
                 'performance.classroom.members.voiceClassification',
+                'performance.classroom.trainer',
+                'performance.classroom.attendances.details',
             ])->findOrFail($programId);
         }
 
@@ -108,6 +113,14 @@ class ReportController extends Controller
 
     public function rekrutmen(Request $request)
     {
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            if ($request->end_date < $request->start_date) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['end_date' => 'Tanggal Akhir tidak boleh kurang dari Tanggal Mulai.']);
+            }
+        }
+
         $query = Member::with('voiceClassification')->orderBy('created_at', 'desc');
 
         if ($request->filled('tahun')) {
@@ -130,9 +143,17 @@ class ReportController extends Controller
 
     public function keuangan(Request $request)
     {
-        $query = Finance::with(['program'])->orderBy('transaction_date', 'desc');
-
         $filterMode = $request->filter_mode ?? 'custom'; // bulanan | tahunan | custom
+
+        if ($filterMode === 'custom' && $request->filled('start_date') && $request->filled('end_date')) {
+            if ($request->end_date < $request->start_date) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['end_date' => 'Tanggal Akhir tidak boleh kurang dari Tanggal Mulai.']);
+            }
+        }
+
+        $query = Finance::with(['program'])->orderBy('transaction_date', 'desc');
 
         if ($filterMode === 'bulanan' && $request->filled('bulan')) {
             [$year, $month] = explode('-', $request->bulan);
@@ -158,10 +179,23 @@ class ReportController extends Controller
 
     public function lpj(Request $request)
     {
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            if ($request->end_date < $request->start_date) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['end_date' => 'Tanggal Akhir tidak boleh kurang dari Tanggal Mulai.']);
+            }
+        }
+
         $startDate = $request->start_date ?? now()->startOfYear()->toDateString();
         $endDate   = $request->end_date   ?? now()->toDateString();
 
-        $programs     = Program::with(['report', 'performance.classroom.members.voiceClassification'])
+        $programs     = Program::with([
+            'report',
+            'performance.classroom.members.voiceClassification',
+            'performance.classroom.trainer',
+            'performance.classroom.attendances.details',
+        ])
             ->whereBetween('start_date', [$startDate, $endDate])
             ->orderBy('start_date')
             ->get();
@@ -202,40 +236,44 @@ class ReportController extends Controller
 
     public function printKegiatan($programId)
     {
-        $program  = Program::with(['report.creator', 'performance.classroom.members.voiceClassification'])->findOrFail($programId);
+        $program  = Program::with([
+            'report.creator',
+            'performance.classroom.members.voiceClassification',
+            'performance.classroom.trainer',
+            'performance.classroom.attendances.details',
+        ])->findOrFail($programId);
 
-        // Automatically create report if not exists (Laporan Kegiatan terbuat otomatis)
         if (!$program->report) {
-            $expense = Finance::where('program_id', $programId)->where('type', 'expense')->sum('amount');
-            $createdBy = auth()->id();
-            if (!$createdBy) {
-                $createdBy = \App\Models\User::first()?->id ?? 1;
-            }
-
-            $reportData = [
-                'program_id' => $programId,
-                'created_by' => $createdBy,
-                'title' => 'Laporan Pertanggungjawaban ' . $program->name,
-                'executive_summary' => $program->description ?? 'Laporan pelaksanaan program kerja ' . $program->name . '.',
-                'activities_description' => $program->performance 
-                    ? "Kegiatan ini merupakan penampilan dengan nama '" . $program->name . "' yang diselenggarakan pada tanggal " . ($program->performance->performance_date ? $program->performance->performance_date->format('d-m-Y') : '-') . " di " . ($program->performance->venue ?? '-') . "."
-                    : "Kegiatan '" . $program->name . "' diselenggarakan oleh divisi " . $program->division . " dari tanggal " . ($program->start_date ? date('d-m-Y', strtotime($program->start_date)) : '-') . " sampai " . ($program->end_date ? date('d-m-Y', strtotime($program->end_date)) : '-') . ".",
-                'budget_realization' => "Realisasi anggaran untuk program kerja " . $program->name . " adalah sebesar Rp " . number_format($expense, 0, ',', '.') . " dari rencana anggaran sebesar Rp " . number_format($program->budget, 0, ',', '.') . ".",
-                'obstacles' => "Pelaksanaan program kerja berjalan dengan baik tanpa ada hambatan yang berarti.",
-                'recommendations' => "Disarankan agar program kerja serupa dapat dilaksanakan kembali di periode mendatang dengan persiapan yang lebih matang.",
-                'realized_budget' => $expense,
-                'status' => 'Approved',
-            ];
-
-            ProgramReport::create($reportData);
-
-            // Reload program report
-            $program = Program::with(['report.creator', 'performance.classroom.members.voiceClassification'])->findOrFail($programId);
+            $expense   = Finance::where('program_id', $programId)->where('type', 'expense')->sum('amount');
+            $createdBy = auth()->id() ?? (\App\Models\User::first()?->id ?? 1);
+            ProgramReport::create([
+                'program_id'              => $programId,
+                'created_by'              => $createdBy,
+                'title'                   => 'Laporan Pertanggungjawaban ' . $program->name,
+                'executive_summary'       => $program->description ?? 'Laporan pelaksanaan program kerja ' . $program->name . '.',
+                'activities_description'  => "Kegiatan '" . $program->name . "' diselenggarakan oleh divisi " . $program->division . ".",
+                'budget_realization'      => "Realisasi anggaran Rp " . number_format($expense, 0, ',', '.') . ".",
+                'obstacles'               => 'Pelaksanaan program kerja berjalan dengan baik.',
+                'recommendations'         => 'Disarankan agar program serupa dilanjutkan di periode mendatang.',
+                'realized_budget'         => $expense,
+                'status'                  => 'Approved',
+            ]);
+            $program = Program::with([
+                'report.creator',
+                'performance.classroom.members.voiceClassification',
+                'performance.classroom.trainer',
+                'performance.classroom.attendances.details',
+            ])->findOrFail($programId);
         }
 
         $finances = Finance::where('program_id', $programId)->orderBy('transaction_date', 'desc')->get();
         $letters  = Letter::where('program_id', $programId)->orderBy('date', 'desc')->get();
-        return view('ukm.reports.print.kegiatan', compact('program', 'finances', 'letters'));
+
+        $filename = 'Laporan_Kegiatan_' . str_replace(' ', '_', $program->name) . '.pdf';
+        $pdf = Pdf::loadView('ukm.reports.print.kegiatan', compact('program', 'finances', 'letters'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream($filename);
     }
 
     public function printRekrutmen(Request $request)
@@ -245,7 +283,11 @@ class ReportController extends Controller
         if ($request->filled('start_date')) $query->whereDate('created_at', '>=', $request->start_date);
         if ($request->filled('end_date'))   $query->whereDate('created_at', '<=', $request->end_date);
         $members = $query->get();
-        return view('ukm.reports.print.rekrutmen', compact('members'));
+
+        $pdf = Pdf::loadView('ukm.reports.print.rekrutmen', compact('members'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Laporan_Rekrutmen_PSUP.pdf');
     }
 
     public function printKeuangan(Request $request)
@@ -258,14 +300,23 @@ class ReportController extends Controller
         $income   = $finances->where('type', 'income')->sum('amount');
         $expense  = $finances->where('type', 'expense')->sum('amount');
         $saldo    = $income - $expense;
-        return view('ukm.reports.print.keuangan', compact('finances', 'income', 'expense', 'saldo'));
+
+        $pdf = Pdf::loadView('ukm.reports.print.keuangan', compact('finances', 'income', 'expense', 'saldo'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Laporan_Keuangan_PSUP.pdf');
     }
 
     public function printLpj(Request $request)
     {
         $startDate    = $request->start_date ?? now()->startOfYear()->toDateString();
         $endDate      = $request->end_date   ?? now()->toDateString();
-        $programs     = Program::with(['report', 'performance.classroom.members.voiceClassification'])->whereBetween('start_date', [$startDate, $endDate])->orderBy('start_date')->get();
+        $programs     = Program::with([
+            'report',
+            'performance.classroom.members.voiceClassification',
+            'performance.classroom.trainer',
+            'performance.classroom.attendances.details',
+        ])->whereBetween('start_date', [$startDate, $endDate])->orderBy('start_date')->get();
         $performances = Performance::whereBetween('performance_date', [$startDate, $endDate])->with('program')->orderBy('performance_date')->get();
         $finances     = Finance::whereBetween('transaction_date', [$startDate, $endDate])->orderBy('transaction_date')->get();
         $income       = $finances->where('type', 'income')->sum('amount');
@@ -274,9 +325,14 @@ class ReportController extends Controller
         $inventories  = Inventory::with('loans')->get();
         $letters      = Letter::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'desc')->get();
         $members      = Member::with('voiceClassification')->where('status', 'Anggota Aktif')->get();
-        return view('ukm.reports.print.lpj', compact(
-            'startDate', 'endDate', 'programs', 'performances',
-            'finances', 'income', 'expense', 'saldo', 'inventories', 'letters', 'members'
-        ));
+
+        $filename = 'LPJ_PSUP_' . $startDate . '_sd_' . $endDate . '.pdf';
+        $pdf = Pdf::loadView('ukm.reports.print.lpj', compact(
+                'startDate', 'endDate', 'programs', 'performances',
+                'finances', 'income', 'expense', 'saldo', 'inventories', 'letters', 'members'
+            ))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream($filename);
     }
 }

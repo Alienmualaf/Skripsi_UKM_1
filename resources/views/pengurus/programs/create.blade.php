@@ -91,6 +91,12 @@
             </div>
         </div>
 
+        <div id="performance-time-container" style="display: none; margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Jam Pelaksanaan <span style="color: var(--danger-color);">*</span></label>
+            <input type="time" name="performance_time" class="form-control" value="{{ old('performance_time', '19:00') }}" style="max-width: 200px;">
+            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.25rem;">Waktu atau jam pelaksanaan penampilan / lomba.</span>
+        </div>
+
         <div class="form-group" style="margin-bottom: 1.25rem;">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Penanggung Jawab (PJ) Kegiatan</label>
             <input type="text" name="pic" class="form-control" value="{{ old('pic') }}" placeholder="Nama pengurus PJ">
@@ -114,17 +120,31 @@
 </div>
 
 <script>
-function toggleEventCategory() {
-    const container = document.getElementById('event-category-container');
+function toggleEventFields() {
+    const categoryContainer = document.getElementById('event-category-container');
+    const timeContainer = document.getElementById('performance-time-container');
     const checkedRadio = document.querySelector('input[name="activity_type"]:checked');
-    if (checkedRadio && checkedRadio.value === 'Event') {
-        container.style.display = 'block';
-        container.querySelectorAll('input').forEach(el => el.required = true);
-    } else {
-        container.style.display = 'none';
-        container.querySelectorAll('input').forEach(el => {
-            el.required = false;
-        });
+    
+    if (checkedRadio) {
+        if (checkedRadio.value === 'Event') {
+            categoryContainer.style.display = 'block';
+            categoryContainer.querySelectorAll('input').forEach(el => el.required = true);
+            
+            timeContainer.style.display = 'none';
+            timeContainer.querySelector('input').required = false;
+        } else if (checkedRadio.value === 'Performance' || checkedRadio.value === 'Competition') {
+            categoryContainer.style.display = 'none';
+            categoryContainer.querySelectorAll('input').forEach(el => el.required = false);
+            
+            timeContainer.style.display = 'block';
+            timeContainer.querySelector('input').required = true;
+        } else {
+            categoryContainer.style.display = 'none';
+            categoryContainer.querySelectorAll('input').forEach(el => el.required = false);
+            
+            timeContainer.style.display = 'none';
+            timeContainer.querySelector('input').required = false;
+        }
     }
 }
 
@@ -139,11 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.closest('label').style.borderColor = 'var(--border-color)';
             });
             radio.closest('label').style.borderColor = typeColors[radio.value] || 'var(--accent-color)';
-            toggleEventCategory();
+            toggleEventFields();
         });
     });
 
-    toggleEventCategory();
+    toggleEventFields();
 });
 </script>
 @endsection

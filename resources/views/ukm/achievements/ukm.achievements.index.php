@@ -8,15 +8,15 @@
 @section('header', 'Manajemen Prestasi & Medali')
 
 @section('content')
-<div style="display: grid; grid-template-columns: 1fr 350px; gap: 1.5rem; align-items: start;">
+<div class="grid-sidebar-layout">
     <div class="card animate-fade-in">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <div>
                 <h3 style="font-weight: 700; font-size: 1.25rem;">Daftar Prestasi & Medali</h3>
                 <p style="color: var(--text-secondary); font-size: 0.875rem;">Total: {{ $achievements->total() }} prestasi tercatat.</p>
             </div>
             @if($isOperator)
-            <button onclick="document.getElementById('modal-add-achievement').style.display='flex'" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+            <button onclick="document.getElementById('modal-add-achievement').style.display='flex'" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                 <i class="ph ph-plus-circle"></i> Tambah Prestasi
             </button>
             @endif
@@ -24,18 +24,18 @@
 
         <div style="display: flex; flex-direction: column; gap: 1.25rem;">
             @foreach($achievements as $ach)
-            <div style="padding: 1.25rem; border: 1px solid var(--border-color); border-radius: 12px; display: flex; gap: 1.25rem; align-items: flex-start; position: relative;">
+            <div class="achievement-card">
                 @if($ach->photo)
-                <div style="width: 140px; height: 100px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--bg-color);">
-                    <img src="{{ asset('storage/' . $ach->photo) }}" alt="{{ $ach->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="achievement-card-img">
+                    <img src="{{ asset('storage/' . $ach->photo) }}" alt="{{ $ach->title }}">
                 </div>
                 @else
-                <div style="width: 140px; height: 100px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--bg-color); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                <div class="achievement-card-img" style="display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
                     <i class="ph ph-trophy" style="font-size: 2.5rem; opacity: 0.5;"></i>
                 </div>
                 @endif
-                <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div class="achievement-card-content">
+                    <div class="achievement-card-header">
                         <div>
                             <h4 style="font-weight: 700; font-size: 1.1rem; margin: 0 0 0.25rem 0;">{{ $ach->title }}</h4>
                             <span style="font-size: 0.75rem; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600;">
@@ -43,7 +43,7 @@
                             </span>
                         </div>
                         @if($isOperator)
-                        <div style="display: flex; gap: 0.35rem; align-items: center; flex-shrink: 0;">
+                        <div class="achievement-card-actions">
                             <form action="/ukm/achievements/{{ $ach->id }}/toggle-landing" method="POST" style="margin: 0;">
                                 @csrf
                                 <button type="submit" class="btn" style="padding: 0.35rem 0.5rem; font-size: 0.75rem; background: {{ $ach->show_on_landing ? 'var(--accent-color)' : 'var(--bg-color)' }}; border: 1px solid {{ $ach->show_on_landing ? 'var(--accent-color)' : 'var(--border-color)' }}; color: {{ $ach->show_on_landing ? '#fff' : 'var(--text-secondary)' }}; display: inline-flex; align-items: center; gap: 0.25rem;" title="{{ $ach->show_on_landing ? 'Sembunyikan dari Landing Page' : 'Tampilkan di Landing Page' }}">

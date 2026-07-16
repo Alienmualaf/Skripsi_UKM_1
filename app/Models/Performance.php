@@ -15,12 +15,7 @@ class Performance extends Model
         'performance_date',
         'performance_time',
         'description',
-        'dress_code',
         'status',
-        'institution',
-        'fee',
-        'pic',
-        'rundown',
         'show_on_landing',
     ];
 

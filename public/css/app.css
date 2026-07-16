@@ -560,6 +560,11 @@ h6 {
   transform: translateY(-1px);
 }
 
+/* Enforce padding-left for search inputs accompanied by magnifying glass icons */
+i.ph-magnifying-glass + .form-control {
+  padding-left: 2.25rem !important;
+}
+
 /* Modern Hand-Crafted Tables */
 .table-wrapper {
   overflow-x: auto;
@@ -791,6 +796,14 @@ h6 {
   z-index: 9;
 }
 
+/* Mobile-only responsive helpers */
+.show-mobile-inline {
+  display: none !important;
+}
+.show-mobile-block {
+  display: none !important;
+}
+
 /* ==========================================================================
    COMPREHENSIVE RESPONSIVE DESIGN
    Covers: Super Admin, Admin UKM, Member — all pages
@@ -803,7 +816,7 @@ h6 {
   html,
   body {
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     position: relative;
     width: 100%;
   }
@@ -811,7 +824,11 @@ h6 {
   .app-container {
     max-width: 100% !important;
     width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
+  }
+
+  .sidebar-overlay {
+    z-index: 1010 !important;
   }
 
   .menu-toggle-btn {
@@ -833,7 +850,7 @@ h6 {
     box-shadow: var(--shadow-lg);
     background-color: var(--surface-color);
     position: fixed;
-    z-index: 11;
+    z-index: 1020 !important;
   }
 
   .sidebar.active {
@@ -843,17 +860,29 @@ h6 {
   .main-content {
     margin-left: 0 !important;
     padding: 1rem !important;
+    padding-top: calc(56px + 1rem) !important;
     width: 100% !important;
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
   }
 
   .topbar {
-    margin-bottom: 1.5rem;
-    padding: 0.75rem 1rem !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 56px !important;
+    z-index: 1000 !important;
+    background: var(--surface-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 0 1rem !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
     gap: 1rem;
     flex-wrap: nowrap !important;
-    border-radius: var(--radius-lg) !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
   }
 
   /* --- All inline grid layouts (used across all dashboards) --- */
@@ -1031,11 +1060,7 @@ h6 {
 @media (max-width: 768px) {
   .main-content {
     padding: 0.75rem !important;
-  }
-
-  .topbar {
-    padding: 0.5rem 0.75rem !important;
-    gap: 0.5rem;
+    padding-top: calc(56px + 0.75rem) !important;
   }
 
   .topbar h2 {
@@ -1105,23 +1130,36 @@ h6 {
   }
 
   /* Filter form - stack on mobile */
-  form[style*="display: flex"][style*="gap: 1rem"] {
+  form[style*="display: flex"] {
     flex-direction: column !important;
+    align-items: stretch !important;
     gap: 0.75rem !important;
   }
+  
+  form[style*="display: flex"] > div[style*="display: flex"] {
+    width: 100% !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+  }
 
-  form[style*="display: flex"][style*="gap: 1rem"]>div[style*="flex: 1"] {
+  form[style*="display: flex"] > div[style*="display: flex"] > div {
+    width: 100% !important;
     min-width: 100% !important;
-    width: 100% !important;
+    flex: 1 1 100% !important;
   }
 
-  form[style*="display: flex"][style*="gap: 1rem"]>div[style*="width: 180px"] {
+  form[style*="display: flex"] > div:last-child {
     width: 100% !important;
+    display: flex !important;
+    gap: 0.5rem !important;
   }
 
-  /* Filter reset button */
-  form[style*="display: flex"][style*="gap: 1rem"]>a.btn {
-    align-self: flex-start !important;
+  form[style*="display: flex"] > div:last-child > button,
+  form[style*="display: flex"] > div:last-child > a {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
   }
 
   /* Table card header - stack title + count */
@@ -1247,16 +1285,109 @@ h6 {
     flex-wrap: wrap !important;
     gap: 0.75rem !important;
   }
+
+  /* Stack inline grids that cause horizontal scrolling on mobile */
+  div[style*="grid-template-columns:"][style*="1fr 350px"],
+  div[style*="grid-template-columns:"][style*="1fr 360px"],
+  div[style*="grid-template-columns:"][style*="1fr 340px"],
+  div[style*="grid-template-columns:"][style*="1fr 1fr"],
+  div[style*="grid-template-columns:"][style*="2fr 1fr"],
+  div[style*="grid-template-columns:"][style*="1fr 2fr"],
+  div[style*="grid-template-columns:"][style*="repeat(2,"],
+  div[style*="grid-template-columns:"][style*="repeat(4,"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* EXCEPTION: repeat(3,...) only collapses if NOT a classroom stats grid */
+  div[style*="grid-template-columns:"][style*="repeat(3,"]:not(.classroom-stats-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Classroom stats row: always stay 3 columns */
+  .classroom-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Filter form dropdowns - full width on mobile */
+  form[style*="display: flex"][style*="gap: 1rem"]>div[style*="width: 200px"],
+  form[style*="display: flex"][style*="gap: 1rem"]>div[style*="width: 250px"] {
+    width: 100% !important;
+  }
+
+  /* Stack classroom index grids on mobile */
+  div[style*="minmax(340px"],
+  .classroom-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Classroom card: tighten header/body padding on mobile */
+  .classroom-card-header {
+    padding: 1rem 1.1rem !important;
+  }
+  .classroom-card-body {
+    padding: 1rem 1.1rem !important;
+  }
+
+  /* Stack member classroom stream on mobile */
+  #tab-content-stream {
+    grid-template-columns: 1fr !important;
+  }
+
+  .show-mobile-inline {
+    display: inline-flex !important;
+  }
+  
+  .show-mobile-block {
+    display: block !important;
+  }
+
+  /* Compact responsive table: hides columns 3, 4, 5, 6 on mobile */
+  .table-responsive-compact th:nth-child(3),
+  .table-responsive-compact td:nth-child(3),
+  .table-responsive-compact th:nth-child(4),
+  .table-responsive-compact td:nth-child(4),
+  .table-responsive-compact th:nth-child(5),
+  .table-responsive-compact td:nth-child(5),
+  .table-responsive-compact th:nth-child(6),
+  .table-responsive-compact td:nth-child(6) {
+    display: none !important;
+  }
+
+  /* Log activity compact table: hides columns 3, 4, 6 on mobile */
+  .table-logs-compact th:nth-child(3),
+  .table-logs-compact td:nth-child(3),
+  .table-logs-compact th:nth-child(4),
+  .table-logs-compact td:nth-child(4),
+  .table-logs-compact th:nth-child(6),
+  .table-logs-compact td:nth-child(6) {
+    display: none !important;
+  }
+
+  /* Login history compact table: hides columns 3, 4, 5, 6 on mobile */
+  .table-login-compact th:nth-child(3),
+  .table-login-compact td:nth-child(3),
+  .table-login-compact th:nth-child(4),
+  .table-login-compact td:nth-child(4),
+  .table-login-compact th:nth-child(5),
+  .table-login-compact td:nth-child(5),
+  .table-login-compact th:nth-child(6),
+  .table-login-compact td:nth-child(6) {
+    display: none !important;
+  }
 }
 
 /* ---- SMALL MOBILE (max-width: 480px) ---- */
 @media (max-width: 480px) {
   .main-content {
     padding: 0.5rem !important;
+    padding-top: calc(56px + 0.5rem) !important;
   }
 
   .topbar {
-    padding: 0.5rem !important;
+    padding: 0 0.75rem !important;
+    margin: 0 !important;
   }
 
   .topbar h2 {
@@ -1520,4 +1651,103 @@ h6 {
   cursor: not-allowed;
   background: var(--bg-color);
   color: var(--text-secondary);
+}
+
+/* Sidebar Grid Layout with responsive collapse */
+.grid-sidebar-layout {
+  display: grid !important;
+  grid-template-columns: 1fr 350px !important;
+  gap: 1.5rem !important;
+  align-items: start !important;
+}
+
+@media (max-width: 992px) {
+  .grid-sidebar-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Responsive Achievement Cards */
+.achievement-card {
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  position: relative;
+  background: var(--surface-color);
+}
+
+.achievement-card-img {
+  width: 140px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-color);
+}
+
+.achievement-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.achievement-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.achievement-card-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .achievement-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .achievement-card-img {
+    width: 100% !important;
+    height: 180px !important;
+  }
+  
+  .achievement-card-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .achievement-card-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Responsive Grid Sidebar Layout */
+.grid-sidebar-layout {
+  display: grid;
+  grid-template-columns: 1fr var(--sidebar-width, 350px);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .grid-sidebar-layout {
+    grid-template-columns: 1fr !important;
+  }
 }

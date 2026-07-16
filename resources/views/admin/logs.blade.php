@@ -4,6 +4,18 @@
 @section('header', 'Activity Log')
 
 @section('content')
+<style>
+@media (max-width: 768px) {
+  .table-logs-compact th:nth-child(3),
+  .table-logs-compact td:nth-child(3),
+  .table-logs-compact th:nth-child(4),
+  .table-logs-compact td:nth-child(4),
+  .table-logs-compact th:nth-child(6),
+  .table-logs-compact td:nth-child(6) {
+    display: none !important;
+  }
+}
+</style>
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Aktivitas Pengguna</h3>
@@ -13,10 +25,12 @@
 
 <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
     <form action="{{ route('admin.logs.activity') }}" method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-        <div style="position: relative; min-width: 320px; flex: 1;">
+        <div style="min-width: 320px; flex: 1;">
             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Aktivitas</label>
-            <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
-            <input type="text" name="search" value="{{ $search }}" placeholder="Cari deskripsi, operator, modul..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+            <div style="position: relative;">
+                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem; pointer-events: none;"></i>
+                <input type="text" name="search" value="{{ $search }}" placeholder="Cari deskripsi, operator, modul..." class="form-control" style="padding-left: 2.25rem !important; height: 2.5rem; font-size: 0.875rem;">
+            </div>
         </div>
         <div style="display: flex; gap: 0.5rem; height: 2.5rem;">
             <button type="submit" class="btn btn-primary" style="padding: 0 1.25rem; font-weight: 700; border-radius: 8px;">Filter</button>
@@ -38,7 +52,7 @@
     </div>
 
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-        <table class="table">
+        <table class="table table-logs-compact">
             <thead>
                 <tr>
                     <th style="width: 180px;">Waktu</th>
@@ -52,8 +66,22 @@
             <tbody>
                 @forelse($logs as $log)
                 <tr>
-                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">{{ $log->created_at->format('d-m-Y H:i:s') }}</td>
-                    <td style="font-weight: 700; color: var(--text-primary);">{{ $log->username }}</td>
+                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        <span class="hidden-mobile">{{ $log->created_at->format('d-m-Y H:i:s') }}</span>
+                        <div class="show-mobile-block" style="font-size: 0.75rem; line-height: 1.2;">
+                            <div>{{ $log->created_at->format('d-m-Y') }}</div>
+                            <div style="opacity: 0.7;">{{ $log->created_at->format('H:i:s') }}</div>
+                        </div>
+                    </td>
+                    <td style="font-weight: 700; color: var(--text-primary);">
+                        <div style="margin-bottom: 0.25rem;">{{ $log->username }}</div>
+                        
+                        <!-- Mobile-only badges -->
+                        <div class="show-mobile-inline" style="gap: 0.25rem; flex-wrap: wrap;">
+                            <span class="badge" style="background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.6rem; padding: 0.1rem 0.35rem;">{{ $log->role }}</span>
+                            <span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color); font-weight: bold; font-size: 0.6rem; padding: 0.1rem 0.35rem;">{{ $log->module }}</span>
+                        </div>
+                    </td>
                     <td><span class="badge" style="background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.7rem;">{{ $log->role }}</span></td>
                     <td><span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color); font-weight: bold;">{{ $log->module }}</span></td>
                     <td style="color: var(--text-primary); font-weight: 500;">{{ $log->activity }}</td>

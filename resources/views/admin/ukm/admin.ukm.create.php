@@ -51,7 +51,12 @@
 
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Password Admin</label>
-            <input type="password" name="admin_password" class="form-control" required placeholder="Minimal 8 karakter" style="padding: 0.65rem;" autocomplete="new-password">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="admin_password" class="form-control" required placeholder="Minimal 8 karakter" style="padding: 0.65rem; padding-right: 2.75rem;" autocomplete="new-password">
+                <button type="button" class="toggle-password-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem; z-index: 10;">
+                    <i class="ph ph-eye" style="font-size: 1.20rem;"></i>
+                </button>
+            </div>
         </div>
 
         <div class="flex gap-2 mt-6">

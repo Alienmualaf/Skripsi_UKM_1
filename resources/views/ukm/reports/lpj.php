@@ -4,6 +4,57 @@
 @section('header', 'LPJ — Laporan Pertanggungjawaban')
 
 @section('content')
+<style>
+    .lpj-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .lpj-finance-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+        .lpj-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table td, .table th {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+        .lpj-finance-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+    }
+    @media (max-width: 640px) {
+        .lpj-stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 
 {{-- Header --}}
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
@@ -18,7 +69,7 @@
     </div>
     <a href="{{ route('ukm.reports.lpj.print') }}?start_date={{ $startDate }}&end_date={{ $endDate }}" target="_blank"
        class="btn" style="padding:0.6rem 1.1rem;font-weight:700;border-radius:8px;display:inline-flex;align-items:center;gap:0.35rem;background:#f59e0b;color:white;text-decoration:none;">
-        <i class="ph ph-printer"></i> Cetak / PDF
+        <i class="ph ph-download-simple"></i> Download LPJ
     </a>
 </div>
 
@@ -26,14 +77,19 @@
 <form method="GET" action="{{ route('ukm.reports.lpj') }}" style="margin-bottom:1.5rem;">
     <div class="card" style="padding:1.25rem;">
         <h5 style="font-weight:800;font-size:0.9rem;margin:0 0 1rem;"><i class="ph ph-calendar-check" style="color:#f59e0b;"></i> Periode Kepengurusan</h5>
+        @if ($errors->has('end_date'))
+            <div style="background:#fef2f2; border:1px solid #fee2e2; color:#ef4444; padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.85rem; font-weight:600;">
+                <i class="ph ph-warning-circle" style="vertical-align:middle; margin-right:4px;"></i> {{ $errors->first('end_date') }}
+            </div>
+        @endif
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;align-items:end;">
             <div>
                 <label style="font-size:0.8rem;font-weight:700;display:block;margin-bottom:0.35rem;">Tanggal Mulai</label>
-                <input type="date" name="start_date" class="form-control" value="{{ $startDate }}" required>
+                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ $startDate }}" required>
             </div>
             <div>
                 <label style="font-size:0.8rem;font-weight:700;display:block;margin-bottom:0.35rem;">Tanggal Akhir</label>
-                <input type="date" name="end_date" class="form-control" value="{{ $endDate }}" required>
+                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ $endDate }}" required>
             </div>
             <div>
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:0.6rem;font-weight:700;border-radius:8px;">
@@ -44,8 +100,28 @@
     </div>
 </form>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+
+        if (startDateInput && endDateInput) {
+            // Set initial min date for end date input
+            endDateInput.min = startDateInput.value;
+
+            // Update min date for end date when start date changes
+            startDateInput.addEventListener('change', function() {
+                endDateInput.min = this.value;
+                if (endDateInput.value && endDateInput.value < this.value) {
+                    endDateInput.value = this.value;
+                }
+            });
+        }
+    });
+</script>
+
 {{-- Summary Stats --}}
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem;">
+<div class="lpj-stats-grid">
     <div class="card" style="padding:1.25rem;text-align:center;border-top:3px solid #3b82f6;">
         <div style="font-size:1.75rem;font-weight:800;color:#3b82f6;">{{ $programs->count() }}</div>
         <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);">Program Kerja</div>
@@ -175,7 +251,7 @@
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
         <i class="ph-fill ph-money" style="color:#10b981;"></i> 3. Rekapitulasi Keuangan Selama Satu Periode
     </h5>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div class="lpj-finance-grid">
         <div>
             <p style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin:0 0 0.75rem;">Pemasukan</p>
             @foreach($finances->where('type','income') as $f)
@@ -212,24 +288,34 @@
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
         <i class="ph-fill ph-package" style="color:#f59e0b;"></i> 4. Rekapitulasi Inventaris
     </h5>
-    <table class="table" style="font-size:0.85rem;">
-        <thead><tr><th>#</th><th>Nama</th><th>Kode</th><th>Kategori</th><th>Kondisi</th><th>Jumlah</th><th>Lokasi</th></tr></thead>
-        <tbody>
-            @forelse($inventories as $i => $inv)
-            <tr>
-                <td>{{ $i+1 }}</td>
-                <td style="font-weight:600;">{{ $inv->name }}</td>
-                <td>{{ $inv->code ?? '-' }}</td>
-                <td>{{ $inv->category ?? '-' }}</td>
-                <td>{{ $inv->condition ?? '-' }}</td>
-                <td>{{ $inv->quantity }}</td>
-                <td>{{ $inv->storage_location ?? '-' }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Belum ada inventaris.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-wrapper" style="margin-bottom:0;border:none;padding:0;box-shadow:none;">
+        <table class="table" style="font-size:0.85rem; width: 100%;">
+            <thead>
+                <tr>
+                    <th class="hidden-mobile" style="width: 40px;">#</th>
+                    <th>Nama</th>
+                    <th class="hidden-mobile">Kategori</th>
+                    <th class="hidden-mobile">Kondisi</th>
+                    <th style="width: 70px;">Jumlah</th>
+                    <th class="hidden-mobile">Lokasi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($inventories as $i => $inv)
+                <tr>
+                    <td class="hidden-mobile">{{ $i+1 }}</td>
+                    <td style="font-weight:600; color: var(--text-primary);">{{ $inv->name }}</td>
+                    <td class="hidden-mobile">{{ $inv->category ?? '-' }}</td>
+                    <td class="hidden-mobile">{{ $inv->condition ?? '-' }}</td>
+                    <td style="font-weight: 700;">{{ $inv->quantity }}</td>
+                    <td class="hidden-mobile">{{ $inv->storage_location ?? '-' }}</td>
+                </tr>
+                @empty
+                <tr><td colspan="6" class="text-center text-secondary py-4">Belum ada inventaris.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {{-- Section 5: Persuratan --}}
@@ -237,25 +323,36 @@
     <h5 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
         <i class="ph-fill ph-envelope" style="color:#06b6d4;"></i> 5. Rekapitulasi Persuratan
     </h5>
-    <table class="table" style="font-size:0.85rem;">
-        <thead><tr><th>#</th><th>No. Surat</th><th>Tanggal</th><th>Perihal</th><th>Tujuan</th><th>Jenis</th></tr></thead>
-        <tbody>
-            @forelse($letters as $i => $letter)
-            <tr>
-                <td>{{ $i+1 }}</td>
-                <td>{{ $letter->letter_number }}</td>
-                <td>{{ date('d M Y', strtotime($letter->date)) }}</td>
-                <td style="font-weight:600;">{{ $letter->subject }}</td>
-                <td>{{ $letter->destination ?? '-' }}</td>
-                <td>
-                    <span class="badge" style="font-weight:700;">{{ $letter->type }}</span>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Belum ada surat pada periode ini.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-wrapper" style="margin-bottom:0;border:none;padding:0;box-shadow:none;">
+        <table class="table" style="font-size:0.85rem; width: 100%;">
+            <thead>
+                <tr>
+                    <th class="hidden-mobile" style="width: 40px;">#</th>
+                    <th>No. Surat</th>
+                    <th class="hidden-mobile" style="width: 100px;">Tanggal</th>
+                    <th>Perihal</th>
+                    <th class="hidden-mobile">Tujuan</th>
+                    <th class="hidden-mobile" style="width: 80px;">Jenis</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($letters as $i => $letter)
+                <tr>
+                    <td class="hidden-mobile">{{ $i+1 }}</td>
+                    <td style="font-family:monospace; font-weight:600; color: var(--text-primary);">{{ $letter->letter_number }}</td>
+                    <td class="hidden-mobile">{{ date('d M Y', strtotime($letter->date)) }}</td>
+                    <td style="font-weight:600; color: var(--text-primary);">{{ $letter->subject }}</td>
+                    <td class="hidden-mobile">{{ $letter->destination ?? '-' }}</td>
+                    <td class="hidden-mobile">
+                        <span class="badge" style="font-weight:700;">{{ $letter->type }}</span>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="6" class="text-center text-secondary py-4">Belum ada surat pada periode ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @endsection

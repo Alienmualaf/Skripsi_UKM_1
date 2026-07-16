@@ -11,6 +11,42 @@
     </div>
 @endif
 
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .th-action-compact {
+            width: 75px !important;
+        }
+        .table td .btn {
+            padding: 0.35rem 0.5rem !important;
+            font-size: 0.8rem !important;
+        }
+        .table td .btn i {
+            margin-right: 0 !important;
+            font-size: 0.95rem !important;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.4rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+    }
+</style>
+
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Daftar Anggota Paduan Suara</h3>
@@ -56,7 +92,7 @@
 </div>
 
 <div class="card" style="padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
         <h4 style="margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-users" style="color: var(--accent-color);"></i> Daftar Penyanyi PSUP
         </h4>
@@ -71,21 +107,40 @@
                 <tr>
                     <th>NPM</th>
                     <th>Nama Lengkap</th>
-                    <th>Fakultas</th>
-                    <th>No. HP</th>
-                    <th>Klasifikasi Suara</th>
-                    <th>Status</th>
-                    <th style="width: 150px; text-align: center;">Aksi</th>
+                    <th class="hidden-mobile">Fakultas</th>
+                    <th class="hidden-mobile">No. HP</th>
+                    <th class="hidden-mobile">Klasifikasi Suara</th>
+                    <th class="hidden-mobile">Status</th>
+                    <th class="th-action-compact" style="width: 150px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($members as $member)
                 <tr>
                     <td style="font-weight: 600; color: var(--text-primary);">{{ $member->npm ?? '-' }}</td>
-                    <td style="font-weight: 700; color: var(--text-primary);">{{ $member->user->name ?? 'User dihapus' }}</td>
-                    <td style="color: var(--text-secondary);">{{ $member->faculty ?? '-' }}</td>
-                    <td style="color: var(--text-secondary);">{{ $member->phone ?? '-' }}</td>
-                    <td>
+                    <td style="font-weight: 700; color: var(--text-primary);">
+                        {{ $member->user->name ?? 'User dihapus' }}
+
+                        <!-- Mobile-only badges -->
+                        <div class="show-mobile-inline" style="gap: 0.35rem; margin-top: 0.35rem; flex-wrap: wrap;">
+                            @if($member->user && $member->user->role && $member->user->role->name !== 'anggota')
+                                <span class="badge" style="background: #f1f5f9; color: #64748b; font-style: italic;">N/A</span>
+                            @elseif($member->voiceClassification)
+                                <span class="badge badge-info" style="background: var(--accent-light); color: var(--accent-color);">{{ $member->voiceClassification->name }}</span>
+                            @else
+                                <span class="badge" style="background: #f1f5f9; color: #475569;">Belum diklasifikasi</span>
+                            @endif
+
+                            @if($member->status === 'Anggota Aktif')
+                                <span class="badge" style="background: var(--success-light); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2);">Aktif</span>
+                            @else
+                                <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">Alumni</span>
+                            @endif
+                        </div>
+                    </td>
+                    <td class="hidden-mobile" style="color: var(--text-secondary);">{{ $member->faculty ?? '-' }}</td>
+                    <td class="hidden-mobile" style="color: var(--text-secondary);">{{ $member->phone ?? '-' }}</td>
+                    <td class="hidden-mobile">
                         @if($member->user && $member->user->role && $member->user->role->name !== 'anggota')
                             <span class="badge" style="background: #f1f5f9; color: #64748b; font-style: italic;">N/A (Bukan Anggota)</span>
                         @elseif($member->voiceClassification)
@@ -94,7 +149,7 @@
                             <span class="badge" style="background: #f1f5f9; color: #475569;">Belum diklasifikasi</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="hidden-mobile">
                         @if($member->status === 'Anggota Aktif')
                             <span style="color: var(--success-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
                                 <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: inline-block;"></span> Aktif
@@ -107,12 +162,18 @@
                     </td>
                     <td>
                         <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                            <a href="{{ route('ukm.members.edit', $member->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;"><i class="ph ph-pencil-simple"></i> Edit</a>
+                            <a href="{{ route('ukm.members.edit', $member->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-decoration: none;">
+                                <i class="ph ph-pencil-simple"></i>
+                                <span class="hidden-mobile">Edit</span>
+                            </a>
                             
                             <form action="{{ route('ukm.members.destroy', $member->id) }}" method="POST" onsubmit="return confirm('Keluarkan anggota ini dari PSUP? Akun pengguna tetap ada namun status keanggotaan terhapus.');" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;"><i class="ph ph-trash"></i> Hapus</button>
+                                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;">
+                                    <i class="ph ph-trash"></i>
+                                    <span class="hidden-mobile">Hapus</span>
+                                </button>
                             </form>
                         </div>
                     </td>

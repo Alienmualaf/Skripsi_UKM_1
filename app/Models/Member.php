@@ -9,6 +9,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
 {
+    protected static function booted()
+    {
+        static::addGlobalScope('exclude_non_anggota', function ($builder) {
+            $builder->where(function ($query) {
+                $query->whereHas('user.role', function ($q) {
+                    $q->whereNotIn('name', ['administrator', 'admin_ukm', 'pengurus']);
+                })->orWhereDoesntHave('user');
+            });
+        });
+    }
+
     protected $fillable = [
         'user_id',
         'npm',
@@ -40,8 +51,7 @@ class Member extends Model
 
     public function jobs()
     {
-        return Performance::whereNull('program_id')
-            ->whereHas('classroom.members', function ($query) {
+        return Performance::whereHas('classroom.members', function ($query) {
                 $query->where('members.id', $this->id);
             });
     }
@@ -65,5 +75,15 @@ class Member extends Model
     {
         return $this->belongsToMany(Classroom::class, 'classroom_members')
             ->withPivot('role');
+    }
+
+    public function getNimAttribute()
+    {
+        return $this->attributes['npm'] ?? null;
+    }
+
+    public function setNimAttribute($value)
+    {
+        $this->attributes['npm'] = $value;
     }
 }

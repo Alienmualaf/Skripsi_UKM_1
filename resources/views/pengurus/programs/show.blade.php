@@ -37,9 +37,11 @@
                 <i class="ph ph-file-text"></i> Lihat LPJ
             </a>
         @else
-            <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn btn-primary" style="padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            @if(!auth()->user()->isAdminUkm())
+            <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="padding: 0.65rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <i class="ph ph-file-text"></i> Buat LPJ
             </a>
+            @endif
         @endif
     </div>
 </div>
@@ -116,27 +118,29 @@
                 <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
                     <i class="ph ph-eye"></i> Lihat LPJ
                 </a>
-                <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px; color: var(--text-primary);">
-                    <i class="ph ph-pencil-simple"></i> Edit LPJ
+                <a href="{{ route('ukm.reports.kegiatan.print', $program->id) }}" target="_blank" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px; color: var(--text-primary);">
+                    <i class="ph ph-download-simple"></i> Download LPJ
                 </a>
             </div>
         @else
             <div style="text-align: center; padding: 1.5rem 0;">
-                <i class="ph ph-file-plus" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
-                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">Laporan LPJ belum dibuat</p>
-                <a href="{{ route('pengurus.programs.report', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
+                <i class="ph ph-file-x" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: {{ auth()->user()->isAdminUkm() ? '0' : '1rem' }};">Laporan LPJ belum dibuat{{ auth()->user()->isAdminUkm() ? ' oleh Pengurus' : '' }}</p>
+                @if(!auth()->user()->isAdminUkm())
+                <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
                     <i class="ph ph-plus"></i> Buat LPJ
                 </a>
+                @endif
             </div>
         @endif
     </div>
 </div>
 
-{{-- Performance Section (only if activity_type = Performance) --}}
-@if($program->activity_type === 'Performance')
+{{-- Performance Section (only if activity_type = Performance or Competition) --}}
+@if($program->activity_type === 'Performance' || $program->activity_type === 'Competition')
 <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid rgba(16,185,129,0.3);">
     <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
-        <i class="ph ph-microphone-stage" style="color: #10b981;"></i> Data Penampilan
+        <i class="ph ph-microphone-stage" style="color: #10b981;"></i> Data Penampilan / Lomba
     </h4>
 
     @if($program->performance)
@@ -162,12 +166,12 @@
 
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <a href="{{ route('pengurus.programs.performance.classroom.show', [$program->id, $perf->id]) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.6rem 1.1rem; font-weight: 700; border-radius: 8px;">
-                <i class="ph ph-chalkboard"></i> Buka Classroom
+                <i class="ph ph-chalkboard"></i> Buka Pusat Latihan
             </a>
             <button onclick="document.getElementById('editPerfModal').style.display='flex'" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <i class="ph ph-pencil-simple"></i> Edit Penampilan
+                <i class="ph ph-pencil-simple"></i> Edit Penampilan / Lomba
             </button>
-            <form action="{{ route('pengurus.programs.performance.destroy', [$program->id, $perf->id]) }}" method="POST" onsubmit="return confirm('Hapus data penampilan ini?');" style="display: inline;">
+            <form action="{{ route('pengurus.programs.performance.destroy', [$program->id, $perf->id]) }}" method="POST" onsubmit="return confirm('Hapus data penampilan / lomba ini?');" style="display: inline;">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn btn-danger" style="padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.35rem;">
                     <i class="ph ph-trash"></i> Hapus
@@ -179,13 +183,13 @@
         <div id="editPerfModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
             <div class="card" style="width: 100%; max-width: 540px; padding: 2rem; margin: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h4 style="margin: 0; font-weight: 800;">Edit Data Penampilan</h4>
+                    <h4 style="margin: 0; font-weight: 800;">Edit Data Penampilan / Lomba</h4>
                     <button onclick="document.getElementById('editPerfModal').style.display='none'" style="background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--text-secondary);">&times;</button>
                 </div>
                 <form action="{{ route('pengurus.programs.performance.update', [$program->id, $perf->id]) }}" method="POST">
                     @csrf @method('PUT')
                     <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Judul Penampilan</label>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Judul Penampilan / Lomba</label>
                         <input type="text" name="title" class="form-control" value="{{ $perf->title }}" required>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
@@ -202,11 +206,7 @@
                         <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Venue / Lokasi</label>
                         <input type="text" name="venue" class="form-control" value="{{ $perf->venue }}" required>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div>
-                            <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Dress Code</label>
-                            <input type="text" name="dress_code" class="form-control" value="{{ $perf->dress_code }}" placeholder="Contoh: Pakaian Formal">
-                        </div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div>
                             <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Status</label>
                             <select name="status" class="form-control" required>
@@ -222,7 +222,7 @@
                     </div>
                     <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
                         <button type="button" onclick="document.getElementById('editPerfModal').style.display='none'" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.6rem 1rem; font-weight: 700; border-radius: 8px;">Batal</button>
-                        <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-weight: 700; border-radius: 8px;">Simpan</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 8px;">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -230,50 +230,53 @@
 
     @else
         {{-- Create performance form --}}
-        <div style="text-align: center; padding: 1rem 0 0.5rem;">
-            <i class="ph ph-microphone-stage" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
-            <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">Belum ada data penampilan. Isi data berikut untuk membuat penampilan.</p>
-        </div>
-        <form action="{{ route('pengurus.programs.performance.store', $program->id) }}" method="POST">
-            @csrf
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Judul Penampilan <span style="color: var(--danger-color);">*</span></label>
-                    <input type="text" name="title" class="form-control" placeholder="Nama acara/konser" required>
-                </div>
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Venue <span style="color: var(--danger-color);">*</span></label>
-                    <input type="text" name="venue" class="form-control" placeholder="Lokasi penampilan" required>
-                </div>
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Tanggal Penampilan <span style="color: var(--danger-color);">*</span></label>
-                    <input type="date" name="performance_date" class="form-control" required>
-                </div>
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Waktu</label>
-                    <input type="time" name="performance_time" class="form-control">
-                </div>
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Dress Code</label>
-                    <input type="text" name="dress_code" class="form-control" placeholder="Pakaian resmi / seragam">
-                </div>
-                <div>
-                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Status <span style="color: var(--danger-color);">*</span></label>
-                    <select name="status" class="form-control" required>
-                        <option value="Persiapan">Persiapan</option>
-                        <option value="Berlangsung">Berlangsung</option>
-                        <option value="Selesai">Selesai</option>
-                    </select>
-                </div>
+        @if(auth()->user()->isAdminUkm())
+            <div style="text-align: center; padding: 1.5rem 0;">
+                <i class="ph ph-microphone-stage" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0;">Belum ada data penampilan / lomba. Data penampilan / lomba harus ditambahkan oleh Pengurus.</p>
             </div>
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-                <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Deskripsi</label>
-                <textarea name="description" class="form-control" rows="3" placeholder="Deskripsi singkat mengenai penampilan ini..."></textarea>
+        @else
+            <div style="text-align: center; padding: 1rem 0 0.5rem;">
+                <i class="ph ph-microphone-stage" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">Belum ada data penampilan / lomba. Isi data berikut untuk membuat penampilan / lomba.</p>
             </div>
-            <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <i class="ph ph-plus"></i> Simpan Data Penampilan
-            </button>
-        </form>
+            <form action="{{ route('pengurus.programs.performance.store', $program->id) }}" method="POST">
+                @csrf
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Judul Penampilan / Lomba <span style="color: var(--danger-color);">*</span></label>
+                        <input type="text" name="title" class="form-control" placeholder="Nama acara/konser/lomba" required>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Venue <span style="color: var(--danger-color);">*</span></label>
+                        <input type="text" name="venue" class="form-control" placeholder="Lokasi penampilan/lomba" required>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Tanggal Penampilan / Lomba <span style="color: var(--danger-color);">*</span></label>
+                        <input type="date" name="performance_date" class="form-control" required>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Waktu</label>
+                        <input type="time" name="performance_time" class="form-control">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Status <span style="color: var(--danger-color);">*</span></label>
+                        <select name="status" class="form-control" required>
+                            <option value="Persiapan">Persiapan</option>
+                            <option value="Berlangsung">Berlangsung</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.8125rem;">Deskripsi</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Deskripsi singkat mengenai penampilan/lomba ini..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <i class="ph ph-plus"></i> Simpan Data Penampilan / Lomba
+                </button>
+            </form>
+        @endif
     @endif
 </div>
 @endif

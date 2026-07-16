@@ -34,22 +34,26 @@
 
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">NPM (Nomor Pokok Mahasiswa)</label>
-            <input type="text" name="nim" class="form-control" required value="{{ old('nim', $member->nim) }}" placeholder="Contoh: 45202100XX" style="padding: 0.65rem;">
+            <input type="text" @if(auth()->user()->isAnggota()) name="nim" required @else disabled @endif class="form-control" value="{{ old('nim', $member->nim) }}" placeholder="Contoh: 45202100XX" style="padding: 0.65rem; @if(!auth()->user()->isAnggota()) background: #f1f5f9; cursor: not-allowed; color: #64748b; @endif">
             @error('nim') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>
 
         <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Fakultas</label>
-            <select name="faculty" class="form-control" required style="padding: 0.65rem;">
-                <option value="">-- Pilih Fakultas --</option>
-                <option value="Ekonomi & Bisnis" {{ old('faculty', $member->faculty) === 'Ekonomi & Bisnis' ? 'selected' : '' }}>Ekonomi & Bisnis</option>
-                <option value="Teknik" {{ old('faculty', $member->faculty) === 'Teknik' ? 'selected' : '' }}>Teknik</option>
-                <option value="Psikologi" {{ old('faculty', $member->faculty) === 'Psikologi' ? 'selected' : '' }}>Psikologi</option>
-                <option value="Hukum" {{ old('faculty', $member->faculty) === 'Hukum' ? 'selected' : '' }}>Hukum</option>
-                <option value="Ilmu Komunikasi" {{ old('faculty', $member->faculty) === 'Ilmu Komunikasi' ? 'selected' : '' }}>Ilmu Komunikasi</option>
-                <option value="Farmasi" {{ old('faculty', $member->faculty) === 'Farmasi' ? 'selected' : '' }}>Farmasi</option>
-                <option value="Pariwisata" {{ old('faculty', $member->faculty) === 'Pariwisata' ? 'selected' : '' }}>Pariwisata</option>
-            </select>
+            @if(auth()->user()->isAnggota())
+                <select name="faculty" class="form-control" required style="padding: 0.65rem;">
+                    <option value="">-- Pilih Fakultas --</option>
+                    <option value="Ekonomi & Bisnis" {{ old('faculty', $member->faculty) === 'Ekonomi & Bisnis' ? 'selected' : '' }}>Ekonomi & Bisnis</option>
+                    <option value="Teknik" {{ old('faculty', $member->faculty) === 'Teknik' ? 'selected' : '' }}>Teknik</option>
+                    <option value="Psikologi" {{ old('faculty', $member->faculty) === 'Psikologi' ? 'selected' : '' }}>Psikologi</option>
+                    <option value="Hukum" {{ old('faculty', $member->faculty) === 'Hukum' ? 'selected' : '' }}>Hukum</option>
+                    <option value="Ilmu Komunikasi" {{ old('faculty', $member->faculty) === 'Ilmu Komunikasi' ? 'selected' : '' }}>Ilmu Komunikasi</option>
+                    <option value="Farmasi" {{ old('faculty', $member->faculty) === 'Farmasi' ? 'selected' : '' }}>Farmasi</option>
+                    <option value="Pariwisata" {{ old('faculty', $member->faculty) === 'Pariwisata' ? 'selected' : '' }}>Pariwisata</option>
+                </select>
+            @else
+                <input type="text" class="form-control" disabled value="Bukan Anggota" style="padding: 0.65rem; background: #f1f5f9; cursor: not-allowed; color: #64748b;">
+            @endif
             @error('faculty') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>
 
@@ -67,7 +71,12 @@
 
         <div class="form-group mb-6" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Ubah Password (Opsional)</label>
-            <input type="password" name="password" class="form-control" placeholder="Masukkan password baru jika ingin mengubah" style="padding: 0.65rem;">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="password" class="form-control" placeholder="Masukkan password baru jika ingin mengubah" style="padding: 0.65rem; padding-right: 2.75rem;">
+                <button type="button" class="toggle-password-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem; z-index: 10;">
+                    <i class="ph ph-eye" style="font-size: 1.20rem;"></i>
+                </button>
+            </div>
             @error('password') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
         </div>
 

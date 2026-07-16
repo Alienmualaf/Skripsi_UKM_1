@@ -11,6 +11,7 @@ class Classroom extends Model
 {
     protected $fillable = [
         'performance_id',
+        'trainer_id',
         'name',
         'description',
         'status',
@@ -19,6 +20,11 @@ class Classroom extends Model
     public function performance(): BelongsTo
     {
         return $this->belongsTo(Performance::class);
+    }
+
+    public function trainer(): BelongsTo
+    {
+        return $this->belongsTo(Trainer::class);
     }
 
     public function members(): BelongsToMany
@@ -50,5 +56,19 @@ class Classroom extends Model
     public function songTargets(): HasMany
     {
         return $this->hasMany(ClassroomSongTarget::class);
+    }
+
+    public static function autoArchivePastClassrooms(): void
+    {
+        $pastClassrooms = self::where('status', 'Aktif')
+            ->whereHas('performance', function ($query) {
+                $query->whereNotNull('performance_date')
+                      ->where('performance_date', '<', date('Y-m-d'));
+            })
+            ->get();
+
+        foreach ($pastClassrooms as $classroom) {
+            $classroom->update(['status' => 'Terarsip']);
+        }
     }
 }

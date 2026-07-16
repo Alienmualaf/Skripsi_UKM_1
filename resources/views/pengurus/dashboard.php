@@ -37,6 +37,29 @@
         gap: 1.5rem;
         margin-bottom: 1.5rem;
     }
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+    }
 </style>
 
 <!-- Stat Grid -->
@@ -98,8 +121,8 @@
                     <tr>
                         <th>Nama Penampilan</th>
                         <th>Tanggal</th>
-                        <th>Waktu</th>
-                        <th>Lokasi</th>
+                        <th class="hidden-mobile">Waktu</th>
+                        <th class="hidden-mobile">Lokasi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,8 +130,8 @@
                     <tr>
                         <td style="font-weight: 700; color: var(--text-primary);">{{ $agenda->title }}</td>
                         <td style="color: var(--text-secondary);">{{ date('d-m-Y', strtotime($agenda->performance_date)) }}</td>
-                        <td style="color: var(--text-secondary);">{{ $agenda->performance_time }} WIB</td>
-                        <td style="color: var(--text-secondary);">{{ $agenda->venue }}</td>
+                        <td class="hidden-mobile" style="color: var(--text-secondary);">{{ $agenda->performance_time }} WIB</td>
+                        <td class="hidden-mobile" style="color: var(--text-secondary);">{{ $agenda->venue }}</td>
                     </tr>
                     @empty
                     <tr><td colspan="4" class="text-secondary text-center py-4">Belum ada agenda terdekat.</td></tr>

@@ -4,6 +4,101 @@
 @section('header', 'Materi Latihan PSUP')
 
 @section('content')
+<style>
+.fm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1.5rem 1rem;
+}
+.fm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.2s ease;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+}
+.fm-item:hover {
+    background-color: rgba(255, 205, 14, 0.04);
+    border-color: rgba(255, 205, 14, 0.3);
+}
+.fm-icon-wrapper {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+.fm-name {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    width: 100%;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+}
+.fm-meta {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+.fm-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+.fm-item:hover .fm-actions {
+    opacity: 1;
+}
+.fm-action-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    padding: 0;
+}
+.fm-action-btn:hover {
+    background: var(--accent-color);
+    color: #00072D;
+    border-color: var(--accent-color);
+}
+.fm-action-btn.danger:hover {
+    background: var(--danger-color);
+    color: #fff;
+    border-color: var(--danger-color);
+}
+@media (max-width: 768px) {
+    .fm-actions {
+        opacity: 0.8;
+    }
+}
+</style>
 @php
     $isIframe = request()->has('iframe') || request()->query('iframe') || request('iframe') || isset($_GET['iframe']) || strpos(request()->fullUrl(), 'iframe') !== false;
 @endphp
@@ -58,7 +153,7 @@
 <div class="card mb-6" style="padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
     <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem;">
         <a href="{{ route('pengurus.materials.index', array_merge($classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="color: var(--accent-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
-            <i class="ph-fill ph-house" style="font-size: 1.15rem;"></i> Root
+            <i class="ph-fill ph-house" style="font-size: 1.15rem;"></i> Home
         </a>
         @foreach($breadcrumbs as $bc)
             <span style="color: var(--text-muted);">/</span>
@@ -69,17 +164,21 @@
     </div>
 
     <!-- Actions to create Folder or Upload File in current directory -->
+    @if(!auth()->user()->isAdminUkm())
     <div style="display: flex; gap: 0.75rem;">
         <!-- Add Folder Trigger -->
         <button onclick="document.getElementById('addFolderModal').style.display='flex'" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem;">
             <i class="ph ph-folder-plus"></i> Folder Baru
         </button>
 
-        <!-- Upload File Trigger -->
+        <!-- Upload File Trigger (Only when inside a folder) -->
+        @if($currentFolderId)
         <button onclick="document.getElementById('uploadFileModal').style.display='flex'" class="btn btn-primary" style="padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem;">
             <i class="ph ph-upload-simple"></i> Unggah Berkas
         </button>
+        @endif
     </div>
+    @endif
 </div>
 
 <!-- Search and Filter Bar -->
@@ -113,124 +212,119 @@
 </div>
 
 <!-- Folders and Materials Display -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <!-- Folder List -->
-    <div class="card md:col-span-1" style="padding: 1.5rem; height: fit-content;">
-        <h4 style="margin: 0 0 1rem 0; font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem;">
-            <i class="ph ph-folder" style="color: var(--accent-color);"></i> Sub-Folder
-        </h4>
-        
-        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            @forelse($folders as $folder)
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
-                    <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $folder->id], $classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-primary); text-decoration: none; flex: 1;">
-                        <i class="ph-fill ph-folder" style="font-size: 1.25rem; color: #eab308;"></i>
-                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;">{{ $folder->name }}</span>
-                    </a>
-                    
+<div class="card" style="padding: 1.5rem;">
+    <h4 style="margin: 0 0 1.5rem 0; font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem;">
+        <i class="ph ph-folder-open" style="color: var(--accent-color);"></i> Berkas & Folder
+    </h4>
+    
+    <div class="fm-grid">
+        <!-- Folders -->
+        @foreach($folders as $folder)
+            <div class="fm-item">
+                <!-- Clickable Area -->
+                <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $folder->id], $classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; text-decoration: none; z-index: 1;">
+                    <div class="fm-icon-wrapper">
+                        <i class="ph-fill ph-folder" style="font-size: 3.75rem; color: #FFCD0E;"></i>
+                    </div>
+                    <div class="fm-name" style="color: var(--text-primary);">{{ $folder->name }}</div>
+                    <div class="fm-meta" style="color: var(--text-secondary);">Folder</div>
+                </a>
+                
+                <!-- Action buttons -->
+                <div class="fm-actions" style="z-index: 2;">
                     <form action="{{ route('pengurus.folders.destroy', $folder->id) }}" method="POST" onsubmit="return confirm('Hapus folder ini beserta seluruh isinya secara permanen?');" style="margin: 0;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" style="background: none; border: none; padding: 0.25rem; cursor: pointer; color: var(--danger-color); display: flex; align-items: center;">
-                            <i class="ph ph-trash" style="font-size: 1rem;"></i>
+                        <button type="submit" class="fm-action-btn danger" title="Hapus Folder" style="border: none;">
+                            <i class="ph ph-trash" style="font-size: 0.85rem;"></i>
                         </button>
                     </form>
                 </div>
-            @empty
-                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 1rem 0;">Tidak ada sub-folder.</p>
-            @endforelse
-        </div>
-    </div>
-
-    <!-- Materials list -->
-    <div class="card md:col-span-3" style="padding: 1.5rem;">
-        <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem;">
-            <i class="ph ph-file" style="color: var(--accent-color);"></i> Berkas Latihan
-        </h4>
-
-        <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nama Berkas</th>
-                        <th>Ukuran</th>
-                        <th>Tipe</th>
-                        <th style="min-width: 150px; text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($materials as $mat)
-                    <tr>
-                        <td style="font-weight: 700; color: var(--text-primary);">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                @if(Str::endsWith($mat->file_path, '.mp3') || Str::endsWith($mat->file_path, '.wav'))
-                                    <i class="ph-fill ph-music-notes" style="font-size: 1.25rem; color: var(--accent-color);"></i>
-                                @elseif(Str::endsWith($mat->file_path, '.pdf'))
-                                    <i class="ph-fill ph-file-pdf" style="font-size: 1.25rem; color: #ef4444;"></i>
-                                @else
-                                    <i class="ph-fill ph-file" style="font-size: 1.25rem; color: #64748b;"></i>
+            </div>
+        @endforeach
+        
+        <!-- Files -->
+        @foreach($materials as $mat)
+            @php
+                $ext = pathinfo($mat->file_path, PATHINFO_EXTENSION);
+                $isAudio = Str::endsWith($mat->file_path, '.mp3') || Str::endsWith($mat->file_path, '.wav');
+                $isPdf = Str::endsWith($mat->file_path, '.pdf');
+                $isVideo = Str::endsWith($mat->file_path, '.mp4') || Str::endsWith($mat->file_path, '.mov');
+                
+                // Icon config
+                $iconClass = 'ph-fill ph-file';
+                $iconColor = '#64748b';
+                
+                if ($isAudio) {
+                    $iconClass = 'ph-fill ph-music-notes';
+                    $iconColor = 'var(--accent-color)';
+                } elseif ($isPdf) {
+                    $iconClass = 'ph-fill ph-file-pdf';
+                    $iconColor = '#ef4444';
+                } elseif ($isVideo) {
+                    $iconClass = 'ph-fill ph-video-camera';
+                    $iconColor = '#3b82f6';
+                }
+            @endphp
+            <div class="fm-item">
+                <!-- Clickable Area for Preview -->
+                <div onclick="showPreview('{{ addslashes($mat->title) }}', '{{ $ext }}', '{{ asset('storage/' . $mat->file_path) }}')" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; z-index: 1;">
+                    <div class="fm-icon-wrapper">
+                        <i class="{{ $iconClass }}" style="font-size: 3.75rem; color: {{ $iconColor }};"></i>
+                    </div>
+                    <div class="fm-name">{{ $mat->title }}</div>
+                    <div class="fm-meta">{{ $mat->size ? number_format($mat->size / 1024, 1) . ' KB' : '-' }}</div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="fm-actions" style="z-index: 2;">
+                    @if($classroom)
+                        @if($classroom->materials->contains($mat->id))
+                            <span class="badge bg-success" style="font-size: 0.65rem; padding: 0.25rem 0.5rem; border-radius: 20px;">Terhubung</span>
+                        @else
+                            @if(!auth()->user()->isAdminUkm())
+                            @php
+                                $addRoute = $classroom->performance_id
+                                    ? route('pengurus.programs.performance.classroom.materials.add', [$classroom->performance->program_id, $classroom->performance_id])
+                                    : route('pengurus.jobs.classroom.materials.add', [$classroom->job_id]);
+                            @endphp
+                            <form action="{{ $addRoute }}" method="POST" style="margin: 0;">
+                                @csrf
+                                <input type="hidden" name="material_id" value="{{ $mat->id }}">
+                                <input type="hidden" name="redirect_to_materials" value="1">
+                                @if(request()->has('iframe'))
+                                    <input type="hidden" name="iframe" value="1">
                                 @endif
-                                <span>{{ $mat->title }}</span>
-                            </div>
-                        </td>
-                        <td style="color: var(--text-secondary); font-size: 0.8rem;">
-                            {{ $mat->size ? number_format($mat->size / 1024, 1) . ' KB' : '-' }}
-                        </td>
-                        <td style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
-                            {{ pathinfo($mat->file_path, PATHINFO_EXTENSION) }}
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
-                                @if($classroom)
-                                    @if($classroom->materials->contains($mat->id))
-                                        <button type="button" class="btn" disabled style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; border-radius: 6px; cursor: not-allowed; width: 100%; justify-content: center;">
-                                            <i class="ph ph-check-circle"></i> Terhubung
-                                        </button>
-                                    @else
-                                        @php
-                                            $addRoute = $classroom->performance_id
-                                                ? route('pengurus.programs.performance.classroom.materials.add', [$classroom->performance->program_id, $classroom->performance_id])
-                                                : route('pengurus.jobs.classroom.materials.add', [$classroom->job_id]);
-                                        @endphp
-                                        <form action="{{ $addRoute }}" method="POST" style="margin: 0; display: inline; flex: 1;">
-                                            @csrf
-                                            <input type="hidden" name="material_id" value="{{ $mat->id }}">
-                                            <input type="hidden" name="redirect_to_materials" value="1">
-                                            @if(request()->has('iframe'))
-                                                <input type="hidden" name="iframe" value="1">
-                                            @endif
-                                            <button type="submit" class="btn btn-success" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: var(--success-color); color: #fff; border: none; cursor: pointer;">
-                                                <i class="ph ph-plus-circle"></i> Pilih Berkas
-                                            </button>
-                                        </form>
-                                        <button type="button" onclick="showPreview('{{ addslashes($mat->title) }}', '{{ pathinfo($mat->file_path, PATHINFO_EXTENSION) }}', '{{ asset('storage/' . $mat->file_path) }}')" class="btn" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid var(--accent-color); padding: 0.35rem; font-size: 0.95rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;" title="Pratinjau">
-                                            <i class="ph ph-eye"></i>
-                                        </button>
-                                    @endif
-                                @else
-                                    <button type="button" onclick="showPreview('{{ addslashes($mat->title) }}', '{{ pathinfo($mat->file_path, PATHINFO_EXTENSION) }}', '{{ asset('storage/' . $mat->file_path) }}')" class="btn" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid var(--accent-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; border-radius: 6px;">
-                                        <i class="ph ph-eye"></i> Pratinjau
-                                    </button>
-                                    <a href="{{ route('pengurus.materials.download', $mat->id) }}" class="btn" style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 600; color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; border-radius: 6px;">
-                                        <i class="ph ph-download-simple"></i> Unduh
-                                    </a>
-                                    <form action="{{ route('pengurus.materials.destroy', $mat->id) }}" method="POST" onsubmit="return confirm('Hapus berkas ini?');" style="margin: 0; display: inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 600; border-radius: 6px;"><i class="ph ph-trash"></i></button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="text-center text-secondary py-4">Belum ada berkas materi di folder ini.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                                <button type="submit" class="fm-action-btn" title="Pilih Berkas" style="border: none; background: var(--success-color); color: white;">
+                                    <i class="ph ph-plus" style="font-size: 0.85rem;"></i>
+                                </button>
+                            </form>
+                            @else
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: bold;">-</span>
+                            @endif
+                        @endif
+                    @else
+                        <a href="{{ route('pengurus.materials.download', $mat->id) }}" class="fm-action-btn" title="Unduh">
+                            <i class="ph ph-download-simple" style="font-size: 0.85rem;"></i>
+                        </a>
+                        <form action="{{ route('pengurus.materials.destroy', $mat->id) }}" method="POST" onsubmit="return confirm('Hapus berkas ini?');" style="margin: 0;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="fm-action-btn danger" title="Hapus Berkas" style="border: none;">
+                                <i class="ph ph-trash" style="font-size: 0.85rem;"></i>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        @endforeach
+        
+        @if(count($folders) === 0 && count($materials) === 0)
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+                <i class="ph ph-folder-open" style="font-size: 3rem; display: block; margin-bottom: 0.5rem; opacity: 0.5; margin-left: auto; margin-right: auto;"></i>
+                <p style="font-size: 0.9rem; margin: 0;">Folder ini kosong.</p>
+            </div>
+        @endif
     </div>
 </div>
 

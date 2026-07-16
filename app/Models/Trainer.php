@@ -10,9 +10,6 @@ class Trainer extends Model
         'name',
         'specialty',
         'phone',
-        'email',
         'photo',
-        'salary',
-        'status',
     ];
 }

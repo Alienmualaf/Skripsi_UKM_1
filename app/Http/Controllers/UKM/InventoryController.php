@@ -28,7 +28,6 @@ class InventoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:inventories,code',
             'category' => 'required|exists:inventory_categories,name',
             'condition' => 'required|in:Baik,Rusak,Hilang',
             'quantity' => 'required|integer|min:1',
@@ -60,7 +59,6 @@ class InventoryController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:inventories,code,'.$id,
             'category' => 'required|exists:inventory_categories,name',
             'condition' => 'required|in:Baik,Rusak,Hilang',
             'quantity' => 'required|integer|min:1',

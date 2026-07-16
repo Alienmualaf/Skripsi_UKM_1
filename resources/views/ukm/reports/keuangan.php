@@ -15,7 +15,7 @@
     </div>
     <a href="{{ route('ukm.reports.keuangan.print') }}?{{ http_build_query(request()->all()) }}" target="_blank"
        class="btn" style="padding:0.6rem 1.1rem;font-weight:700;border-radius:8px;display:inline-flex;align-items:center;gap:0.35rem;background:#10b981;color:white;text-decoration:none;">
-        <i class="ph ph-printer"></i> Cetak / PDF
+        <i class="ph ph-download-simple"></i> Download Laporan
     </a>
 </div>
 
@@ -23,6 +23,11 @@
 <form method="GET" action="{{ route('ukm.reports.keuangan') }}" style="margin-bottom:1.5rem;">
     <div class="card" style="padding:1.25rem;">
         <h5 style="font-weight:800;font-size:0.9rem;margin:0 0 1rem;"><i class="ph ph-funnel" style="color:#10b981;"></i> Filter</h5>
+        @if ($errors->has('end_date'))
+            <div style="background:#fef2f2; border:1px solid #fee2e2; color:#ef4444; padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.85rem; font-weight:600;">
+                <i class="ph ph-warning-circle" style="vertical-align:middle; margin-right:4px;"></i> {{ $errors->first('end_date') }}
+            </div>
+        @endif
 
         {{-- Mode Tabs --}}
         <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
@@ -40,11 +45,11 @@
             {{-- Custom Date --}}
             <div id="field-start_date" style="{{ request('filter_mode','custom') !== 'custom' ? 'display:none' : '' }}">
                 <label style="font-size:0.8rem;font-weight:700;display:block;margin-bottom:0.35rem;">Tanggal Mulai</label>
-                <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" style="font-size:0.875rem;">
+                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}" style="font-size:0.875rem;">
             </div>
             <div id="field-end_date" style="{{ request('filter_mode','custom') !== 'custom' ? 'display:none' : '' }}">
                 <label style="font-size:0.8rem;font-weight:700;display:block;margin-bottom:0.35rem;">Tanggal Akhir</label>
-                <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" style="font-size:0.875rem;">
+                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}" style="font-size:0.875rem;">
             </div>
 
             {{-- Bulanan --}}
@@ -96,28 +101,54 @@
     </div>
 </div>
 
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table td, .table th {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+    }
+</style>
+
 {{-- Transaction Table --}}
 <div class="card" style="padding:1.5rem;">
     <h5 style="font-weight:800;font-size:1.1rem;margin:0 0 1.25rem;display:flex;align-items:center;gap:0.5rem;color:var(--text-primary);">
         <i class="ph ph-list-bullets" style="color:var(--accent-color);"></i> Daftar Transaksi Keuangan
     </h5>
     <div class="table-wrapper" style="margin-bottom:0;border:none;padding:0;box-shadow:none;">
-        <table class="table" style="font-size:0.875rem;">
+        <table class="table" style="font-size:0.875rem; width: 100%;">
             <thead>
                 <tr>
-                    <th>Tanggal</th>
-                    <th>Jenis</th>
+                    <th style="width: 80px;">Tanggal</th>
+                    <th class="hidden-mobile">Jenis</th>
                     <th>Transaksi</th>
-                    <th>Digunakan Untuk</th>
-                    <th>Deskripsi</th>
-                    <th style="text-align:right;">Nominal</th>
+                    <th class="hidden-mobile">Digunakan Untuk</th>
+                    <th class="hidden-mobile">Deskripsi</th>
+                    <th style="text-align:right; width: 110px;">Nominal</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($finances as $f)
                 <tr>
                     <td style="color:var(--text-secondary);">{{ date('d/m/Y', strtotime($f->transaction_date)) }}</td>
-                    <td>
+                    <td class="hidden-mobile">
                         @if($f->type === 'income')
                             <span class="badge" style="background:rgba(16, 185, 129, 0.1);color:var(--success-color);border:1.5px solid rgba(16, 185, 129, 0.2);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">Pemasukan</span>
                         @else
@@ -125,7 +156,7 @@
                         @endif
                     </td>
                     <td style="font-weight:700;color:var(--text-primary);">{{ $f->title }}</td>
-                    <td>
+                    <td class="hidden-mobile">
                         @if($f->used_for === 'Program Kerja')
                             <span class="badge" style="background:rgba(30,64,175,0.06);color:var(--accent-color);border:1px solid rgba(30,64,175,0.12);font-weight:bold;font-size:0.7rem;padding:0.25rem 0.5rem;">
                                 Proker: {{ $f->program->name ?? '-' }}
@@ -136,7 +167,7 @@
                             </span>
                         @endif
                     </td>
-                    <td style="color:var(--text-secondary);max-width:250px;white-space:normal;word-break:break-word;font-size:0.8125rem;">
+                    <td class="hidden-mobile" style="color:var(--text-secondary);max-width:250px;white-space:normal;word-break:break-word;font-size:0.8125rem;">
                         {{ $f->description ?? '-' }}
                     </td>
                     <td style="text-align:right;font-weight:800;color:{{ $f->type === 'income' ? 'var(--success-color)' : 'var(--danger-color)' }};">
@@ -145,7 +176,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align:center;color:var(--text-secondary);padding:2rem;">Tidak ada data transaksi keuangan yang sesuai filter.</td>
+                    <td colspan="6" class="text-center text-secondary py-4">Tidak ada data transaksi keuangan yang sesuai filter.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -167,5 +198,25 @@ function switchMode(mode) {
     document.getElementById('field-bulan').style.display      = mode === 'bulanan' ? '' : 'none';
     document.getElementById('field-tahun').style.display      = mode === 'tahunan' ? '' : 'none';
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+
+    if (startDateInput && endDateInput) {
+        // Set initial min date for end date input
+        if (startDateInput.value) {
+            endDateInput.min = startDateInput.value;
+        }
+
+        // Update min date for end date when start date changes
+        startDateInput.addEventListener('change', function() {
+            endDateInput.min = this.value;
+            if (endDateInput.value && endDateInput.value < this.value) {
+                endDateInput.value = this.value;
+            }
+        });
+    }
+});
 </script>
 @endsection

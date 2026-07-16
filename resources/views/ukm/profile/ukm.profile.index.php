@@ -12,19 +12,27 @@
 @endif
 
 <!-- Tab Navigation -->
-<div class="card mb-4" style="padding: 0.5rem 1rem;">
-    <div style="display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 0.25rem;">
+<div class="card mb-4" style="padding: 0.25rem 0.5rem;">
+    <div class="tab-navigation-container" style="display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 0.25rem;">
         <button onclick="switchTab('tab-profile')" id="btn-tab-profile" class="tab-btn active" style="padding: 0.75rem 1.25rem; font-weight: 700; font-size: 0.85rem; border: none; background: none; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;">
-            <i class="ph ph-identification-card" style="margin-right: 0.25rem;"></i> Profil & Kontak
+            <i class="ph ph-identification-card" style="margin-right: 0.25rem;"></i>
+            <span class="hidden-mobile">Profil & Kontak</span>
+            <span class="show-mobile-inline">Profil</span>
         </button>
         <button onclick="switchTab('tab-history')" id="btn-tab-history" class="tab-btn" style="padding: 0.75rem 1.25rem; font-weight: 700; font-size: 0.85rem; border: none; background: none; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;">
-            <i class="ph ph-hourglass-high" style="margin-right: 0.25rem;"></i> Sejarah (Timeline)
+            <i class="ph ph-hourglass-high" style="margin-right: 0.25rem;"></i>
+            <span class="hidden-mobile">Sejarah (Timeline)</span>
+            <span class="show-mobile-inline">Sejarah</span>
         </button>
         <button onclick="switchTab('tab-recruitment')" id="btn-tab-recruitment" class="tab-btn" style="padding: 0.75rem 1.25rem; font-weight: 700; font-size: 0.85rem; border: none; background: none; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;">
-            <i class="ph ph-user-plus" style="margin-right: 0.25rem;"></i> Open Recruitment
+            <i class="ph ph-user-plus" style="margin-right: 0.25rem;"></i>
+            <span class="hidden-mobile">Open Recruitment</span>
+            <span class="show-mobile-inline">Rekrutmen</span>
         </button>
         <button onclick="switchTab('tab-downloads')" id="btn-tab-downloads" class="tab-btn" style="padding: 0.75rem 1.25rem; font-weight: 700; font-size: 0.85rem; border: none; background: none; color: var(--text-secondary); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;">
-            <i class="ph ph-file-pdf" style="margin-right: 0.25rem;"></i> Unduhan & Berkas
+            <i class="ph ph-file-pdf" style="margin-right: 0.25rem;"></i>
+            <span class="hidden-mobile">Unduhan & Berkas</span>
+            <span class="show-mobile-inline">Berkas</span>
         </button>
     </div>
 </div>
@@ -50,6 +58,54 @@
         gap: 0.5rem;
         border-bottom: 1px dashed var(--border-color);
         padding-bottom: 0.75rem;
+    }
+    @media (max-width: 768px) {
+        .tab-navigation-container {
+            display: flex !important;
+            justify-content: space-between !important;
+            gap: 0.25rem !important;
+            overflow-x: visible !important;
+            white-space: normal !important;
+            padding-bottom: 0 !important;
+        }
+        .tab-btn {
+            width: auto !important;
+            flex: 1 !important;
+            text-align: center !important;
+            padding: 0.6rem 0.25rem !important;
+            font-size: 0.75rem !important;
+            background: none !important;
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            border-radius: 0 !important;
+            color: var(--text-secondary) !important;
+            display: block !important;
+        }
+        .tab-btn i {
+            display: block !important;
+            font-size: 1.15rem !important;
+            margin-right: 0 !important;
+            margin-bottom: 0.2rem !important;
+        }
+        .tab-btn.active {
+            background: none !important;
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color) !important;
+        }
+        .upload-field-row {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 0.75rem !important;
+        }
+        .upload-field-row > div {
+            align-self: center;
+        }
+        .table-history-compact th:nth-child(3),
+        .table-history-compact td:nth-child(3),
+        .table-history-compact th:nth-child(4),
+        .table-history-compact td:nth-child(4) {
+            display: none !important;
+        }
     }
 </style>
 
@@ -157,7 +213,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="form-group mb-4">
                     <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Logo Organisasi</label>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="upload-field-row" style="display: flex; gap: 1rem; align-items: center;">
                         <div style="width: 80px; height: 80px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             @if(isset($profile->logo) && $profile->logo)
                                 <img src="{{ asset('storage/' . $profile->logo) }}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -172,7 +228,7 @@
 
                 <div class="form-group mb-4">
                     <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Banner / Background</label>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="upload-field-row" style="display: flex; gap: 1rem; align-items: center;">
                         <div style="width: 120px; height: 80px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             @if(isset($profile->banner) && $profile->banner)
                                 <img src="{{ asset('storage/' . $profile->banner) }}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -187,7 +243,7 @@
 
                 <div class="form-group mb-4">
                     <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Bagan Struktur</label>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="upload-field-row" style="display: flex; gap: 1rem; align-items: center;">
                         <div style="width: 100px; height: 80px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" @if(isset($profile->structure_image) && $profile->structure_image) onclick="openImageModal('{{ asset('storage/' . $profile->structure_image) }}')" @endif>
                             @if(isset($profile->structure_image) && $profile->structure_image)
                                 <img src="{{ asset('storage/' . $profile->structure_image) }}" style="width: 100%; height: 100%; object-fit: contain;">
@@ -255,7 +311,7 @@
         </h3>
 
         <div class="table-wrapper">
-            <table class="table" style="width: 100%;">
+            <table class="table table-history-compact" style="width: 100%;">
                 <thead>
                     <tr>
                         <th style="width: 10%;">Tahun</th>
@@ -269,7 +325,20 @@
                     @forelse($histories as $history)
                         <tr>
                             <td style="font-weight: 800; color: var(--primary-color);">{{ $history->year }}</td>
-                            <td style="font-weight: 700; color: var(--text-primary);">{{ $history->title }}</td>
+                            <td style="font-weight: 700; color: var(--text-primary);">
+                                <div>{{ $history->title }}</div>
+                                <!-- Mobile-only description & photo -->
+                                <div class="show-mobile-block" style="margin-top: 0.35rem; font-weight: 400;">
+                                    <div style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin-bottom: 0.35rem; white-space: normal;">
+                                        {{ $history->description }}
+                                    </div>
+                                    @if($history->photo)
+                                        <img src="{{ asset('storage/' . $history->photo) }}" style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    @else
+                                        <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Tidak ada foto</span>
+                                    @endif
+                                </div>
+                            </td>
                             <td style="font-size: 0.8rem; line-height: 1.4; color: var(--text-secondary);">{{ $history->description }}</td>
                             <td>
                                 @if($history->photo)

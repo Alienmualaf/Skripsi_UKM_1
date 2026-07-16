@@ -24,7 +24,9 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
             if ($user->status !== 'active') {
                 Auth::logout();

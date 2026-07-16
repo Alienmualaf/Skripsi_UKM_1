@@ -15,5 +15,6 @@ class Kernel extends HttpKernel
         // 🔥 TAMBAHKAN DI SINI
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'membership' => \App\Http\Middleware\CheckMembership::class,
+        'block_admin_ukm_create' => \App\Http\Middleware\BlockAdminUkmCreate::class,
     ];
 }

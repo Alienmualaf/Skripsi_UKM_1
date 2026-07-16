@@ -189,17 +189,11 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Hendra Wijaya, S.Sn.',
                 'specialty' => 'Vocal Director & Conductor',
                 'phone' => '08122334455',
-                'email' => 'hendra.vocals@gmail.com',
-                'salary' => 1500000.00,
-                'status' => 'Aktif',
             ],
             [
                 'name' => 'Siti Aminah, M.Mus.',
                 'specialty' => 'Vocal Coach (Sopran & Alto)',
                 'phone' => '08566778899',
-                'email' => 'siti.vocalcoach@gmail.com',
-                'salary' => 1000000.00,
-                'status' => 'Aktif',
             ]
         ];
 
@@ -251,7 +245,6 @@ class DatabaseSeeder extends Seeder
                     'performance_date' => '2026-08-01',
                     'performance_time' => '19:00:00',
                     'description' => 'Konser tahunan utama PSUP membawakan lagu-lagu daerah dan klasik.',
-                    'dress_code' => 'Jas Hitam Almamater',
                     'status' => 'Persiapan',
                     'show_on_landing' => true,
                     'created_at' => now(),
@@ -363,7 +356,6 @@ class DatabaseSeeder extends Seeder
         $inventories = [
             [
                 'name' => 'Kostum Jas Hitam Almamater PSUP',
-                'code' => 'INV-KST-001',
                 'category' => 'Kostum',
                 'condition' => 'Baik',
                 'quantity' => 35,
@@ -371,7 +363,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Keyboard Yamaha PSR-S975',
-                'code' => 'INV-MUS-001',
                 'category' => 'Alat Musik',
                 'condition' => 'Baik',
                 'quantity' => 1,
@@ -379,7 +370,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Sound System & Mic Wireless Shure',
-                'code' => 'INV-SND-001',
                 'category' => 'Sound System',
                 'condition' => 'Baik',
                 'quantity' => 2,
@@ -388,7 +378,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($inventories as $i) {
-            DB::table('inventories')->updateOrInsert(['code' => $i['code']], $i);
+            DB::table('inventories')->updateOrInsert(['name' => $i['name']], $i);
         }
 
         // 16. Seed Sample Achievements

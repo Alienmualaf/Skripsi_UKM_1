@@ -2,7 +2,7 @@
 
 @php
     $isJob = isset($job);
-    $backUrl = $isJob ? '/pengurus/programs?tab=job' : route('pengurus.programs.performance.show', $programId);
+    $backUrl = route('pengurus.classrooms.index');
     $classroomTitle = $isJob ? $job->title : $performance->title;
     $classroomVenue = $isJob ? $job->location : $performance->venue;
     $classroomDate = $isJob ? $job->date : $performance->performance_date;
@@ -11,10 +11,35 @@
     $routeParams = $isJob ? [$job->id] : [$programId, $performance->id];
 @endphp
 
-@section('title', 'Classroom - ' . $classroomTitle)
-@section('header', 'Classroom')
+@section('title', 'Pusat Latihan - ' . $classroomTitle)
+@section('header', 'Pusat Latihan')
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/ukm.css') }}">
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+    }
+</style>
 
 @if(session('success'))
 <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.85rem 1.25rem;border-radius:8px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
@@ -25,8 +50,32 @@
 <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
     <div>
         <a href="{{ $backUrl }}" style="display:inline-flex;align-items:center;gap:0.35rem;color:var(--accent-color);text-decoration:none;font-weight:600;font-size:0.875rem;margin-bottom:0.25rem;"><i class="ph ph-arrow-left"></i> Kembali</a>
-        <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin:0;">Classroom — {{ $classroomTitle }}</h3>
+        <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin:0;">Pusat Latihan — {{ $classroomTitle }}</h3>
         <p style="margin:0.25rem 0 0;color:var(--text-secondary);font-size:0.875rem;"><i class="ph ph-map-pin"></i> {{ $classroomVenue }} &nbsp;|&nbsp; <i class="ph ph-calendar"></i> {{ date('d M Y', strtotime($classroomDate)) }}</p>
+    </div>
+</div>
+
+<!-- Trainer Selection Card -->
+<div class="card" style="padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; border: 1px solid var(--border-color); background: var(--card-bg); margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <i class="ph ph-chalkboard-teacher" style="font-size: 1.75rem; color: var(--accent-color);"></i>
+        <div>
+            <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Pelatih Terpilih</p>
+            <p style="margin: 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary);">
+                {{ $classroom->trainer ? $classroom->trainer->name : 'Belum Ditentukan' }}
+            </p>
+        </div>
+    </div>
+    <div>
+        <form action="{{ route($isJob ? 'pengurus.jobs.classroom.trainer' : 'pengurus.programs.performance.classroom.trainer', $routeParams) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem;">
+            @csrf
+            <select name="trainer_id" class="form-control" style="font-size: 0.8125rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); min-width: 180px;" onchange="this.form.submit()">
+                <option value="">-- Pilih Pelatih --</option>
+                @foreach($allTrainers as $t)
+                    <option value="{{ $t->id }}" {{ ($classroom->trainer_id == $t->id) ? 'selected' : '' }}>{{ $t->name }}</option>
+                @endforeach
+            </select>
+        </form>
     </div>
 </div>
 
@@ -41,17 +90,17 @@
 
 <!-- TAB: Peserta -->
 <div id="panel-members" class="tab-panel" style="display:block;">
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
+    <div class="grid-sidebar-layout" style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
-            <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Peserta Classroom ({{ $classroom->members->count() }} orang)</h5>
+            <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Peserta Pusat Latihan ({{ $classroom->members->count() }} orang)</h5>
             <table class="table" style="font-size:0.875rem;">
-                <thead><tr><th>#</th><th>Nama</th><th>Klasifikasi Suara</th><th>Status</th></tr></thead>
+                <thead><tr><th class="hidden-mobile">#</th><th>Nama</th><th class="hidden-mobile">Klasifikasi Suara</th><th>Status</th></tr></thead>
                 <tbody>
                     @forelse($classroom->members as $i => $m)
                     <tr>
-                        <td>{{ $i+1 }}</td>
+                        <td class="hidden-mobile">{{ $i+1 }}</td>
                         <td style="font-weight:600;">{{ $m->name }}</td>
-                        <td>{{ $m->voiceClassification->name ?? '-' }}</td>
+                        <td class="hidden-mobile">{{ $m->voiceClassification->name ?? '-' }}</td>
                         <td><span class="badge" style="background:rgba(16,185,129,0.1);color:var(--success-color);font-weight:700;">{{ $m->status }}</span></td>
                     </tr>
                     @empty
@@ -89,20 +138,20 @@
 
 <!-- TAB: Materi -->
 <div id="panel-materials" class="tab-panel" style="display:none;">
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
+    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
-            <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Materi Classroom ({{ $classroom->materials->count() }})</h5>
+            <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Materi Pusat Latihan ({{ $classroom->materials->count() }})</h5>
             <table class="table" style="font-size:0.875rem;">
-                <thead><tr><th>Judul</th><th>Jenis</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Judul</th><th class="hidden-mobile">Jenis</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @forelse($classroom->materials as $mat)
                     <tr>
                         <td style="font-weight:600;">{{ $mat->title }}</td>
-                        <td><span class="badge">{{ $mat->type }}</span></td>
+                        <td class="hidden-mobile"><span class="badge">{{ $mat->type }}</span></td>
                         <td>
                             <div style="display:flex;gap:0.35rem;">
                                 <a href="{{ route('pengurus.materials.download', $mat->id) }}" class="btn" style="padding:0.3rem 0.6rem;font-size:0.75rem;background:var(--accent-light);color:var(--accent-color);border-radius:6px;text-decoration:none;font-weight:700;"><i class="ph ph-download-simple"></i></a>
-                                <form action="{{ route($routePrefix . '.materials.remove', array_merge($routeParams, [$mat->id])) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus dari classroom?')">
+                                <form action="{{ route($routePrefix . '.materials.remove', array_merge($routeParams, [$mat->id])) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus dari Pusat Latihan?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;"><i class="ph ph-x"></i></button>
                                 </form>
@@ -115,27 +164,29 @@
                 </tbody>
             </table>
         </div>
+        @if(!auth()->user()->isAdminUkm())
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 0.5rem;font-size:1rem;">Tambah dari Materi Master</h5>
             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.5;margin:0 0 1.25rem 0;">Pilih berkas dari repositori Materi Master atau unggah berkas baru langsung ke dalam perpustakaan materi.</p>
             <button type="button" onclick="openMaterialsModal()" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;text-align:center;display:block;cursor:pointer;"><i class="ph ph-folder-open"></i> Buka Materi Master</button>
         </div>
+        @endif
     </div>
 </div>
 
 <!-- TAB: Absensi -->
 <div id="panel-attendance" class="tab-panel" style="display:none;">
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Sesi Absensi</h5>
             <table class="table" style="font-size:0.875rem;">
-                <thead><tr><th>Judul</th><th>Jenis</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Judul</th><th class="hidden-mobile">Jenis</th><th class="hidden-mobile">Tanggal</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @forelse($classroom->attendances as $att)
                     <tr>
                         <td style="font-weight:600;">{{ $att->title }}</td>
-                        <td><span class="badge">{{ $att->type }}</span></td>
-                        <td>{{ date('d M Y', strtotime($att->date)) }}</td>
+                        <td class="hidden-mobile"><span class="badge">{{ $att->type }}</span></td>
+                        <td class="hidden-mobile">{{ date('d M Y', strtotime($att->date)) }}</td>
                         <td>
                             <a href="{{ route($routePrefix . '.attendance', array_merge($routeParams, [$att->id])) }}" class="btn" style="padding:0.3rem 0.75rem;font-size:0.75rem;font-weight:700;background:var(--accent-light);color:var(--accent-color);border-radius:6px;text-decoration:none;"><i class="ph ph-list-checks"></i> Isi</a>
                         </td>
@@ -146,6 +197,7 @@
                 </tbody>
             </table>
         </div>
+        @if(!auth()->user()->isAdminUkm())
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Buat Sesi Absensi</h5>
             <form action="{{ route($routePrefix . '.attendance.store', $routeParams) }}" method="POST">
@@ -185,23 +237,97 @@
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;"><i class="ph ph-plus"></i> Buat Sesi</button>
             </form>
         </div>
+        @endif
+    </div>
+
+    <!-- Recap Section -->
+    <div class="card" style="padding:1.5rem; margin-top: 1.5rem; width: 100%;">
+        <h5 style="font-weight:800; margin:0 0 1rem; font-size:1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+            <i class="ph ph-chart-bar" style="color: var(--accent-color);"></i> Rekapitulasi Absensi Anggota
+        </h5>
+        
+        <div style="overflow-x:auto;">
+            <table class="table" style="font-size:0.875rem; width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color);">
+                        <th style="text-align: left; padding: 0.75rem 0.5rem;">Nama Anggota</th>
+                        <th class="hidden-mobile" style="text-align: left; padding: 0.75rem 0.5rem;">Klasifikasi Suara</th>
+                        <th class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem;">Total Sesi</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; color: var(--success-color);">Hadir</th>
+                        <th class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; color: #3b82f6;">Izin</th>
+                        <th class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; color: #f59e0b;">Sakit</th>
+                        <th class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; color: var(--danger-color);">Alpha</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: bold;">Persentase</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($classroom->members as $member)
+                        @php
+                            $total = $classroom->attendances->count();
+                            $hadir = 0;
+                            $izin = 0;
+                            $sakit = 0;
+                            $alpha = 0;
+                            
+                            foreach($classroom->attendances as $att) {
+                                $detail = $att->details->where('member_id', $member->id)->first();
+                                if ($detail) {
+                                    $status = strtolower($detail->status);
+                                    if ($status === 'hadir') {
+                                        $hadir++;
+                                    } elseif ($status === 'izin') {
+                                        $izin++;
+                                    } elseif ($status === 'sakit') {
+                                        $sakit++;
+                                    } else {
+                                        $alpha++;
+                                    }
+                                } else {
+                                    $alpha++;
+                                }
+                            }
+                            
+                            $percentage = $total > 0 ? ($hadir / $total) * 100 : 0;
+                        @endphp
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="font-weight:600; padding: 0.75rem 0.5rem;">{{ $member->name }}</td>
+                            <td class="hidden-mobile" style="padding: 0.75rem 0.5rem;">{{ $member->voiceClassification->name ?? '-' }}</td>
+                            <td class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem;">{{ $total }}</td>
+                            <td style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: var(--success-color);">{{ $hadir }}</td>
+                            <td class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #3b82f6;">{{ $izin }}</td>
+                            <td class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #f59e0b;">{{ $sakit }}</td>
+                            <td class="hidden-mobile" style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: var(--danger-color);">{{ $alpha }}</td>
+                            <td style="text-align: center; padding: 0.75rem 0.5rem; font-weight: bold;">
+                                <span class="badge" style="background: {{ $percentage >= 75 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)' }}; color: {{ $percentage >= 75 ? 'var(--success-color)' : 'var(--danger-color)' }};">
+                                    {{ round($percentage, 1) }}%
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem;">Belum ada data rekapitulasi.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <!-- TAB: Jadwal -->
 <div id="panel-schedules" class="tab-panel" style="display:none;">
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Jadwal Latihan</h5>
             <table class="table" style="font-size:0.875rem;">
-                <thead><tr><th>Kegiatan</th><th>Tanggal</th><th>Waktu</th><th>Lokasi</th><th></th></tr></thead>
+                <thead><tr><th>Kegiatan</th><th>Tanggal</th><th class="hidden-mobile">Waktu</th><th class="hidden-mobile">Lokasi</th><th></th></tr></thead>
                 <tbody>
                     @forelse($classroom->schedules->sortBy('date') as $sch)
                     <tr>
                         <td style="font-weight:600;">{{ $sch->title }}</td>
                         <td>{{ date('d M Y', strtotime($sch->date)) }}</td>
-                        <td>{{ substr($sch->start_time,0,5) }}{{ $sch->end_time ? ' – '.substr($sch->end_time,0,5) : '' }}</td>
-                        <td>{{ $sch->location ?? '-' }}</td>
+                        <td class="hidden-mobile">{{ substr($sch->start_time,0,5) }}{{ $sch->end_time ? ' – '.substr($sch->end_time,0,5) : '' }}</td>
+                        <td class="hidden-mobile">{{ $sch->location ?? '-' }}</td>
                         <td>
                             <form action="{{ route($routePrefix . '.schedules.destroy', array_merge($routeParams, [$sch->id])) }}" method="POST" onsubmit="return confirm('Hapus?')">
                                 @csrf @method('DELETE')
@@ -215,6 +341,7 @@
                 </tbody>
             </table>
         </div>
+        @if(!auth()->user()->isAdminUkm())
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Tambah Jadwal</h5>
             <form action="{{ route($routePrefix . '.schedules.store', $routeParams) }}" method="POST">
@@ -229,22 +356,23 @@
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;"><i class="ph ph-plus"></i> Tambah Jadwal</button>
             </form>
         </div>
+        @endif
     </div>
 </div>
 
 <!-- TAB: Target Lagu -->
 <div id="panel-songs" class="tab-panel" style="display:none;">
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
+    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Target Lagu</h5>
             <table class="table" style="font-size:0.875rem;">
-                <thead><tr><th>Judul Lagu</th><th>Komposer</th><th>Part</th><th>Status</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Judul Lagu</th><th class="hidden-mobile">Komposer</th><th class="hidden-mobile">Part</th><th>Status</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @forelse($classroom->songTargets as $song)
                     <tr>
                         <td style="font-weight:600;">{{ $song->song_title }}</td>
-                        <td style="color:var(--text-secondary);">{{ $song->composer ?? '-' }}</td>
-                        <td>{{ $song->voice_part ?? 'Full Choir' }}</td>
+                        <td class="hidden-mobile" style="color:var(--text-secondary);">{{ $song->composer ?? '-' }}</td>
+                        <td class="hidden-mobile">{{ $song->voice_part ?? 'Full Choir' }}</td>
                         <td>
                             <form action="{{ route($routePrefix . '.songs.update', array_merge($routeParams, [$song->id])) }}" method="POST" style="display:inline;">
                                 @csrf @method('PATCH')
@@ -268,6 +396,7 @@
                 </tbody>
             </table>
         </div>
+        @if(!auth()->user()->isAdminUkm())
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Tambah Target Lagu</h5>
             <form action="{{ route($routePrefix . '.songs.store', $routeParams) }}" method="POST">
@@ -288,12 +417,13 @@
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;"><i class="ph ph-plus"></i> Tambah Lagu</button>
             </form>
         </div>
+        @endif
     </div>
 </div>
 
 <!-- TAB: Pengumuman -->
 <div id="panel-announcements" class="tab-panel" style="display:none;">
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start;">
+    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Pengumuman Classroom</h5>
             @forelse($classroom->announcements->sortByDesc('created_at') as $ann)
@@ -314,6 +444,7 @@
             <p style="text-align:center;color:var(--text-muted);padding:2rem 0;">Belum ada pengumuman.</p>
             @endforelse
         </div>
+        @if(!auth()->user()->isAdminUkm())
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Buat Pengumuman</h5>
             <form action="{{ route($routePrefix . '.announcements.store', $routeParams) }}" method="POST">
@@ -323,6 +454,7 @@
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;"><i class="ph ph-megaphone"></i> Kirim Pengumuman</button>
             </form>
         </div>
+        @endif
     </div>
 </div>
 

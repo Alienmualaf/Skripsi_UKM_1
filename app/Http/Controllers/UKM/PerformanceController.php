@@ -19,8 +19,8 @@ class PerformanceController extends Controller
     {
         $program = Program::findOrFail($programId);
 
-        if ($program->activity_type !== 'Performance') {
-            return back()->with('error', 'Program ini bukan bertipe Penampilan.');
+        if ($program->activity_type !== 'Performance' && $program->activity_type !== 'Competition') {
+            return back()->with('error', 'Program ini bukan bertipe Penampilan atau Kompetisi.');
         }
 
         $data = $request->validate([
@@ -29,7 +29,6 @@ class PerformanceController extends Controller
             'performance_date' => 'required|date',
             'performance_time' => 'nullable|date_format:H:i',
             'description'      => 'nullable|string',
-            'dress_code'       => 'nullable|string|max:255',
             'status'           => 'required|in:Persiapan,Berlangsung,Selesai',
         ]);
 
@@ -43,13 +42,13 @@ class PerformanceController extends Controller
         $performance->classroom()->firstOrCreate(
             ['performance_id' => $performance->id],
             [
-                'name'   => 'Classroom ' . $performance->title,
+                'name'   => 'Pusat Latihan ' . $performance->title,
                 'status' => 'Aktif',
             ]
         );
 
         return redirect()->route('pengurus.programs.show', $programId)
-            ->with('success', 'Data Penampilan berhasil disimpan.');
+            ->with('success', 'Data Penampilan / Lomba berhasil disimpan.');
     }
 
     public function update(Request $request, $programId, $performanceId)
@@ -62,7 +61,6 @@ class PerformanceController extends Controller
             'performance_date' => 'required|date',
             'performance_time' => 'nullable|date_format:H:i',
             'description'      => 'nullable|string',
-            'dress_code'       => 'nullable|string|max:255',
             'status'           => 'required|in:Persiapan,Berlangsung,Selesai',
         ]);
 
@@ -72,15 +70,15 @@ class PerformanceController extends Controller
         $classroom = $performance->classroom()->firstOrCreate(
             ['performance_id' => $performance->id],
             [
-                'name'   => 'Classroom ' . $performance->title,
+                'name'   => 'Pusat Latihan ' . $performance->title,
                 'status' => 'Aktif',
             ]
         );
         $classroom->update([
-            'name' => 'Classroom ' . $performance->title
+            'name' => 'Pusat Latihan ' . $performance->title
         ]);
 
-        return back()->with('success', 'Data Penampilan berhasil diperbarui.');
+        return back()->with('success', 'Data Penampilan / Lomba berhasil diperbarui.');
     }
 
     public function destroy($programId, $performanceId)
@@ -89,6 +87,6 @@ class PerformanceController extends Controller
         $performance->delete();
 
         return redirect()->route('pengurus.programs.show', $programId)
-            ->with('success', 'Data Penampilan berhasil dihapus.');
+            ->with('success', 'Data Penampilan / Lomba berhasil dihapus.');
     }
 }

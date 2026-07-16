@@ -51,10 +51,13 @@ class PublicController extends Controller
         $agendaCount = Performance::count();
         $programCount = Program::count();
         
-        $trainers = Trainer::where('status', 'Aktif')->take(4)->get();
+        $trainers = Trainer::take(4)->get();
         
-        // Fetch only performances & jobs marked for landing page
-        $agendas = Performance::where('show_on_landing', true)->orderBy('performance_date', 'asc')->get();
+        // Fetch only upcoming performances & jobs marked for landing page
+        $agendas = Performance::where('show_on_landing', true)
+            ->where('performance_date', '>=', now()->toDateString())
+            ->orderBy('performance_date', 'asc')
+            ->get();
             
         $galleries = Gallery::where('show_on_landing', true)->latest()->take(6)->get();
         
@@ -110,7 +113,7 @@ class PublicController extends Controller
     public function trainers()
     {
         $profile = $this->getProfile();
-        $trainers = Trainer::where('status', 'Aktif')->get();
+        $trainers = Trainer::all();
         return view('public.trainers', compact('profile', 'trainers'));
     }
 
@@ -124,7 +127,9 @@ class PublicController extends Controller
     public function agendas()
     {
         $profile = $this->getProfile();
-        $agendas = Performance::orderBy('performance_date', 'desc')->get();
+        $agendas = Performance::where('performance_date', '>=', now()->toDateString())
+            ->orderBy('performance_date', 'asc')
+            ->get();
         return view('public.agendas', compact('profile', 'agendas'));
     }
 

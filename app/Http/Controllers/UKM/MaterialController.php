@@ -21,10 +21,11 @@ class MaterialController extends Controller
 
         // Build breadcrumbs if inside a folder
         $breadcrumbs = [];
+        $currentFolder = null;
         if ($currentFolderId) {
-            $folder = Folder::findOrFail($currentFolderId);
-            $breadcrumbs[] = $folder;
-            $parent = $folder->parent;
+            $currentFolder = Folder::findOrFail($currentFolderId);
+            $breadcrumbs[] = $currentFolder;
+            $parent = $currentFolder->parent;
             while ($parent) {
                 array_unshift($breadcrumbs, $parent);
                 $parent = $parent->parent;
@@ -58,7 +59,7 @@ class MaterialController extends Controller
         }
         $materials = $materialsQuery->orderBy('title', 'asc')->get();
 
-        return view('pengurus.materials.index', compact('folders', 'materials', 'breadcrumbs', 'currentFolderId', 'search', 'type', 'classroom', 'classroomId'));
+        return view('pengurus.materials.index', compact('folders', 'materials', 'breadcrumbs', 'currentFolder', 'currentFolderId', 'search', 'type', 'classroom', 'classroomId'));
     }
 
     public function storeFolder(Request $request)
@@ -89,7 +90,7 @@ class MaterialController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:Partitur,Audio,Video',
-            'folder_id' => 'nullable|exists:folders,id',
+            'folder_id' => 'required|exists:folders,id',
             'description' => 'nullable|string',
             'file' => 'required|file|mimes:pdf,docx,mp3,wav,mp4,mov|max:51200', // Max 50MB
         ]);

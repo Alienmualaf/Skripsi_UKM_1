@@ -41,8 +41,6 @@ class TrainerController extends Controller
             $data['photo'] = $request->file('photo')->store('trainers', 'public');
         }
 
-        $data['status'] = 'Aktif';
-
         Trainer::create($data);
 
         return redirect()->route('pengurus.trainers.index')

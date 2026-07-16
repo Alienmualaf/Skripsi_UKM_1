@@ -4,6 +4,34 @@
 @section('header', 'Manajemen Program & Penampilan')
 
 @section('content')
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+        .th-action-compact {
+            width: 90px !important;
+        }
+    }
+</style>
 @if(session('success'))
     <div class="card mb-4 animate-fade-in" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
         <i class="ph-fill ph-check-circle" style="font-size: 1.15rem; vertical-align: middle; margin-right: 0.5rem;"></i>
@@ -16,11 +44,13 @@
         <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Aktivitas & Program Kerja</h3>
         <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Kelola target tahunan, penampilan konser, penugasan delegasi, dan performa tim PSUP.</p>
     </div>
+    @if(!auth()->user()->isAdminUkm())
     <div style="display: flex; gap: 0.75rem;">
         <a href="{{ route('pengurus.programs.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
             <i class="ph ph-plus"></i> Tambah Proker & Job
         </a>
     </div>
+    @endif
 </div>
 
 <!-- Beautiful Tab Navigation -->
@@ -50,12 +80,10 @@
                     <tr>
                         <th>Nama Program</th>
                         <th>Jenis</th>
-                        <th>Kategori / Scope</th>
-                        <th>Lokasi</th>
-                        <th>Periode</th>
-                        <th>Status</th>
-                        <th>LPJ</th>
-                        <th style="width: 180px; text-align: center;">Aksi</th>
+                        <th class="hidden-mobile">Kategori / Scope</th>
+                        <th class="hidden-mobile">Lokasi</th>
+                        <th class="hidden-mobile">Periode</th>
+                        <th class="th-action-compact" style="width: 180px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,48 +108,31 @@
                             @endphp
                             <span class="badge" style="background: {{ $c }}22; color: {{ $c }}; font-weight: 700; border: 1px solid {{ $c }}33; font-size: 0.75rem;">{{ $program->activity_type }}</span>
                         </td>
-                        <td>
+                        <td class="hidden-mobile">
                             @if($program->activity_type === 'Event')
                                 <span class="badge" style="background: #e2e8f0; color: #475569; font-weight: 600;">{{ $program->event_category ?? 'Internal' }}</span>
                             @else
                                 <span style="color: var(--text-muted); font-size: 0.875rem;">—</span>
                             @endif
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.875rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.875rem;">
                             {{ $program->venue ?? 'Belum ditentukan' }}
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.8125rem;">
                             {{ date('d/m/y', strtotime($program->start_date)) }} – {{ date('d/m/y', strtotime($program->end_date)) }}
                         </td>
-                        <td>
-                            @if($program->status === 'Selesai')
-                                <span class="badge" style="background: rgba(16,185,129,0.1); color: var(--success-color); font-weight: bold;">Selesai</span>
-                            @elseif($program->status === 'Berjalan')
-                                <span class="badge" style="background: var(--accent-light); color: var(--accent-color); font-weight: bold;">Berjalan</span>
-                            @else
-                                <span class="badge" style="background: #fff8e6; color: #f59e0b; font-weight: bold;">Persiapan</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($program->report)
-                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: 700; color: var(--success-color);">
-                                    <i class="ph ph-check-circle"></i> Ada
-                                </span>
-                            @else
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">—</span>
-                            @endif
-                        </td>
+
                         <td>
                             <div style="display: flex; gap: 0.35rem; justify-content: center; flex-wrap: wrap;">
-                                <a href="{{ route('pengurus.programs.show', $program->id) }}" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; text-decoration: none;">
-                                    <i class="ph ph-eye"></i> Detail
+                                <a href="{{ route('pengurus.programs.show', $program->id) }}" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; text-decoration: none;" title="Detail">
+                                    <i class="ph ph-eye"></i><span class="hidden-mobile"> Detail</span>
                                 </a>
-                                <a href="{{ route('pengurus.programs.edit', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;">
+                                <a href="{{ route('pengurus.programs.edit', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;" title="Edit">
                                     <i class="ph ph-pencil-simple"></i>
                                 </a>
                                 <form action="{{ route('pengurus.programs.destroy', $program->id) }}" method="POST" onsubmit="return confirm('Hapus program kerja ini?');" style="display: inline;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;">
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;" title="Hapus">
                                         <i class="ph ph-trash"></i>
                                     </button>
                                 </form>
@@ -130,7 +141,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-secondary py-8">Belum ada program kerja terdaftar.</td>
+                        <td colspan="6" class="text-center text-secondary py-8">Belum ada program kerja terdaftar.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -151,12 +162,10 @@
                 <thead>
                     <tr>
                         <th>Nama Penampilan / Job</th>
-                        <th>Tanggal Pelaksanaan</th>
-                        <th>Lokasi</th>
-                        <th>Status</th>
-                        <th>LPJ</th>
+                        <th class="hidden-mobile">Tanggal Pelaksanaan</th>
+                        <th class="hidden-mobile">Lokasi</th>
                         <th>Classroom</th>
-                        <th style="width: 200px; text-align: center;">Aksi</th>
+                        <th class="th-action-compact" style="width: 180px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,37 +176,20 @@
                             <a href="{{ route('pengurus.programs.show', $program->id) }}" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.35rem;">
                                 <i class="ph ph-microphone-stage" style="color: #10b981;"></i>
                                 {{ $program->name }}
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem; margin-left: 0.5rem; font-weight: 700;">Proker</span>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem; margin-left: 0.5rem; font-weight: 700; display: inline-block; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Penampilan</span>
                             </a>
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.8125rem;">
                             {{ date('d-m-Y', strtotime($program->start_date)) }}
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.875rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.875rem;">
                             {{ $program->performance->venue ?? 'Belum ditentukan' }}
                         </td>
-                        <td>
-                            @if($program->status === 'Selesai')
-                                <span class="badge" style="background: rgba(16,185,129,0.1); color: var(--success-color); font-weight: bold;">Selesai</span>
-                            @elseif($program->status === 'Berjalan')
-                                <span class="badge" style="background: var(--accent-light); color: var(--accent-color); font-weight: bold;">Berjalan</span>
-                            @else
-                                <span class="badge" style="background: #fff8e6; color: #f59e0b; font-weight: bold;">Persiapan</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($program->report)
-                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: 700; color: var(--success-color);">
-                                    <i class="ph ph-check-circle"></i> Selesai
-                                </span>
-                            @else
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">Belum Dibuat</span>
-                            @endif
-                        </td>
+
                         <td>
                             @if($program->performance && $program->performance->classroom)
-                                <a href="{{ route('pengurus.programs.performance.classroom.show', [$program->id, $program->performance->id]) }}" class="badge badge-approved" style="text-decoration: none; font-weight: bold;">
-                                    <i class="ph ph-chalkboard"></i> Buka Classroom
+                                <a href="{{ route('pengurus.programs.performance.classroom.show', [$program->id, $program->performance->id]) }}" class="badge badge-approved" style="text-decoration: none; font-weight: bold; padding: 0.25rem 0.5rem;" title="Buka Classroom">
+                                    <i class="ph ph-chalkboard"></i><span class="hidden-mobile"> Classroom</span>
                                 </a>
                             @else
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">—</span>
@@ -205,15 +197,15 @@
                         </td>
                         <td>
                             <div style="display: flex; gap: 0.35rem; justify-content: center; flex-wrap: wrap;">
-                                <a href="{{ route('pengurus.programs.show', $program->id) }}" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; text-decoration: none;">
-                                    <i class="ph ph-eye"></i> Detail
+                                <a href="{{ route('pengurus.programs.show', $program->id) }}" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; text-decoration: none;" title="Detail">
+                                    <i class="ph ph-eye"></i><span class="hidden-mobile"> Detail</span>
                                 </a>
-                                <a href="{{ route('pengurus.programs.edit', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;">
-                                    <i class="ph ph-pencil-simple"></i> Edit
+                                <a href="{{ route('pengurus.programs.edit', $program->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;" title="Edit">
+                                    <i class="ph ph-pencil-simple"></i>
                                 </a>
                                 <form action="{{ route('pengurus.programs.destroy', $program->id) }}" method="POST" onsubmit="return confirm('Hapus penampilan ini?');" style="display: inline;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;">
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;" title="Hapus">
                                         <i class="ph ph-trash"></i>
                                     </button>
                                 </form>
@@ -229,39 +221,20 @@
                             <div style="display: flex; align-items: center; gap: 0.35rem;">
                                 <i class="ph ph-music-notes-simple" style="color: var(--accent-color);"></i>
                                 {{ $job->title }}
-                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-color); font-size: 0.7rem; margin-left: 0.5rem; font-weight: 700;">Job Eksternal</span>
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-color); font-size: 0.7rem; margin-left: 0.5rem; font-weight: 700; display: inline-block; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Job</span>
                             </div>
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.8125rem;">
                             {{ $job->performance_date ? $job->performance_date->format('d-m-Y') : ($job->date ? date('d-m-Y', strtotime($job->date)) : '-') }}
                         </td>
-                        <td style="color: var(--text-secondary); font-size: 0.875rem;">
+                        <td class="hidden-mobile" style="color: var(--text-secondary); font-size: 0.875rem;">
                             {{ $job->venue ?? $job->location ?? 'Belum ditentukan' }}
                         </td>
-                        <td>
-                            @php
-                                $jobDate = $job->performance_date ? $job->performance_date->toDateString() : ($job->date ? date('Y-m-d', strtotime($job->date)) : null);
-                                $todayDate = now()->toDateString();
-                            @endphp
-                            @if($jobDate)
-                                @if($todayDate > $jobDate)
-                                    <span class="badge" style="background: rgba(16,185,129,0.1); color: var(--success-color); font-weight: bold;">Selesai</span>
-                                @elseif($todayDate == $jobDate)
-                                    <span class="badge" style="background: var(--accent-light); color: var(--accent-color); font-weight: bold;">Berjalan</span>
-                                @else
-                                    <span class="badge" style="background: #fff8e6; color: #f59e0b; font-weight: bold;">Persiapan</span>
-                                @endif
-                            @else
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">—</span>
-                            @endif
-                        </td>
-                        <td>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">—</span>
-                        </td>
+
                         <td>
                             @if($job->classroom)
-                                <a href="{{ route('pengurus.jobs.classroom.show', $job->id) }}" class="badge badge-approved" style="text-decoration: none; font-weight: bold;">
-                                    <i class="ph ph-chalkboard"></i> Buka Classroom
+                                <a href="{{ route('pengurus.jobs.classroom.show', $job->id) }}" class="badge badge-approved" style="text-decoration: none; font-weight: bold; padding: 0.25rem 0.5rem;" title="Buka Classroom">
+                                    <i class="ph ph-chalkboard"></i><span class="hidden-mobile"> Classroom</span>
                                 </a>
                             @else
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">—</span>
@@ -269,10 +242,10 @@
                         </td>
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                <a href="{{ route('pengurus.jobs.edit', $job->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;"><i class="ph ph-pencil-simple"></i> Edit</a>
+                                <a href="{{ route('pengurus.jobs.edit', $job->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px;" title="Edit"><i class="ph ph-pencil-simple"></i></a>
                                 <form action="{{ route('pengurus.jobs.destroy', $job->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus penugasan ini?');" style="display: inline;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;"><i class="ph ph-trash"></i></button>
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px;" title="Hapus"><i class="ph ph-trash"></i></button>
                                 </form>
                             </div>
                         </td>
@@ -281,7 +254,7 @@
 
                     @if($performances->count() == 0 && $jobs->count() == 0)
                     <tr>
-                        <td colspan="7" class="text-center text-secondary py-8">Belum ada agenda penampilan konser atau job terdaftar.</td>
+                        <td colspan="5" class="text-center text-secondary py-8">Belum ada agenda penampilan konser atau job terdaftar.</td>
                     </tr>
                     @endif
                 </tbody>

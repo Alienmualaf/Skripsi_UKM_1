@@ -11,8 +11,6 @@ class Attendance extends Model
         'title',
         'type',
         'date',
-        'qr_code',
-        'is_active_qr',
         'classroom_id',
     ];
 

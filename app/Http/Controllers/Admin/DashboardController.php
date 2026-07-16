@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Permission;
 use App\Models\Member;
 use App\Models\Trainer;
 use App\Models\VoiceClassification;
@@ -19,7 +18,6 @@ use App\Models\Letter;
 use App\Models\Attendance;
 use App\Models\ActivityLog;
 use App\Models\LoginHistory;
-use App\Models\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -36,23 +34,24 @@ class DashboardController extends Controller
         if (ActivityLog::count() === 0) {
             $u = User::first();
             $uName = $u ? $u->name : 'Super Admin';
+            $adminUkm = User::whereHas('role', function($q) { $q->where('name', 'admin_ukm'); })->first();
+            $pengurus = User::whereHas('role', function($q) { $q->where('name', 'pengurus'); })->first();
+
             ActivityLog::create(['user_id' => $u?->id, 'username' => $uName, 'role' => 'Administrator', 'activity' => 'Membuka dashboard utama sistem', 'module' => 'Dashboard', 'ip_address' => '127.0.0.1', 'browser' => 'Chrome']);
             ActivityLog::create(['user_id' => $u?->id, 'username' => $uName, 'role' => 'Administrator', 'activity' => 'Melakukan backup database ke storage', 'module' => 'Maintenance', 'ip_address' => '127.0.0.1', 'browser' => 'Chrome']);
-            ActivityLog::create(['user_id' => 2, 'username' => 'Admin UKM PSUP', 'role' => 'Admin UKM', 'activity' => 'Memverifikasi registrasi calon anggota: Budi Santoso', 'module' => 'Recruitment', 'ip_address' => '127.0.0.1', 'browser' => 'Firefox']);
-            ActivityLog::create(['user_id' => 3, 'username' => 'Pengurus UKM PSUP', 'role' => 'Pengurus', 'activity' => 'Menambahkan program kerja baru', 'module' => 'Program Kerja', 'ip_address' => '192.168.1.15', 'browser' => 'Safari']);
+            ActivityLog::create(['user_id' => $adminUkm?->id, 'username' => 'Admin UKM PSUP', 'role' => 'Admin UKM', 'activity' => 'Memverifikasi registrasi calon anggota: Budi Santoso', 'module' => 'Recruitment', 'ip_address' => '127.0.0.1', 'browser' => 'Firefox']);
+            ActivityLog::create(['user_id' => $pengurus?->id, 'username' => 'Pengurus UKM PSUP', 'role' => 'Pengurus', 'activity' => 'Menambahkan program kerja baru', 'module' => 'Program Kerja', 'ip_address' => '192.168.1.15', 'browser' => 'Safari']);
         }
         if (LoginHistory::count() === 0) {
             $u = User::first();
             $uName = $u ? $u->name : 'Super Admin';
+            $adminUkm = User::whereHas('role', function($q) { $q->where('name', 'admin_ukm'); })->first();
+            $pengurus = User::whereHas('role', function($q) { $q->where('name', 'pengurus'); })->first();
+
             LoginHistory::create(['user_id' => $u?->id, 'username' => $uName, 'login_at' => now()->subHours(2), 'logout_at' => now()->subHours(1), 'ip_address' => '127.0.0.1', 'device' => 'Desktop', 'browser' => 'Chrome', 'status' => 'Success']);
-            LoginHistory::create(['user_id' => 2, 'username' => 'Admin UKM PSUP', 'login_at' => now()->subMinutes(45), 'ip_address' => '127.0.0.1', 'device' => 'Desktop', 'browser' => 'Firefox', 'status' => 'Success']);
-            LoginHistory::create(['user_id' => 3, 'username' => 'Pengurus UKM PSUP', 'login_at' => now()->subHours(5), 'logout_at' => now()->subHours(3), 'ip_address' => '192.168.1.15', 'device' => 'Tablet', 'browser' => 'Safari', 'status' => 'Success']);
-            LoginHistory::create(['user_id' => 0, 'username' => 'unknown@psup.com', 'login_at' => now()->subMinutes(10), 'ip_address' => '203.0.113.1', 'device' => 'Mobile', 'browser' => 'Chrome', 'status' => 'Failed']);
-        }
-        if (AuditTrail::count() === 0) {
-            $u = User::first();
-            $uName = $u ? $u->name : 'Super Admin';
-            AuditTrail::create(['user_id' => $u?->id, 'username' => $uName, 'model_name' => 'User', 'action' => 'update', 'old_values' => ['status' => 'inactive'], 'new_values' => ['status' => 'active']]);
+            LoginHistory::create(['user_id' => $adminUkm?->id, 'username' => 'Admin UKM PSUP', 'login_at' => now()->subMinutes(45), 'ip_address' => '127.0.0.1', 'device' => 'Desktop', 'browser' => 'Firefox', 'status' => 'Success']);
+            LoginHistory::create(['user_id' => $pengurus?->id, 'username' => 'Pengurus UKM PSUP', 'login_at' => now()->subHours(5), 'logout_at' => now()->subHours(3), 'ip_address' => '192.168.1.15', 'device' => 'Tablet', 'browser' => 'Safari', 'status' => 'Success']);
+            LoginHistory::create(['user_id' => null, 'username' => 'unknown@psup.com', 'login_at' => now()->subMinutes(10), 'ip_address' => '203.0.113.1', 'device' => 'Mobile', 'browser' => 'Chrome', 'status' => 'Failed']);
         }
 
         // Stats calculations
@@ -110,12 +109,16 @@ class DashboardController extends Controller
             'percentage' => min(round((($totalMaterials * 1.8) / 2048) * 100, 2), 100)
         ];
 
+        $tableCountQuery = config('database.default') === 'sqlite'
+            ? "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            : "SHOW TABLES";
+
         // Database monitoring
         $databaseMonitor = [
             'connection' => config('database.default'),
-            'database_name' => config('database.connections.mysql.database'),
-            'table_count' => count(DB::select('SHOW TABLES')),
-            'total_rows' => $totalUsers + $totalMembers + Trainer::count() + VoiceClassification::count() + $totalPerformances + $totalPrograms + $totalMaterials + $totalInventories + Finance::count() + $totalLetters + $totalJobs + ActivityLog::count() + LoginHistory::count() + AuditTrail::count(),
+            'database_name' => config('database.default') === 'sqlite' ? 'sqlite_memory' : config('database.connections.mysql.database'),
+            'table_count' => count(DB::select($tableCountQuery)),
+            'total_rows' => $totalUsers + $totalMembers + Trainer::count() + VoiceClassification::count() + $totalPerformances + $totalPrograms + $totalMaterials + $totalInventories + Finance::count() + $totalLetters + $totalJobs + ActivityLog::count() + LoginHistory::count(),
         ];
 
         return view('admin.dashboard', compact(
@@ -127,40 +130,6 @@ class DashboardController extends Controller
         ));
     }
 
-    public function rolesPermissions()
-    {
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('admin.roles-permissions', compact('roles', 'permissions'));
-    }
-
-    public function storeRole(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name',
-            'display_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        Role::create([
-            'name' => strtolower(str_replace(' ', '_', $request->name)),
-            'display_name' => $request->display_name,
-            'description' => $request->description,
-        ]);
-
-        return back()->with('success', 'Peran (Role) baru berhasil dibuat.');
-    }
-
-    public function destroyRole($id)
-    {
-        $role = Role::findOrFail($id);
-        if (in_array($role->name, ['administrator', 'admin_ukm', 'pengurus', 'anggota'])) {
-            return back()->with('error', 'Role bawaan sistem tidak dapat dihapus.');
-        }
-
-        $role->delete();
-        return back()->with('success', 'Role berhasil dihapus.');
-    }
 
     public function settings()
     {
@@ -256,18 +225,30 @@ class DashboardController extends Controller
             }
 
             // Using fallback manual dump as executing mysqldump on developer environments can fail
-            $tables = DB::select('SHOW TABLES');
-            $dbProp = 'Tables_in_' . $dbName;
+            if (config('database.default') === 'sqlite') {
+                $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                $dbProp = 'name';
+            } else {
+                $tables = DB::select('SHOW TABLES');
+                $dbProp = 'Tables_in_' . $dbName;
+            }
             
             $sqlContent = "-- PSUP Database Backup\n-- Date: " . date('Y-m-d H:i:s') . "\n\n";
-            $sqlContent .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+            if (config('database.default') !== 'sqlite') {
+                $sqlContent .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+            }
             
             foreach ($tables as $table) {
                 $tableName = $table->$dbProp;
                 
                 // Get create table query
-                $createTable = DB::select("SHOW CREATE TABLE `{$tableName}`")[0];
-                $createTableProp = 'Create Table';
+                if (config('database.default') === 'sqlite') {
+                    $createTable = DB::select("SELECT sql FROM sqlite_master WHERE type='table' AND name='{$tableName}'")[0];
+                    $createTableProp = 'sql';
+                } else {
+                    $createTable = DB::select("SHOW CREATE TABLE `{$tableName}`")[0];
+                    $createTableProp = 'Create Table';
+                }
                 $sqlContent .= $createTable->$createTableProp . ";\n\n";
                 
                 // Get data
@@ -285,7 +266,9 @@ class DashboardController extends Controller
                 $sqlContent .= "\n";
             }
             
-            $sqlContent .= "SET FOREIGN_KEY_CHECKS=1;\n";
+            if (config('database.default') !== 'sqlite') {
+                $sqlContent .= "SET FOREIGN_KEY_CHECKS=1;\n";
+            }
             File::put($backupPath, $sqlContent);
 
             return back()->with('success', "Backup database berhasil dibuat: {$backupFilename}");
@@ -383,18 +366,6 @@ class DashboardController extends Controller
         return view('admin.login-history', compact('logs', 'search'));
     }
 
-    public function auditTrail(Request $request)
-    {
-        $search = $request->input('search');
-        $query = AuditTrail::latest();
-        if ($search) {
-            $query->where('username', 'like', "%{$search}%")
-                  ->orWhere('model_name', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%");
-        }
-        $logs = $query->paginate(20)->withQueryString();
-        return view('admin.audit-trail', compact('logs', 'search'));
-    }
 
     // Monitoring Organization Views
     public function monitorMembers()
@@ -451,7 +422,6 @@ class DashboardController extends Controller
             $record = $class::findOrFail($id);
             
             // Audit Log before delete
-            \App\Services\SystemLogger::logAudit($model, 'delete', $record->toArray(), null);
             \App\Services\SystemLogger::logActivity("Override Hapus Data: " . $model . " ID: " . $id, 'Master Override');
             
             $record->delete();
@@ -474,12 +444,87 @@ class DashboardController extends Controller
             
             $record->update($request->all());
             
-            \App\Services\SystemLogger::logAudit($model, 'update', $oldData, $record->toArray());
             \App\Services\SystemLogger::logActivity("Override Perbarui Data: " . $model . " ID: " . $id, 'Master Override');
             
             return back()->with('success', "Data {$model} berhasil diperbarui oleh Administrator.");
         } catch (\Exception $e) {
             return back()->with('error', "Gagal memperbarui data: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Agenda Utama (Super Admin)
+     */
+    public function agenda()
+    {
+        // Fetch all classroom schedules
+        $classroomSchedules = \App\Models\ClassroomSchedule::with('classroom.performance')
+            ->where('date', '>=', now()->toDateString())
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function($schedule) {
+                $schedule->agenda_type = 'Latihan';
+                $schedule->time_display = date('H:i', strtotime($schedule->start_time)) . ($schedule->end_time ? ' - ' . date('H:i', strtotime($schedule->end_time)) : '');
+                
+                // Link to classroom show
+                if ($schedule->classroom) {
+                    $perf = $schedule->classroom->performance;
+                    if ($perf) {
+                        if ($perf->program_id) {
+                            $schedule->link = route('pengurus.programs.performance.classroom.show', [$perf->program_id, $perf->id]);
+                        } else {
+                            $schedule->link = route('pengurus.jobs.classroom.show', $perf->id);
+                        }
+                    } else {
+                        $schedule->link = '#';
+                    }
+                } else {
+                    $schedule->link = '#';
+                }
+                return $schedule;
+            });
+
+        // Fetch all performances
+        $performances = Performance::with('classroom')
+            ->where('performance_date', '>=', now()->toDateString())
+            ->orderBy('performance_date', 'asc')
+            ->get()
+            ->map(function($perf) {
+                $perf->agenda_type = $perf->program_id ? 'Penampilan' : 'Job';
+                $perf->date = $perf->performance_date ? $perf->performance_date->format('Y-m-d') : null;
+                $perf->time_display = $perf->performance_time ? date('H:i', strtotime($perf->performance_time)) : '17:00';
+                
+                if ($perf->classroom) {
+                    if ($perf->program_id) {
+                        $perf->link = route('pengurus.programs.performance.classroom.show', [$perf->program_id, $perf->id]);
+                    } else {
+                        $perf->link = route('pengurus.jobs.classroom.show', $perf->id);
+                    }
+                } else {
+                    $perf->link = '#';
+                }
+                return $perf;
+            });
+
+        // Fetch non-performance Programs (Proker)
+        $prokers = \App\Models\Program::where('activity_type', '!=', 'Performance')
+            ->where('start_date', '>=', now()->toDateString())
+            ->orderBy('start_date', 'asc')
+            ->get()
+            ->map(function($prog) {
+                $prog->agenda_type = $prog->activity_type; // Event or Competition
+                $prog->title = $prog->name;
+                $prog->date = $prog->start_date;
+                $prog->time_display = 'All Day';
+                $prog->location = $prog->venue;
+                $prog->notes = $prog->description;
+                $prog->link = route('pengurus.programs.show', $prog->id);
+                return $prog;
+            });
+
+        // Merge and sort
+        $agendas = $classroomSchedules->concat($performances)->concat($prokers)->sortBy('date')->values();
+
+        return view('admin.agenda', compact('agendas'));
     }
 }

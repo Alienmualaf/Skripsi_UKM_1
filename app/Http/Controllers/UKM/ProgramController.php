@@ -35,6 +35,7 @@ class ProgramController extends Controller
             'pic'            => 'nullable|string|max:255',
             'description'    => 'nullable|string',
             'show_on_landing'=> 'nullable|boolean',
+            'performance_time' => 'nullable|string',
         ]);
 
         $data['show_on_landing'] = $request->has('show_on_landing');
@@ -54,17 +55,19 @@ class ProgramController extends Controller
 
         $program = Program::create($data);
 
-        if ($program->activity_type === 'Performance') {
+        if ($program->activity_type === 'Performance' || $program->activity_type === 'Competition') {
+            $prefix = $program->activity_type === 'Competition' ? 'Lomba ' : 'Penampilan ';
             $performance = $program->performance()->create([
-                'title'            => 'Penampilan ' . $program->name,
+                'title'            => $prefix . $program->name,
                 'venue'            => $program->venue ?? 'Belum ditentukan',
                 'performance_date' => $program->start_date,
+                'performance_time' => $request->performance_time ?? '19:00:00',
                 'status'           => 'Persiapan',
                 'show_on_landing'  => $program->show_on_landing,
             ]);
 
             $performance->classroom()->create([
-                'name'   => 'Classroom ' . $performance->title,
+                'name'   => 'Pusat Latihan ' . $performance->title,
                 'status' => 'Aktif',
             ]);
         }
@@ -98,6 +101,7 @@ class ProgramController extends Controller
             'pic'            => 'nullable|string|max:255',
             'description'    => 'nullable|string',
             'show_on_landing'=> 'nullable|boolean',
+            'performance_time' => 'nullable|string',
         ]);
 
         $data['show_on_landing'] = $request->has('show_on_landing');
@@ -114,27 +118,32 @@ class ProgramController extends Controller
 
         $program->update($data);
 
-        if ($program->activity_type === 'Performance') {
+        if ($program->activity_type === 'Performance' || $program->activity_type === 'Competition') {
             $performance = $program->performance;
+            $prefix = $program->activity_type === 'Competition' ? 'Lomba ' : 'Penampilan ';
             if (!$performance) {
                 $performance = $program->performance()->create([
-                    'title'            => 'Penampilan ' . $program->name,
+                    'title'            => $prefix . $program->name,
                     'venue'            => $program->venue ?? 'Belum ditentukan',
                     'performance_date' => $program->start_date,
+                    'performance_time' => $request->performance_time ?? '19:00:00',
                     'status'           => 'Persiapan',
                     'show_on_landing'  => $program->show_on_landing,
                 ]);
             } else {
                 $performance->update([
-                    'venue'           => $program->venue ?? 'Belum ditentukan',
-                    'show_on_landing' => $program->show_on_landing,
+                    'title'            => $prefix . $program->name,
+                    'venue'            => $program->venue ?? 'Belum ditentukan',
+                    'performance_date' => $program->start_date,
+                    'performance_time' => $request->performance_time ?? $performance->performance_time ?? '19:00:00',
+                    'show_on_landing'  => $program->show_on_landing,
                 ]);
             }
 
             $performance->classroom()->firstOrCreate(
                 ['performance_id' => $performance->id],
                 [
-                    'name'   => 'Classroom ' . $performance->title,
+                    'name'   => 'Pusat Latihan ' . $performance->title,
                     'status' => 'Aktif',
                 ]
             );

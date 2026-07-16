@@ -31,10 +31,17 @@
                     @error('description') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="form-group mb-4">
-                    <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Tanggal</label>
-                    <input type="date" name="date" class="form-control" required value="{{ old('date') }}" style="padding: 0.65rem;">
-                    @error('date') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Tanggal <span style="color: var(--danger-color);">*</span></label>
+                        <input type="date" name="date" class="form-control" required value="{{ old('date') }}" style="padding: 0.65rem;">
+                        @error('date') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Jam / Waktu <span style="color: var(--danger-color);">*</span></label>
+                        <input type="time" name="performance_time" class="form-control" required value="{{ old('performance_time', '17:00') }}" style="padding: 0.65rem;">
+                        @error('performance_time') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">

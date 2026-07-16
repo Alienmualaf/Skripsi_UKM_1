@@ -46,7 +46,7 @@
                         <td>
                             <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center;">
                                 <a href="{{ route('pengurus.finances.edit', $f->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.15rem;"><i class="ph ph-pencil-simple"></i> Edit</a>
-                                <form action="{{ route('admin.override.delete', ['model' => 'finance', 'id' => $f->id]) }}" method="POST" onsubmit="return confirm('Hapus paksa transaksi ini? Saldo kas akan menyesuaikan kembali.');" style="margin: 0;">
+                                <form action="{{ route('admin.monitor.override.delete', ['model' => 'finance', 'id' => $f->id]) }}" method="POST" onsubmit="return confirm('Hapus paksa transaksi ini? Saldo kas akan menyesuaikan kembali.');" style="margin: 0;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.15rem;"><i class="ph ph-trash"></i> Hapus</button>

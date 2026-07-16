@@ -19,21 +19,26 @@ class ClassroomController extends Controller
 {
     public function index()
     {
-        // Self-healing: auto-create Performance & Classroom for any Program of type 'Performance' that doesn't have it
-        $programsWithoutPerformance = Program::where('activity_type', 'Performance')
+        // Auto-archive past classrooms
+        Classroom::autoArchivePastClassrooms();
+
+        // Self-healing: auto-create Performance & Classroom for any Program of type 'Performance' or 'Competition' that doesn't have it
+        $programsWithoutPerformance = Program::whereIn('activity_type', ['Performance', 'Competition'])
             ->whereDoesntHave('performance')
             ->get();
 
         foreach ($programsWithoutPerformance as $program) {
+            $prefix = $program->activity_type === 'Competition' ? 'Lomba ' : 'Penampilan ';
             $performance = $program->performance()->create([
-                'title'            => 'Penampilan ' . $program->name,
-                'venue'            => 'Belum ditentukan',
+                'title'            => $prefix . $program->name,
+                'venue'            => $program->venue ?? 'Belum ditentukan',
                 'performance_date' => $program->start_date,
+                'performance_time' => '19:00:00',
                 'status'           => 'Persiapan',
             ]);
 
             $performance->classroom()->create([
-                'name'   => 'Classroom ' . $performance->title,
+                'name'   => 'Pusat Latihan ' . $performance->title,
                 'status' => 'Aktif',
             ]);
         }
@@ -42,7 +47,7 @@ class ClassroomController extends Controller
         $performancesWithoutClassroom = Performance::whereDoesntHave('classroom')->get();
         foreach ($performancesWithoutClassroom as $perf) {
             $perf->classroom()->create([
-                'name'   => 'Classroom ' . $perf->title,
+                'name'   => 'Pusat Latihan ' . $perf->title,
                 'status' => 'Aktif',
             ]);
         }
@@ -50,13 +55,13 @@ class ClassroomController extends Controller
         // Self-healing for Jobs: auto-create Classroom for any external Performance that doesn't have it
         $jobsWithoutClassroom = Performance::whereNull('program_id')->whereDoesntHave('classroom')->get();
         foreach ($jobsWithoutClassroom as $job) {
-            $classroom = $job->classroom()->create([
-                'name'   => 'Classroom ' . $job->title,
+            $job->classroom()->create([
+                'name'   => 'Pusat Latihan ' . $job->title,
                 'status' => 'Aktif',
             ]);
         }
 
-        $classrooms = Classroom::with(['performance.program', 'members', 'attendances'])->latest()->get();
+        $classrooms = Classroom::with(['performance.program', 'members', 'attendances', 'songTargets'])->latest()->get();
         $performances = Performance::with('program')->latest()->get();
         return view('pengurus.classrooms.index', compact('classrooms', 'performances'));
     }
@@ -69,10 +74,11 @@ class ClassroomController extends Controller
         $performance = Performance::with([
             'classroom.members.voiceClassification',
             'classroom.materials',
-            'classroom.attendances',
+            'classroom.attendances.details',
             'classroom.announcements.creator',
             'classroom.schedules',
             'classroom.songTargets',
+            'classroom.trainer',
         ])->where('program_id', $programId)->findOrFail($performanceId);
 
         $classroom = $performance->classroom;
@@ -81,18 +87,19 @@ class ClassroomController extends Controller
         if (!$classroom) {
             $classroom = Classroom::create([
                 'performance_id' => $performanceId,
-                'name'           => 'Classroom ' . $performance->title,
+                'name'           => 'Pusat Latihan ' . $performance->title,
                 'status'         => 'Aktif',
             ]);
-            $classroom->load(['members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets']);
+            $classroom->load(['members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets', 'trainer']);
         }
 
         $allMembers = Member::where('status', 'Anggota Aktif')->with('voiceClassification')->get();
         $allMaterials = Material::with('uploader')->orderBy('type')->orderBy('title')->get();
+        $allTrainers = \App\Models\Trainer::orderBy('name')->get();
         $classroomMemberIds = $classroom->members->pluck('id')->toArray();
 
         return view('pengurus.classrooms.show', compact(
-            'performance', 'classroom', 'allMembers', 'allMaterials', 'classroomMemberIds', 'programId'
+            'performance', 'classroom', 'allMembers', 'allMaterials', 'classroomMemberIds', 'programId', 'allTrainers'
         ));
     }
 
@@ -104,10 +111,11 @@ class ClassroomController extends Controller
         $job = Performance::whereNull('program_id')->with([
             'classroom.members.voiceClassification',
             'classroom.materials',
-            'classroom.attendances',
+            'classroom.attendances.details',
             'classroom.announcements.creator',
             'classroom.schedules',
             'classroom.songTargets',
+            'classroom.trainer',
         ])->findOrFail($jobId);
 
         $classroom = $job->classroom;
@@ -115,19 +123,40 @@ class ClassroomController extends Controller
         if (!$classroom) {
             $classroom = Classroom::create([
                 'performance_id' => $jobId,
-                'name'           => 'Classroom ' . $job->title,
+                'name'           => 'Pusat Latihan ' . $job->title,
                 'status'         => 'Aktif',
             ]);
-            $classroom->load(['members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets']);
+            $classroom->load(['members', 'materials', 'attendances', 'announcements', 'schedules', 'songTargets', 'trainer']);
         }
 
         $allMembers = Member::where('status', 'Anggota Aktif')->with('voiceClassification')->get();
         $allMaterials = Material::with('uploader')->orderBy('type')->orderBy('title')->get();
+        $allTrainers = \App\Models\Trainer::orderBy('name')->get();
         $classroomMemberIds = $classroom->members->pluck('id')->toArray();
 
         return view('pengurus.classrooms.show', compact(
-            'job', 'classroom', 'allMembers', 'allMaterials', 'classroomMemberIds'
+            'job', 'classroom', 'allMembers', 'allMaterials', 'classroomMemberIds', 'allTrainers'
         ));
+    }
+
+    public function updateTrainer(Request $request, $programId, $performanceId)
+    {
+        $classroom = $this->getCommonClassroom($programId, $performanceId, null);
+        $request->validate([
+            'trainer_id' => 'nullable|exists:trainers,id',
+        ]);
+        $classroom->update(['trainer_id' => $request->trainer_id]);
+        return back()->with('success', 'Pelatih berhasil diperbarui.');
+    }
+
+    public function updateJobTrainer(Request $request, $jobId)
+    {
+        $classroom = $this->getCommonClassroom(null, null, $jobId);
+        $request->validate([
+            'trainer_id' => 'nullable|exists:trainers,id',
+        ]);
+        $classroom->update(['trainer_id' => $request->trainer_id]);
+        return back()->with('success', 'Pelatih berhasil diperbarui.');
     }
 
     // Helper to get Classroom
@@ -136,13 +165,13 @@ class ClassroomController extends Controller
         if ($jobId) {
             $job = Performance::whereNull('program_id')->findOrFail($jobId);
             return $job->classroom ?? $job->classroom()->create([
-                'name'   => 'Classroom ' . $job->title,
+                'name'   => 'Pusat Latihan ' . $job->title,
                 'status' => 'Aktif',
             ]);
         }
         $performance = Performance::where('program_id', $programId)->findOrFail($performanceId);
         return $performance->classroom ?? $performance->classroom()->create([
-            'name'   => 'Classroom ' . $performance->title,
+            'name'   => 'Pusat Latihan ' . $performance->title,
             'status' => 'Aktif',
         ]);
     }
@@ -462,5 +491,23 @@ class ClassroomController extends Controller
         }
 
         return back()->with('success', 'Absensi berhasil disimpan.');
+    }
+
+    public function archive(Classroom $classroom)
+    {
+        if ($classroom->status === 'Aktif') {
+            $classroom->update(['status' => 'Terarsip']);
+            $msg = 'Pusat latihan berhasil diarsipkan.';
+        } else {
+            $classroom->update(['status' => 'Aktif']);
+            $msg = 'Pusat latihan berhasil diaktifkan kembali.';
+        }
+        return back()->with('success', $msg);
+    }
+
+    public function destroy(Classroom $classroom)
+    {
+        $classroom->delete();
+        return redirect()->route('pengurus.classrooms.index')->with('success', 'Pusat latihan berhasil dihapus.');
     }
 }

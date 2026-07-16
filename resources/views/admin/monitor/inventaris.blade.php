@@ -21,7 +21,6 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Kode Aset</th>
                         <th>Nama Barang</th>
                         <th>Jumlah Total</th>
                         <th>Kondisi</th>
@@ -32,7 +31,6 @@
                 <tbody>
                     @forelse($inventories as $i)
                     <tr>
-                        <td style="font-family: monospace; font-weight: 700;">{{ $i->code }}</td>
                         <td style="font-weight: 700; color: var(--text-primary);">{{ $i->name }}</td>
                         <td style="font-weight: bold; color: var(--accent-color);">{{ $i->total_qty }} unit</td>
                         <td>
@@ -58,7 +56,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-secondary py-4">Tidak ada data aset inventaris.</td>
+                        <td colspan="5" class="text-center text-secondary py-4">Tidak ada data aset inventaris.</td>
                     </tr>
                     @endforelse
                 </tbody>

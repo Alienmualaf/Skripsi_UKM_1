@@ -15,9 +15,6 @@ use App\Models\VoiceClassification;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Announcement;
-use App\Models\NotificationLog;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -31,22 +28,22 @@ class UKMAdminController extends Controller
     public function dashboard()
     {
         $totalMembers = Member::where('status', 'Anggota Aktif')->count();
-        $totalPrograms = Program::where('status', 'Berjalan')->count();
-        $totalPerformances = Performance::count();
+        $pendingRegistrationsCount = Member::where('status', 'Calon Anggota')->count();
+        $totalInventories = Inventory::count();
+        $totalTrainers = Trainer::count();
         
-        $totalIncome = Finance::where('type', 'income')->sum('amount');
-        $totalExpense = Finance::where('type', 'expense')->sum('amount');
-        $netBalance = $totalIncome - $totalExpense;
+        $latestRegistrations = Member::where('status', 'Calon Anggota')
+            ->latest()
+            ->take(5)
+            ->get();
 
-        $upcomingAgendas = Performance::where('status', '!=', 'Selesai')
-            ->orderBy('performance_date', 'asc')
-            ->orderBy('performance_time', 'asc')
-            ->take(5)->get();
-
-        $announcements = Announcement::with('creator')->latest()->take(5)->get();
+        $latestGalleries = \App\Models\Gallery::latest()
+            ->take(4)
+            ->get();
 
         return view('ukm.dashboard', compact(
-            'totalMembers', 'totalPrograms', 'totalPerformances', 'netBalance', 'upcomingAgendas', 'announcements'
+            'totalMembers', 'pendingRegistrationsCount', 'totalInventories', 'totalTrainers', 
+            'latestRegistrations', 'latestGalleries'
         ));
     }
 
@@ -373,86 +370,6 @@ class UKMAdminController extends Controller
         }
     }
 
-    public function emailLogs()
-    {
-        $logs = NotificationLog::where('type', 'whatsapp')->latest()->paginate(15);
-        return view('ukm.email_logs.index', compact('logs'));
-    }
-
-    public function resendEmail($id)
-    {
-        $log = NotificationLog::findOrFail($id);
-
-        if ($log->type === 'email') {
-            try {
-                Mail::html($log->content, function($message) use ($log) {
-                    $message->to($log->recipient, $log->recipient_name)
-                            ->subject($log->subject);
-                });
-
-                $log->update([
-                    'status' => 'success',
-                    'error_message' => null,
-                ]);
-
-                return back()->with('success', 'Email berhasil dikirim ulang.');
-            } catch (\Exception $e) {
-                $log->update([
-                    'status' => 'failed',
-                    'error_message' => $e->getMessage(),
-                ]);
-
-                return back()->with('error', 'Gagal mengirim ulang email: ' . $e->getMessage());
-            }
-        } else {
-            // WhatsApp
-            $token = env('FONNTE_TOKEN');
-            $formattedPhone = $log->recipient;
-            if (substr($formattedPhone, 0, 1) === '0') {
-                $formattedPhone = '62' . substr($formattedPhone, 1);
-            }
-
-            try {
-                if (empty($token) || $token === 'your_token_here') {
-                    $log->update([
-                        'status' => 'success',
-                        'error_message' => 'Simulated success (FONNTE_TOKEN not configured in .env)',
-                    ]);
-                    return back()->with('success', 'WhatsApp (Simulated) berhasil dikirim ulang.');
-                }
-
-                $response = Http::withHeaders([
-                    'Authorization' => $token,
-                ])->post('https://api.fonnte.com/send', [
-                    'target' => $formattedPhone,
-                    'message' => $log->content,
-                ]);
-
-                $result = $response->json();
-                $status = (isset($result['status']) && $result['status'] == true) ? 'success' : 'failed';
-                $err = $status === 'failed' ? ($result['reason'] ?? 'Unknown Fonnte error') : null;
-
-                $log->update([
-                    'status' => $status,
-                    'error_message' => $err,
-                ]);
-
-                if ($status === 'success') {
-                    return back()->with('success', 'WhatsApp berhasil dikirim ulang.');
-                } else {
-                    return back()->with('error', 'Gagal mengirim ulang WhatsApp: ' . $err);
-                }
-            } catch (\Exception $e) {
-                $log->update([
-                    'status' => 'failed',
-                    'error_message' => $e->getMessage(),
-                ]);
-
-                return back()->with('error', 'Gagal mengirim ulang WhatsApp: ' . $e->getMessage());
-            }
-        }
-    }
-
     /**
      * Pelatih (Trainers) CRUD
      */
@@ -473,18 +390,8 @@ class UKMAdminController extends Controller
             'name' => 'required|string|max:255',
             'specialty' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'salary' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:Aktif,Nonaktif',
             'photo' => 'nullable|image|max:2048',
         ]);
-
-        if (!isset($data['salary'])) {
-            $data['salary'] = 0;
-        }
-        if (!isset($data['status'])) {
-            $data['status'] = 'Aktif';
-        }
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('trainers', 'public');
@@ -510,18 +417,8 @@ class UKMAdminController extends Controller
             'name' => 'required|string|max:255',
             'specialty' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'salary' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:Aktif,Nonaktif',
             'photo' => 'nullable|image|max:2048',
         ]);
-
-        if (!isset($data['salary'])) {
-            unset($data['salary']);
-        }
-        if (!isset($data['status'])) {
-            unset($data['status']);
-        }
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('trainers', 'public');

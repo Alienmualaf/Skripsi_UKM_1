@@ -4,6 +4,35 @@
 @section('header', 'Pusat Laporan')
 
 @section('content')
+<style>
+    @media (max-width: 768px) {
+        .table {
+            display: table !important;
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        thead, tbody, tr {
+            min-width: auto !important;
+            display: table-row-group !important;
+        }
+        thead {
+            display: table-header-group !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+        .table td, .table th {
+            padding: 0.5rem 0.35rem !important;
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+        .th-action-compact {
+            width: 65px !important;
+        }
+    }
+</style>
+
 <div style="margin-bottom:2rem;">
     <p style="color:var(--text-secondary);font-size:0.95rem;">Pilih jenis laporan yang ingin dibuat, dilihat, atau dicetak.</p>
 </div>
@@ -106,54 +135,57 @@
     <h4 style="font-weight:800;font-size:1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;">
         <i class="ph ph-list-checks" style="color:var(--accent-color);"></i> Status Laporan per Program Kerja
     </h4>
-    <table class="table" style="font-size:0.875rem;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Program Kerja</th>
-                <th>Divisi</th>
-                <th>Tipe</th>
-                <th>Tanggal</th>
-                <th>Status Laporan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($programs as $i => $prog)
-            <tr>
-                <td>{{ $i + 1 }}</td>
-                <td style="font-weight:600;">{{ $prog->name }}</td>
-                <td>{{ $prog->division }}</td>
-                <td>
-                    @php $colors = ['Internal'=>'#6366f1','Event'=>'#0ea5e9','Competition'=>'#f59e0b','Performance'=>'#10b981']; $c = $colors[$prog->activity_type] ?? '#888'; @endphp
-                    <span style="background:{{ $c }}22;color:{{ $c }};padding:0.2rem 0.6rem;border-radius:4px;font-weight:700;font-size:0.75rem;">{{ $prog->activity_type }}</span>
-                </td>
-                <td>{{ $prog->start_date ? date('d M Y', strtotime($prog->start_date)) : '-' }}</td>
-                <td>
-                    @if($prog->report)
-                        @if($prog->report->status === 'Approved')
-                            <span class="badge" style="background:rgba(16,185,129,0.1);color:var(--success-color);font-weight:700;">Disetujui</span>
-                        @elseif($prog->report->status === 'Submitted')
-                            <span class="badge" style="background:rgba(14,165,233,0.1);color:#0ea5e9;font-weight:700;">Diajukan</span>
+    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
+        <table class="table" style="font-size:0.875rem; vertical-align: middle;">
+            <thead>
+                <tr>
+                    <th class="hidden-mobile" style="width: 40px;">#</th>
+                    <th>Program Kerja</th>
+                    <th class="hidden-mobile">Divisi</th>
+                    <th class="hidden-mobile">Tipe</th>
+                    <th class="hidden-mobile">Tanggal</th>
+                    <th style="width: 100px;">Status</th>
+                    <th class="th-action-compact" style="width: 80px; text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($programs as $i => $prog)
+                <tr>
+                    <td class="hidden-mobile">{{ $i + 1 }}</td>
+                    <td style="font-weight:600; color: var(--text-primary);">{{ $prog->name }}</td>
+                    <td class="hidden-mobile">{{ $prog->division }}</td>
+                    <td class="hidden-mobile">
+                        @php $colors = ['Internal'=>'#6366f1','Event'=>'#0ea5e9','Competition'=>'#f59e0b','Performance'=>'#10b981']; $c = $colors[$prog->activity_type] ?? '#888'; @endphp
+                        <span style="background:{{ $c }}22;color:{{ $c }};padding:0.2rem 0.6rem;border-radius:4px;font-weight:700;font-size:0.75rem;">{{ $prog->activity_type }}</span>
+                    </td>
+                    <td class="hidden-mobile">{{ $prog->start_date ? date('d M Y', strtotime($prog->start_date)) : '-' }}</td>
+                    <td>
+                        @if($prog->report)
+                            @if($prog->report->status === 'Approved')
+                                <span class="badge" style="background:rgba(16,185,129,0.1);color:var(--success-color);font-weight:700;">Disetujui</span>
+                            @elseif($prog->report->status === 'Submitted')
+                                <span class="badge" style="background:rgba(14,165,233,0.1);color:#0ea5e9;font-weight:700;">Diajukan</span>
+                            @else
+                                <span class="badge" style="background:rgba(245,158,11,0.1);color:#f59e0b;font-weight:700;">Draft</span>
+                            @endif
                         @else
-                            <span class="badge" style="background:rgba(245,158,11,0.1);color:#f59e0b;font-weight:700;">Draft</span>
+                            <span class="badge" style="background:var(--border-color);color:var(--text-secondary);">Belum ada</span>
                         @endif
-                    @else
-                        <span class="badge" style="background:var(--border-color);color:var(--text-muted);">Belum ada</span>
-                    @endif
-                </td>
-                <td>
-                    <a href="{{ route('ukm.reports.kegiatan', $prog->id) }}" class="btn" style="padding:0.3rem 0.75rem;font-size:0.75rem;font-weight:700;border-radius:6px;text-decoration:none;background:rgba(59,130,246,0.1);color:#3b82f6;">
-                        <i class="ph ph-eye"></i> {{ $prog->report ? 'Lihat' : 'Buat' }}
-                    </a>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">Belum ada Program Kerja.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ route('ukm.reports.kegiatan', $prog->id) }}" class="btn" style="padding:0.3rem 0.5rem;font-size:0.75rem;font-weight:700;border-radius:6px;text-decoration:none;background:rgba(59,130,246,0.1);color:#3b82f6;display:inline-flex;align-items:center;justify-content:center;" title="{{ $prog->report ? 'Lihat' : 'Buat' }}">
+                            <i class="ph ph-eye"></i><span class="hidden-mobile"> {{ $prog->report ? 'Lihat' : 'Buat' }}</span>
+                        </a>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="7" class="text-center text-secondary py-4">Belum ada Program Kerja.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
+
 
 <script>
 function goToKegiatan() {

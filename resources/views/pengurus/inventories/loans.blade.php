@@ -43,9 +43,9 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 {{ isset($inventory) ? 'md:grid-cols-3' : '' }} gap-6">
+<div class="grid grid-cols-1 {{ (isset($inventory) && !auth()->user()->isAdminUkm()) ? 'md:grid-cols-3' : '' }} gap-6">
     <!-- Log Peminjaman List -->
-    <div class="card {{ isset($inventory) ? 'md:col-span-2' : '' }}" style="padding: 1.5rem; height: fit-content;">
+    <div class="card {{ (isset($inventory) && !auth()->user()->isAdminUkm()) ? 'md:col-span-2' : '' }}" style="padding: 1.5rem; height: fit-content;">
         <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-hand-holding-box" style="color: var(--accent-color);"></i> Log Aktivitas Peminjaman
         </h4>
@@ -126,7 +126,7 @@
     </div>
 
     <!-- Catat Peminjaman Baru Form (Only shown if specific inventory is loaded) -->
-    @if(isset($inventory))
+    @if(isset($inventory) && !auth()->user()->isAdminUkm())
     <div class="card md:col-span-1" style="padding: 1.5rem; height: fit-content;">
         <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-plus" style="color: var(--accent-color);"></i> Catat Peminjaman

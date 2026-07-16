@@ -34,5 +34,23 @@
             @yield('content')
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-password-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.className = 'ph ph-eye-slash';
+                    } else {
+                        input.type = 'password';
+                        icon.className = 'ph ph-eye';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

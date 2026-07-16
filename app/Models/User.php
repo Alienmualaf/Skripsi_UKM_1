@@ -23,7 +23,6 @@ class User extends Authenticatable
         'password',
         'role_id',
         'status',
-        'division', // Divisi pengurus: Sekretaris, Bendahara, Divisi Latihan, Divisi Humas, Divisi Perlengkapan
     ];
 
     /**

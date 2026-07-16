@@ -4,6 +4,20 @@
 @section('header', 'Kelola Pengguna PSUP')
 
 @section('content')
+<style>
+@media (max-width: 768px) {
+  .table-responsive-compact th:nth-child(3),
+  .table-responsive-compact td:nth-child(3),
+  .table-responsive-compact th:nth-child(4),
+  .table-responsive-compact td:nth-child(4),
+  .table-responsive-compact th:nth-child(5),
+  .table-responsive-compact td:nth-child(5),
+  .table-responsive-compact th:nth-child(6),
+  .table-responsive-compact td:nth-child(6) {
+    display: none !important;
+  }
+}
+</style>
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Manajemen Pengguna</h3>
@@ -19,10 +33,12 @@
     <form action="{{ route('admin.users.index') }}" method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; justify-content: space-between;">
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; flex: 1;">
             <!-- Search Input -->
-            <div style="position: relative; min-width: 280px; flex: 1;">
+            <div style="min-width: 280px; flex: 1;">
                 <label class="form-label" style="font-weight: 700; font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cari Pengguna</label>
-                <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: calc(50% + 0.4rem); transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem;"></i>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, username..." class="form-control" style="padding-left: 2.25rem; height: 2.5rem; font-size: 0.875rem;">
+                <div style="position: relative;">
+                    <i class="ph ph-magnifying-glass" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1rem; pointer-events: none;"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, username..." class="form-control" style="padding-left: 2.25rem !important; height: 2.5rem; font-size: 0.875rem;">
+                </div>
             </div>
             
             <!-- Role Filter -->
@@ -69,7 +85,7 @@
     </div>
 
     <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-        <table class="table">
+        <table class="table table-responsive-compact">
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -85,10 +101,33 @@
                 @forelse($users as $user)
                 <tr>
                     <td style="font-weight: 700; color: var(--text-primary);">
-                        {{ $user->name }}
-                        @if(auth()->id() == $user->id)
-                            <span style="font-size: 0.7rem; background: var(--accent-light); color: var(--accent-color); padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Saya</span>
-                        @endif
+                        <div style="display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;">
+                            {{ $user->name }}
+                            @if(auth()->id() == $user->id)
+                                <span style="font-size: 0.7rem; background: var(--accent-light); color: var(--accent-color); padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Saya</span>
+                            @endif
+                        </div>
+                        
+                        <!-- Mobile-only badges to keep table compact -->
+                        <div class="show-mobile-inline" style="gap: 0.35rem; margin-top: 0.35rem; flex-wrap: wrap;">
+                            @if($user->isSuperAdmin())
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">{{ $user->role->display_name }}</span>
+                            @elseif($user->isAdminUkm())
+                                <span class="badge" style="background: #fff8e6; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); font-weight: 700;">{{ $user->role->display_name }}</span>
+                            @elseif($user->isPengurus())
+                                <span class="badge" style="background: var(--accent-light); color: var(--accent-color); border: 1px solid rgba(30, 64, 175, 0.15); font-weight: 700;">{{ $user->role->display_name }}</span>
+                            @else
+                                <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700;">{{ $user->role ? $user->role->display_name : 'Anggota' }}</span>
+                            @endif
+
+                            @if($user->status === 'active')
+                                <span class="badge" style="background: var(--success-light); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">Aktif</span>
+                            @elseif($user->status === 'suspended')
+                                <span class="badge" style="background: var(--danger-light); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 700;">Suspended</span>
+                            @else
+                                <span class="badge" style="background: #f1f5f9; color: var(--text-secondary); border: 1px solid var(--border-color); font-weight: 700;">Nonaktif</span>
+                            @endif
+                        </div>
                     </td>
                     <td>
                         <div style="font-weight: 600; color: var(--text-primary);">{{ explode('@', $user->email)[0] }}</div>

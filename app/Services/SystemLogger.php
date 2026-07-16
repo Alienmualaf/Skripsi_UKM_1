@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\ActivityLog;
 use App\Models\LoginHistory;
-use App\Models\AuditTrail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
@@ -59,22 +58,6 @@ class SystemLogger
                 'status' => 'Logout',
             ]);
         }
-    }
-
-    public static function logAudit(string $modelName, string $action, ?array $oldValues = null, ?array $newValues = null)
-    {
-        $user = Auth::user();
-        $username = $user ? $user->name : 'System/Guest';
-        $userId = $user ? $user->id : null;
-
-        AuditTrail::create([
-            'user_id' => $userId,
-            'username' => $username,
-            'model_name' => $modelName,
-            'action' => $action,
-            'old_values' => $oldValues,
-            'new_values' => $newValues,
-        ]);
     }
 
     private static function getDevice(): string

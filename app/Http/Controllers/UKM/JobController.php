@@ -17,8 +17,7 @@ class JobController extends Controller
 
     public function create()
     {
-        $members = Member::where('status', 'Anggota Aktif')->get();
-        return view('pengurus.jobs.create', compact('members'));
+        return redirect()->route('pengurus.programs.create');
     }
 
     public function store(Request $request)
@@ -28,6 +27,7 @@ class JobController extends Controller
             'description' => 'nullable|string',
             'location' => 'required|string|max:255',
             'date' => 'required|date',
+            'performance_time' => 'required|string',
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'exists:members,id',
             'show_on_landing' => 'nullable|boolean',
@@ -39,10 +39,7 @@ class JobController extends Controller
             'description' => $data['description'] ?? null,
             'venue' => $data['location'],
             'performance_date' => $data['date'],
-            'institution' => 'Universitas Pancasila',
-            'performance_time' => '17:00:00',
-            'fee' => 0.00,
-            'pic' => auth()->user()->name,
+            'performance_time' => $data['performance_time'],
             'status' => 'Persiapan',
             'show_on_landing' => $request->has('show_on_landing'),
         ]);
@@ -80,6 +77,7 @@ class JobController extends Controller
             'description' => 'nullable|string',
             'location' => 'required|string|max:255',
             'date' => 'required|date',
+            'performance_time' => 'required|string',
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'exists:members,id',
             'show_on_landing' => 'nullable|boolean',
@@ -90,6 +88,7 @@ class JobController extends Controller
             'description' => $data['description'] ?? null,
             'venue' => $data['location'],
             'performance_date' => $data['date'],
+            'performance_time' => $data['performance_time'],
             'show_on_landing' => $request->has('show_on_landing'),
         ]);
 

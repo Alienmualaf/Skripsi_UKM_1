@@ -395,7 +395,6 @@
             <thead>
                 <tr>
                     <th style="width: 50px;">No</th>
-                    <th style="width: 120px;">Kode Barang</th>
                     <th>Nama Aset / Inventaris</th>
                     <th>Kategori</th>
                     <th style="width: 100px;">Jumlah</th>
@@ -407,7 +406,6 @@
                 @forelse($data as $idx => $item)
                 <tr>
                     <td class="text-center">{{ $idx + 1 }}</td>
-                    <td class="text-center">{{ $item->code }}</td>
                     <td class="font-bold">{{ $item->name }}</td>
                     <td>{{ $item->category }}</td>
                     <td class="text-center">{{ $item->quantity }} pcs</td>
@@ -421,7 +419,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center">Tidak ada data barang inventaris.</td>
+                    <td colspan="6" class="text-center">Tidak ada data barang inventaris.</td>
                 </tr>
                 @endforelse
             </tbody>
