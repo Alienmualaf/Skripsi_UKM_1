@@ -74,8 +74,8 @@ class DashboardController extends Controller
         $totalExpense = Finance::where('type', 'expense')->sum('amount');
 
         // Recent Logs Widgets
-        $recentActivities = ActivityLog::latest()->take(6)->get();
-        $recentLogins = LoginHistory::latest()->take(6)->get();
+        $recentActivities = ActivityLog::where('created_at', '>=', now()->subDays(7))->latest()->take(6)->get();
+        $recentLogins = LoginHistory::where('created_at', '>=', now()->subDays(7))->latest()->take(6)->get();
 
         // System statistics count mapping
         $systemUsage = [
@@ -343,11 +343,13 @@ class DashboardController extends Controller
     public function activityLogs(Request $request)
     {
         $search = $request->input('search');
-        $query = ActivityLog::latest();
+        $query = ActivityLog::where('created_at', '>=', now()->subDays(7))->latest();
         if ($search) {
-            $query->where('activity', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('activity', 'like', "%{$search}%")
                   ->orWhere('username', 'like', "%{$search}%")
                   ->orWhere('module', 'like', "%{$search}%");
+            });
         }
         $logs = $query->paginate(20)->withQueryString();
         return view('admin.logs', compact('logs', 'search'));
@@ -356,11 +358,13 @@ class DashboardController extends Controller
     public function loginHistory(Request $request)
     {
         $search = $request->input('search');
-        $query = LoginHistory::latest();
+        $query = LoginHistory::where('created_at', '>=', now()->subDays(7))->latest();
         if ($search) {
-            $query->where('username', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('username', 'like', "%{$search}%")
                   ->orWhere('ip_address', 'like', "%{$search}%")
                   ->orWhere('status', 'like', "%{$search}%");
+            });
         }
         $logs = $query->paginate(20)->withQueryString();
         return view('admin.login-history', compact('logs', 'search'));

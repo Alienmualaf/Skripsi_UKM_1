@@ -9,6 +9,7 @@ class Trainer extends Model
     protected $fillable = [
         'name',
         'specialty',
+        'description',
         'phone',
         'photo',
     ];

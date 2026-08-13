@@ -11,13 +11,88 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* Custom transitions and glow effects */
         .premium-shadow {
             box-shadow: 0 20px 50px -12px rgba(10, 11, 16, 0.5), 0 0 40px 0 rgba(197, 160, 89, 0.05);
         }
         .premium-input:focus {
             box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15);
         }
+
+        /* ─── Mobile Layout ────────────────────────────────── */
+        @media (max-width: 640px) {
+
+            /* Reset body to simple column, no centering */
+            body.body-register {
+                display: block !important;
+                padding: 0 !important;
+                min-height: 100dvh;
+                background: #0a0b10 !important;
+            }
+
+            /* Hero image section at top */
+            .mob-hero {
+                display: flex !important;
+                height: 200px;
+                background-size: cover;
+                background-position: center top;
+                flex-direction: column;
+                justify-content: flex-end;
+                padding: 1.25rem 1.5rem 1.5rem;
+                position: relative;
+            }
+            .mob-hero::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to bottom, rgba(10,11,16,0.3) 0%, rgba(10,11,16,0.88) 100%);
+            }
+            .mob-hero-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            /* Card slides up over hero */
+            .register-card {
+                border-radius: 22px 22px 0 0 !important;
+                margin-top: -22px !important;
+                min-height: calc(100dvh - 178px);
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 1.75rem 1.25rem 4rem !important;
+                box-shadow: 0 -6px 24px rgba(0,0,0,0.25) !important;
+                border: none !important;
+                my-0 !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Desktop header hidden on mobile */
+            .desktop-header { display: none !important; }
+
+            /* Mobile compact header inside card */
+            .mob-card-header { display: flex !important; }
+
+            /* Footer: stack submit on top, kembali below */
+            .form-footer {
+                flex-direction: column-reverse !important;
+                gap: 0.65rem !important;
+            }
+            .form-footer > a {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            .btn-submit-reg {
+                width: 100% !important;
+                justify-content: center !important;
+                padding-top: 0.9rem !important;
+                padding-bottom: 0.9rem !important;
+                font-size: 0.85rem !important;
+                letter-spacing: 0.12em !important;
+            }
+        }
+
+        /* Hidden by default (desktop) */
+        .mob-hero        { display: none; }
+        .mob-card-header { display: none; }
     </style>
     <script>
         tailwind.config = {
@@ -45,19 +120,26 @@
         }
     </script>
 </head>
-<body class="bg-navy-950 text-slate-800 font-sans antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
+<body class="body-register bg-navy-950 text-slate-800 font-sans antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
     
-    <!-- Smooth fixed background to prevent scrolling repaint stutter -->
+    <!-- Desktop: fixed background -->
     <div class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none" style="background-image: linear-gradient(rgba(10, 11, 16, 0.88), rgba(10, 11, 16, 0.95)), url('{{ asset('images/REMINISCENTIA.jpeg') }}'); transform: translate3d(0,0,0); will-change: transform;"></div>
-    
-    <!-- Premium Backdrop Elements -->
     <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-gold-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-navy-800/80 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-    <div class="max-w-2xl w-full space-y-8 bg-white p-8 sm:p-12 rounded-[28px] border border-slate-100 premium-shadow relative z-10 my-8 transition-all duration-300">
+    <!-- Mobile Hero (hidden on desktop via CSS class, no inline display) -->
+    <div class="mob-hero w-full" style="background-image: url('{{ asset('images/REMINISCENTIA.jpeg') }}');">
+        <div class="mob-hero-content">
+            <span style="font-size:0.65rem; font-weight:800; color:#c5a059; text-transform:uppercase; letter-spacing:0.18em; display:block; margin-bottom:0.3rem;">Paduan Suara Universitas Pancasila</span>
+            <h1 style="font-family:Georgia,serif; font-size:1.35rem; color:#fff; line-height:1.25; margin:0 0 0.25rem;">Formulir Pendaftaran</h1>
+            <p style="font-size:0.75rem; color:rgba(255,255,255,0.65); margin:0;">Lengkapi data diri Anda untuk bergabung</p>
+        </div>
+    </div>
+
+    <div class="register-card max-w-2xl w-full space-y-8 bg-white p-8 sm:p-12 rounded-[28px] border border-slate-100 premium-shadow relative z-10 my-8 transition-all duration-300">
         
-        <!-- Header -->
-        <div class="text-center">
+        <!-- Header (Desktop) -->
+        <div class="desktop-header text-center">
             <a href="/" class="inline-flex items-center gap-3 mb-6 group">
                 <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-gold-500 bg-white p-0.5 transition-all duration-300 group-hover:scale-105 shrink-0 shadow-md">
                     @if($profile->logo)
@@ -74,6 +156,23 @@
             <h2 class="font-serif font-normal text-3xl text-navy-900 tracking-tight">Formulir Pendaftaran</h2>
             <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">Bergabunglah dengan keluarga besar Paduan Suara Universitas Pancasila. Silakan lengkapi data diri Anda di bawah ini.</p>
             <div class="w-16 h-[2px] bg-gold-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <!-- Mobile compact header (shown only on mobile) -->
+        <div class="mob-card-header items-center gap-3 pb-4 border-b border-slate-100">
+            <a href="/" class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-gold-500 bg-white p-0.5 shadow">
+                    <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo" class="w-full h-full object-contain">
+                </div>
+            </a>
+            <div class="flex-1">
+                <p class="font-extrabold text-[10px] tracking-widest text-slate-400 uppercase">{{ $profile->alias }}</p>
+                <p class="font-serif text-lg text-navy-900 leading-tight">Formulir Pendaftaran</p>
+            </div>
+            <a href="/login" class="flex-shrink-0 text-[10px] font-extrabold text-gold-500 uppercase tracking-wider flex flex-col items-center gap-0.5">
+                <i class="ph ph-sign-in text-lg"></i>
+                <span>Masuk</span>
+            </a>
         </div>
 
         <!-- Alert Success -->
@@ -283,13 +382,13 @@
             </div>
 
             <!-- Footer Buttons -->
-            <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+            <div class="form-footer flex items-center justify-between pt-6 border-t border-slate-100">
                 <a href="/" class="text-xs font-bold text-slate-500 hover:text-navy-900 transition-colors uppercase tracking-wider flex items-center gap-1.5 font-sans">
                     <i class="ph ph-arrow-left"></i> Kembali
                 </a>
                 <button type="submit" 
-                        class="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-500 text-white font-extrabold text-[11px] tracking-widest uppercase px-8 py-3.5 rounded-xl shadow-lg hover:shadow-gold-500/20 transition-all duration-300 transform hover:-translate-y-0.5">
-                    Kirim Pendaftaran
+                        class="btn-submit-reg bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-500 text-white font-extrabold text-[11px] tracking-widest uppercase px-8 py-3.5 rounded-xl shadow-lg hover:shadow-gold-500/20 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <i class="ph ph-paper-plane-tilt"></i> Kirim Pendaftaran
                 </button>
             </div>
         </form>

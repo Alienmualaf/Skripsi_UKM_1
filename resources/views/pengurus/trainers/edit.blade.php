@@ -31,6 +31,12 @@
         </div>
 
         <div class="form-group mb-4">
+            <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Deskripsi Profil (Opsional)</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Contoh: Berdedikasi tinggi dalam membimbing teknik vokal..." style="padding: 0.65rem;">{{ old('description', $trainer->description) }}</textarea>
+            @error('description') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="form-group mb-4">
             <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">No. Telepon / WhatsApp</label>
             <input type="text" name="phone" class="form-control" value="{{ old('phone', $trainer->phone) }}" placeholder="Contoh: 08123456789" style="padding: 0.65rem;">
             @error('phone') <p style="color: var(--danger-color); font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</p> @enderror

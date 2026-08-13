@@ -1,0 +1,217 @@
+@startuml
+title Class Diagram - Sistem Informasi Manajemen UKM PSUP
+
+skinparam class {
+    BackgroundColor #F9F9F9
+    ArrowColor #333333
+    BorderColor #333333
+}
+
+' ================================
+' Core & Authentication
+' ================================
+class Role {
+    + id : bigint
+    + name : varchar
+}
+
+class User {
+    + id : bigint
+    + role_id : bigint
+    + name : varchar
+    + email : varchar
+    + password : varchar
+    + status : enum('active','inactive')
+}
+
+class VoiceClassification {
+    + id : bigint
+    + name : varchar
+    + description : text
+}
+
+class Member {
+    + id : bigint
+    + user_id : bigint
+    + voice_classification_id : bigint
+    + npm : varchar
+    + phone : varchar
+    + faculty : varchar
+    + major : varchar
+    + status : enum
+    + registration_reason : text
+}
+
+' ================================
+' Activities & Programs
+' ================================
+class Program {
+    + id : bigint
+    + name : varchar
+    + activity_type : enum
+    + start_date : date
+    + end_date : date
+    + division : varchar
+    + status : enum
+    + pic : varchar
+}
+
+class ProgramReport {
+    + id : bigint
+    + program_id : bigint
+    + title : varchar
+    + executive_summary : text
+    + realized_budget : decimal
+}
+
+class Performance {
+    + id : bigint
+    + program_id : bigint (nullable)
+    + title : varchar
+    + venue : varchar
+    + performance_date : date
+    + performance_time : time
+    + status : enum
+}
+
+class Trainer {
+    + id : bigint
+    + name : varchar
+    + specialty : varchar
+    + phone : varchar
+}
+
+' ================================
+' Classroom (Pusat Latihan)
+' ================================
+class Classroom {
+    + id : bigint
+    + performance_id : bigint
+    + name : varchar
+    + status : enum
+}
+
+class ClassroomSchedule {
+    + id : bigint
+    + classroom_id : bigint
+    + title : varchar
+    + date : date
+    + start_time : time
+    + end_time : time
+}
+
+class ClassroomSongTarget {
+    + id : bigint
+    + classroom_id : bigint
+    + song_title : varchar
+    + composer : varchar
+    + status : enum
+}
+
+class Attendance {
+    + id : bigint
+    + classroom_id : bigint
+    + title : varchar
+    + type : enum
+    + date : date
+}
+
+class AttendanceDetail {
+    + id : bigint
+    + attendance_id : bigint
+    + member_id : bigint
+    + status : enum('Hadir','Izin','Sakit','Alpha')
+    + notes : text
+}
+
+' ================================
+' Operations & Resources
+' ================================
+class DirectoryFolder {
+    + id : bigint
+    + parent_id : bigint (nullable)
+    + name : varchar
+}
+
+class Material {
+    + id : bigint
+    + folder_id : bigint (nullable)
+    + classroom_id : bigint (nullable)
+    + uploader_id : bigint
+    + title : varchar
+    + type : enum
+    + file_path : varchar
+}
+
+class Inventory {
+    + id : bigint
+    + program_id : bigint (nullable)
+    + name : varchar
+    + category : varchar
+    + quantity : int
+    + available_qty : int
+}
+
+class InventoryLoan {
+    + id : bigint
+    + inventory_id : bigint
+    + member_id : bigint
+    + quantity : int
+    + loan_date : date
+    + return_date : date
+    + status : enum
+}
+
+class Finance {
+    + id : bigint
+    + program_id : bigint (nullable)
+    + type : enum('income','expense')
+    + amount : decimal
+    + title : varchar
+    + transaction_date : date
+}
+
+class Announcement {
+    + id : bigint
+    + classroom_id : bigint
+    + user_id : bigint
+    + content : text
+}
+
+' ================================
+' Relationships
+' ================================
+Role "1" -- "0..*" User
+User "1" -- "0..1" Member
+VoiceClassification "1" -- "0..*" Member
+
+Program "1" -- "0..1" Performance : "has one"
+Program "1" -- "0..1" ProgramReport : "has one"
+
+Performance "1" -- "1" Classroom : "has one"
+
+Classroom "1" *-- "0..*" ClassroomSchedule
+Classroom "1" *-- "0..*" ClassroomSongTarget
+Classroom "1" *-- "0..*" Attendance
+Classroom "1" *-- "0..*" Announcement
+Classroom "1" *-- "0..*" Material
+
+Attendance "1" *-- "0..*" AttendanceDetail
+Member "1" -- "0..*" AttendanceDetail
+
+Classroom "0..*" -- "0..*" Member : "belongsToMany"
+Classroom "0..*" -- "0..*" Trainer : "belongsToMany"
+
+DirectoryFolder "0..1" -- "0..*" DirectoryFolder : "parent/child"
+DirectoryFolder "0..1" -- "0..*" Material
+
+Program "1" -- "0..*" Inventory
+Program "1" -- "0..*" Finance
+
+Inventory "1" *-- "0..*" InventoryLoan
+Member "1" -- "0..*" InventoryLoan
+
+User "1" -- "0..*" Material : "uploader"
+User "1" -- "0..*" Announcement : "creator"
+
+@enduml

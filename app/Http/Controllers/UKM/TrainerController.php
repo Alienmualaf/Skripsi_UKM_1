@@ -33,6 +33,7 @@ class TrainerController extends Controller
         $data = $request->validate([
             'name'      => 'required|string|max:255',
             'specialty' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'phone'     => 'nullable|string|max:20',
             'photo'     => 'nullable|image|max:2048',
         ]);
@@ -66,6 +67,7 @@ class TrainerController extends Controller
         $data = $request->validate([
             'name'      => 'required|string|max:255',
             'specialty' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'phone'     => 'nullable|string|max:20',
             'photo'     => 'nullable|image|max:2048',
         ]);

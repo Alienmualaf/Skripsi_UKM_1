@@ -101,15 +101,12 @@ class InventoryController extends Controller
             'loan_letter' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
             'loan_date' => 'required|date',
             'return_date' => 'required|date|after_or_equal:loan_date',
-            'quantity' => 'required|integer|min:1|max:'.$inventory->quantity,
+            'quantity' => 'required|integer|min:1|max:'.$inventory->available_qty,
             'condition_on_loan' => 'required|in:Baik,Rusak,Hilang',
-            'used_for' => 'required|in:Umum,Program Kerja',
-            'program_id' => 'required_if:used_for,Program Kerja|nullable|exists:programs,id',
         ]);
 
-        if ($data['used_for'] === 'Umum') {
-            $data['program_id'] = null;
-        }
+        $data['used_for'] = 'Umum';
+        $data['program_id'] = null;
 
         if ($request->hasFile('loan_letter')) {
             $path = $request->file('loan_letter')->store('loan_letters', 'public');
@@ -121,9 +118,6 @@ class InventoryController extends Controller
         $data['status'] = 'Dipinjam';
 
         InventoryLoan::create($data);
-
-        // Reduce inventory quantity
-        $inventory->decrement('quantity', $request->quantity);
 
         return back()->with('success', 'Peminjaman inventaris berhasil dicatat.');
     }
@@ -141,9 +135,6 @@ class InventoryController extends Controller
             'condition_on_return' => $request->condition_on_return,
             'status' => 'Dikembalikan',
         ]);
-
-        // Restock inventory quantity
-        $loan->inventory->increment('quantity', $loan->quantity);
 
         return back()->with('success', 'Pengembalian inventaris berhasil dicatat.');
     }

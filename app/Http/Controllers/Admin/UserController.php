@@ -14,6 +14,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $role   = $request->input('role');
+        $status = $request->input('status');
+
         $query = User::with('role');
 
         if ($search) {
@@ -21,6 +24,16 @@ class UserController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
+        }
+
+        if ($role) {
+            $query->whereHas('role', function($q) use ($role) {
+                $q->where('name', $role);
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
         }
 
         $users = $query->latest()->paginate(15)->withQueryString();

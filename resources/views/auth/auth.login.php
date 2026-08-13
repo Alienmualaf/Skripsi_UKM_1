@@ -9,9 +9,9 @@
         @csrf
 
         <div class="form-group">
-            <label class="form-label">Email/akun pengguna <span style="color: #ef4444">*</span></label>
-            <input type="email" name="email" placeholder="Masukkan email atau NPM/NIP Anda" class="form-control" required value="{{ old('email') }}">
-            @error('email')
+            <label class="form-label">Email / NPM <span style="color: #ef4444">*</span></label>
+            <input type="text" name="login" placeholder="Masukkan email atau NPM Anda" class="form-control" required value="{{ old('login') }}">
+            @error('login')
                 <div class="error-message">
                     <i class="ph ph-warning-circle"></i> {{ $message }}
                 </div>

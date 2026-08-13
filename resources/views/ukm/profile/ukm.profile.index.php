@@ -11,6 +11,16 @@
     </div>
 @endif
 
+@if($errors->any())
+    <div class="card mb-4 animate-fade-in" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
+        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <!-- Tab Navigation -->
 <div class="card mb-4" style="padding: 0.25rem 0.5rem;">
     <div class="tab-navigation-container" style="display: flex; gap: 0.5rem; overflow-x: auto; white-space: nowrap; padding-bottom: 0.25rem;">

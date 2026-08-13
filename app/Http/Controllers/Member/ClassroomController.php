@@ -28,33 +28,16 @@ class ClassroomController extends Controller
 
         if (!$member) {
             if ($user->isSuperAdmin()) {
-                $classrooms = Classroom::where(function($query) {
-                    $query->where('status', 'Aktif')
-                          ->orWhere(function($q) {
-                              $q->where('status', 'Terarsip')
-                                ->whereHas('performance', function($qp) {
-                                    $qp->whereNotNull('performance_date')
-                                      ->where('performance_date', '>=', date('Y-m-d'));
-                                });
-                          });
-                })->with(['performance.program', 'members', 'attendances', 'songTargets'])->get();
+                $classrooms = Classroom::where('status', 'Aktif')
+                    ->with(['performance.program', 'members', 'attendances', 'songTargets'])->get();
                 return view('member.classroom.index', compact('classrooms'));
             }
             return redirect()->route('member.dashboard')->with('error', 'Profil anggota tidak ditemukan.');
         }
 
-        // Ambil daftar classroom aktif yang diikuti oleh anggota, ATAU yang statusnya Terarsip tapi tanggal penampilannya belum lewat (diarsipkan pengurus secara manual)
+        // Ambil daftar classroom aktif yang diikuti oleh anggota
         $classrooms = $member->classrooms()
-            ->where(function($query) {
-                $query->where('classrooms.status', 'Aktif')
-                      ->orWhere(function($q) {
-                          $q->where('classrooms.status', 'Terarsip')
-                            ->whereHas('performance', function($qp) {
-                                $qp->whereNotNull('performance_date')
-                                  ->where('performance_date', '>=', date('Y-m-d'));
-                            });
-                      });
-            })
+            ->where('classrooms.status', 'Aktif')
             ->with(['performance.program', 'members', 'attendances', 'songTargets'])
             ->get();
 
@@ -131,7 +114,7 @@ class ClassroomController extends Controller
             }
         }
 
-        $persentase = $totalSessions > 0 ? (($hadirCount + $izinCount + $sakitCount) / $totalSessions) * 100 : 0;
+        $persentase = $totalSessions > 0 ? ($hadirCount / $totalSessions) * 100 : 0;
         $persentase = round($persentase, 2);
 
         return view('member.classroom.classroom', compact(

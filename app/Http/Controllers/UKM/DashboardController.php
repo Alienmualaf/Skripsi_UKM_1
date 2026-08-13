@@ -22,7 +22,7 @@ class DashboardController extends Controller
     public function dashboard()
     {
         $totalMembers = Member::where('status', 'Anggota Aktif')->count();
-        $totalPrograms = Program::where('status', 'Berjalan')->count();
+        $totalPrograms = Program::where('status', '!=', 'Selesai')->count();
         $totalPerformances = Performance::where('status', '!=', 'Selesai')->count();
         
         $totalIncome = Finance::where('type', 'income')->sum('amount');

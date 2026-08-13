@@ -77,10 +77,14 @@
                         <p class="text-slate-500 text-xs flex items-center justify-center sm:justify-start gap-1">
                             <i class="ph ph-envelope text-sm"></i> {{ $trainer->email ?? 'Tidak ada email' }}
                         </p>
-                        @if($trainer->phone)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $trainer->phone) }}" target="_blank" class="inline-flex text-xs text-navy-900 hover:text-gold-600 font-bold items-center gap-1.5 transition-colors mt-2">
-                                <i class="ph ph-whatsapp-logo text-base"></i> Hubungi WhatsApp
-                            </a>
+                        @if($trainer->description)
+                            <p class="text-slate-600 text-sm mt-3 leading-relaxed text-center sm:text-left">
+                                {{ $trainer->description }}
+                            </p>
+                        @else
+                            <p class="text-slate-600 text-sm mt-3 leading-relaxed text-center sm:text-left">
+                                Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.
+                            </p>
                         @endif
                     </div>
                 </div>

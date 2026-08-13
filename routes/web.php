@@ -190,7 +190,7 @@ Route::prefix('ukm')->middleware(['auth', 'prevent-back', 'role:admin_ukm,admini
 |--------------------------------------------------------------------------
 */
 Route::redirect('/pengurus', '/pengurus/dashboard');
-Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,admin_ukm,administrator', 'block_admin_ukm_create'])->name('pengurus.')->group(function () {
+Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,admin_ukm,administrator'])->name('pengurus.')->group(function () {
     Route::get('/', function() { return redirect()->route('pengurus.dashboard'); });
     Route::get('/dashboard', [UKMDashboard::class, 'dashboard'])->name('dashboard');
     Route::get('/agenda', [UKMDashboard::class, 'agenda'])->name('agenda');
@@ -231,6 +231,7 @@ Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,ad
     Route::post('programs/{program}/performance/{performance}/classroom/announcements', [ClassroomController::class, 'storeAnnouncement'])->name('programs.performance.classroom.announcements.store');
     Route::delete('programs/{program}/performance/{performance}/classroom/announcements/{announcement}', [ClassroomController::class, 'destroyAnnouncement'])->name('programs.performance.classroom.announcements.destroy');
     Route::post('programs/{program}/performance/{performance}/classroom/schedules', [ClassroomController::class, 'storeSchedule'])->name('programs.performance.classroom.schedules.store');
+    Route::put('programs/{program}/performance/{performance}/classroom/schedules/{schedule}', [ClassroomController::class, 'updateSchedule'])->name('programs.performance.classroom.schedules.update');
     Route::delete('programs/{program}/performance/{performance}/classroom/schedules/{schedule}', [ClassroomController::class, 'destroySchedule'])->name('programs.performance.classroom.schedules.destroy');
     Route::post('programs/{program}/performance/{performance}/classroom/songs', [ClassroomController::class, 'storeSongTarget'])->name('programs.performance.classroom.songs.store');
     Route::patch('programs/{program}/performance/{performance}/classroom/songs/{target}', [ClassroomController::class, 'updateSongTarget'])->name('programs.performance.classroom.songs.update');
@@ -239,6 +240,8 @@ Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,ad
     // Classroom Attendances
     Route::post('programs/{program}/performance/{performance}/classroom/attendances', [ClassroomController::class, 'storeAttendance'])->name('programs.performance.classroom.attendance.store');
     Route::get('programs/{program}/performance/{performance}/classroom/attendances/{attendance}', [ClassroomController::class, 'showAttendance'])->name('programs.performance.classroom.attendance');
+    Route::put('programs/{program}/performance/{performance}/classroom/attendances/{attendance}', [ClassroomController::class, 'updateAttendance'])->name('programs.performance.classroom.attendance.update');
+    Route::delete('programs/{program}/performance/{performance}/classroom/attendances/{attendance}', [ClassroomController::class, 'destroyAttendance'])->name('programs.performance.classroom.attendance.destroy');
     Route::post('programs/{program}/performance/{performance}/classroom/attendances/{attendance}/save', [ClassroomController::class, 'saveAttendance'])->name('programs.performance.classroom.attendance.save');
     Route::post('programs/{program}/performance/{performance}/classroom/trainer', [ClassroomController::class, 'updateTrainer'])->name('programs.performance.classroom.trainer');
     
@@ -251,6 +254,7 @@ Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,ad
     Route::post('jobs/{job}/classroom/announcements', [ClassroomController::class, 'storeJobAnnouncement'])->name('jobs.classroom.announcements.store');
     Route::delete('jobs/{job}/classroom/announcements/{announcement}', [ClassroomController::class, 'destroyJobAnnouncement'])->name('jobs.classroom.announcements.destroy');
     Route::post('jobs/{job}/classroom/schedules', [ClassroomController::class, 'storeJobSchedule'])->name('jobs.classroom.schedules.store');
+    Route::put('jobs/{job}/classroom/schedules/{schedule}', [ClassroomController::class, 'updateJobSchedule'])->name('jobs.classroom.schedules.update');
     Route::delete('jobs/{job}/classroom/schedules/{schedule}', [ClassroomController::class, 'destroyJobSchedule'])->name('jobs.classroom.schedules.destroy');
     Route::post('jobs/{job}/classroom/songs', [ClassroomController::class, 'storeJobSongTarget'])->name('jobs.classroom.songs.store');
     Route::patch('jobs/{job}/classroom/songs/{target}', [ClassroomController::class, 'updateJobSongTarget'])->name('jobs.classroom.songs.update');
@@ -259,6 +263,8 @@ Route::prefix('pengurus')->middleware(['auth', 'prevent-back', 'role:pengurus,ad
     // Job Classroom Attendances
     Route::post('jobs/{job}/classroom/attendances', [ClassroomController::class, 'storeJobAttendance'])->name('jobs.classroom.attendance.store');
     Route::get('jobs/{job}/classroom/attendances/{attendance}', [ClassroomController::class, 'showJobAttendance'])->name('jobs.classroom.attendance');
+    Route::put('jobs/{job}/classroom/attendances/{attendance}', [ClassroomController::class, 'updateJobAttendance'])->name('jobs.classroom.attendance.update');
+    Route::delete('jobs/{job}/classroom/attendances/{attendance}', [ClassroomController::class, 'destroyJobAttendance'])->name('jobs.classroom.attendance.destroy');
     Route::post('jobs/{job}/classroom/attendances/{attendance}/save', [ClassroomController::class, 'saveJobAttendance'])->name('jobs.classroom.attendance.save');
     
     // Job & Penampilan (lama, tetap ada)

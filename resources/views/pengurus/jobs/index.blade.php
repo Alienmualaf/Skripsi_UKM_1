@@ -16,7 +16,7 @@
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Penugasan Konser & Penampilan</h3>
         <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5;">Kelola sesi performa luar/dalam kampus, tugas menyanyi, dan delegasi tim penyanyi PSUP.</p>
     </div>
-    @if(!auth()->user()->isAdminUkm())
+    @if(!false)
     <a href="{{ route('pengurus.programs.create') }}" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
         <i class="ph ph-plus"></i> Tambah Penugasan
     </a>

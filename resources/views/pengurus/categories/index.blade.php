@@ -32,7 +32,7 @@
         </h4>
 
         <!-- Form Tambah -->
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <form action="{{ route('pengurus.categories.letter.store') }}" method="POST" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.75rem;">
             @csrf
             <div>
@@ -75,7 +75,7 @@
         </h4>
 
         <!-- Form Tambah -->
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <form action="{{ route('pengurus.categories.inventory.store') }}" method="POST" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.75rem;">
             @csrf
             <div>

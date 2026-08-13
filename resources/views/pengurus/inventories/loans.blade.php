@@ -43,9 +43,9 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 {{ (isset($inventory) && !auth()->user()->isAdminUkm()) ? 'md:grid-cols-3' : '' }} gap-6">
+<div class="grid grid-cols-1 {{ (isset($inventory) && !false) ? 'md:grid-cols-3' : '' }} gap-6">
     <!-- Log Peminjaman List -->
-    <div class="card {{ (isset($inventory) && !auth()->user()->isAdminUkm()) ? 'md:col-span-2' : '' }}" style="padding: 1.5rem; height: fit-content;">
+    <div class="card {{ (isset($inventory) && !false) ? 'md:col-span-2' : '' }}" style="padding: 1.5rem; height: fit-content;">
         <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-hand-holding-box" style="color: var(--accent-color);"></i> Log Aktivitas Peminjaman
         </h4>
@@ -58,7 +58,6 @@
                         @if(!isset($inventory))
                             <th>Barang</th>
                         @endif
-                        <th>Digunakan Untuk</th>
                         <th>Jumlah</th>
                         <th>Tgl Pinjam</th>
                         <th>Tgl Kembali</th>
@@ -74,13 +73,6 @@
                         @if(!isset($inventory))
                             <td style="font-weight: 600; color: var(--text-primary);">{{ $loan->inventory->name ?? 'Barang Terhapus' }}</td>
                         @endif
-                        <td>
-                            @if($loan->used_for === 'Program Kerja')
-                                <span class="badge" style="background: rgba(30, 64, 175, 0.1); color: #1e40af; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px;">Proker: {{ $loan->program->name ?? '-' }}</span>
-                            @else
-                                <span class="badge" style="background: rgba(107, 114, 128, 0.1); color: #4b5563; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px;">Umum</span>
-                            @endif
-                        </td>
                         <td style="color: var(--text-secondary);">{{ $loan->quantity }} pcs</td>
                         <td style="color: var(--text-secondary);">{{ date('d-m-Y', strtotime($loan->loan_date)) }}</td>
                         <td style="color: var(--text-secondary);">{{ $loan->return_date ? date('d-m-Y', strtotime($loan->return_date)) : '-' }}</td>
@@ -126,7 +118,7 @@
     </div>
 
     <!-- Catat Peminjaman Baru Form (Only shown if specific inventory is loaded) -->
-    @if(isset($inventory) && !auth()->user()->isAdminUkm())
+    @if(isset($inventory) && !false)
     <div class="card md:col-span-1" style="padding: 1.5rem; height: fit-content;">
         <h4 style="margin: 0 0 1.25rem 0; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
             <i class="ph ph-plus" style="color: var(--accent-color);"></i> Catat Peminjaman
@@ -150,7 +142,7 @@
 
             <div class="form-group mb-3">
                 <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Jumlah Pinjam</label>
-                <input type="number" name="quantity" class="form-control" min="1" max="{{ $inventory->quantity }}" value="1" required style="padding: 0.5rem;">
+                <input type="number" name="quantity" class="form-control" min="1" max="{{ $inventory->available_qty }}" value="1" required style="padding: 0.5rem;">
             </div>
 
             <div class="form-group mb-3">
@@ -163,32 +155,12 @@
                 <input type="date" name="return_date" class="form-control" value="{{ date('Y-m-d', strtotime('+3 days')) }}" required style="padding: 0.5rem;">
             </div>
 
-            <div class="form-group mb-3">
+            <div class="form-group mb-4">
                 <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Kondisi Awal Barang</label>
                 <select name="condition_on_loan" class="form-control" required style="padding: 0.5rem; width: 100%;">
                     <option value="Baik">Baik</option>
                     <option value="Rusak">Rusak</option>
                     <option value="Hilang">Hilang</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Digunakan Untuk</label>
-                <select name="used_for" id="used_for" class="form-control" required style="padding: 0.5rem; width: 100%;">
-                    <option value="Umum" {{ old('used_for') === 'Umum' ? 'selected' : '' }}>Umum</option>
-                    <option value="Program Kerja" {{ old('used_for') === 'Program Kerja' ? 'selected' : '' }}>Program Kerja</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-4" id="program_select_wrapper" style="display: {{ old('used_for') === 'Program Kerja' ? 'block' : 'none' }};">
-                <label class="form-label" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Program Kerja</label>
-                <select name="program_id" class="form-control" style="padding: 0.5rem; width: 100%;">
-                    <option value="">-- Pilih Program Kerja --</option>
-                    @foreach($programs as $prog)
-                        <option value="{{ $prog->id }}" {{ old('program_id') == $prog->id ? 'selected' : '' }}>
-                            {{ $prog->name }}
-                        </option>
-                    @endforeach
                 </select>
             </div>
 
@@ -205,17 +177,5 @@
     @endif
 </div>
 
-<script>
-    if (document.getElementById('used_for')) {
-        document.getElementById('used_for').addEventListener('change', function() {
-            var wrapper = document.getElementById('program_select_wrapper');
-            if (this.value === 'Program Kerja') {
-                wrapper.style.display = 'block';
-            } else {
-                wrapper.style.display = 'none';
-                wrapper.querySelector('select').value = '';
-            }
-        });
-    }
-</script>
+
 @endsection

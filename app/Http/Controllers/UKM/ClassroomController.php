@@ -323,6 +323,40 @@ class ClassroomController extends Controller
         return back()->with('success', 'Jadwal latihan berhasil ditambahkan.');
     }
 
+    // --- Dynamic Update Schedule ---
+    public function updateSchedule(Request $request, $programId, $performanceId, $scheduleId)
+    {
+        return $this->processUpdateSchedule($request, $scheduleId);
+    }
+
+    public function updateJobSchedule(Request $request, $jobId, $scheduleId)
+    {
+        return $this->processUpdateSchedule($request, $scheduleId);
+    }
+
+    private function processUpdateSchedule(Request $request, $scheduleId)
+    {
+        $request->validate([
+            'title'      => 'required|string|max:255',
+            'date'       => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time'   => 'nullable|date_format:H:i',
+            'location'   => 'nullable|string|max:255',
+            'notes'      => 'nullable|string',
+        ]);
+
+        $schedule = ClassroomSchedule::findOrFail($scheduleId);
+        $schedule->update([
+            'title'        => $request->title,
+            'date'         => $request->date,
+            'start_time'   => $request->start_time,
+            'end_time'     => $request->end_time,
+            'location'     => $request->location,
+            'notes'        => $request->notes,
+        ]);
+        return back()->with('success', 'Jadwal latihan berhasil diperbarui.');
+    }
+
     // --- Dynamic Destroy Schedule ---
     public function destroySchedule($programId, $performanceId, $scheduleId)
     {
@@ -444,12 +478,59 @@ class ClassroomController extends Controller
         return redirect()->route($routeName, array_merge($routeParams, [$attendance->id]))->with('success', 'Sesi absensi dibuat. Silakan isi kehadiran.');
     }
 
+    // --- Dynamic Update Attendance ---
+    public function updateAttendance(Request $request, $programId, $performanceId, $attendanceId)
+    {
+        return $this->processUpdateAttendance($request, $attendanceId);
+    }
+
+    public function updateJobAttendance(Request $request, $jobId, $attendanceId)
+    {
+        return $this->processUpdateAttendance($request, $attendanceId);
+    }
+
+    private function processUpdateAttendance(Request $request, $attendanceId)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'type'  => 'required|in:Latihan,Gladi Resik,Penampilan',
+            'date'  => 'required|date',
+        ]);
+
+        $attendance = Attendance::findOrFail($attendanceId);
+        $attendance->update([
+            'title' => $request->title,
+            'type'  => $request->type,
+            'date'  => $request->date,
+        ]);
+        return back()->with('success', 'Sesi absensi berhasil diperbarui.');
+    }
+
+    // --- Dynamic Destroy Attendance ---
+    public function destroyAttendance($programId, $performanceId, $attendanceId)
+    {
+        return $this->processDestroyAttendance($attendanceId);
+    }
+
+    public function destroyJobAttendance($jobId, $attendanceId)
+    {
+        return $this->processDestroyAttendance($attendanceId);
+    }
+
+    private function processDestroyAttendance($attendanceId)
+    {
+        Attendance::findOrFail($attendanceId)->delete();
+        return back()->with('success', 'Sesi absensi berhasil dihapus.');
+    }
+
     // --- Dynamic Show Attendance ---
     public function showAttendance($programId, $performanceId, $attendanceId)
     {
         $performance = Performance::where('program_id', $programId)->findOrFail($performanceId);
         $classroom = $performance->classroom;
         $attendance = Attendance::with('details.member')->where('classroom_id', $classroom->id)->findOrFail($attendanceId);
+
+        $this->ensureAllMembersInAttendance($classroom, $attendance);
 
         return view('pengurus.classrooms.attendance', compact('performance', 'classroom', 'attendance', 'programId', 'performanceId'));
     }
@@ -460,7 +541,29 @@ class ClassroomController extends Controller
         $classroom = $job->classroom;
         $attendance = Attendance::with('details.member')->where('classroom_id', $classroom->id)->findOrFail($attendanceId);
 
+        $this->ensureAllMembersInAttendance($classroom, $attendance);
+
         return view('pengurus.classrooms.attendance', compact('job', 'classroom', 'attendance'));
+    }
+
+    private function ensureAllMembersInAttendance(Classroom $classroom, Attendance $attendance)
+    {
+        $existingDetailMemberIds = $attendance->details->pluck('member_id')->toArray();
+        $classroomMemberIds = $classroom->members->pluck('id')->toArray();
+
+        $missingMemberIds = array_diff($classroomMemberIds, $existingDetailMemberIds);
+        
+        if (!empty($missingMemberIds)) {
+            foreach ($missingMemberIds as $memberId) {
+                AttendanceDetail::create([
+                    'attendance_id' => $attendance->id,
+                    'member_id'     => $memberId,
+                    'status'        => 'Alpha',
+                ]);
+            }
+            // Reload the attendance details to show the newly added members
+            $attendance->load('details.member');
+        }
     }
 
     // --- Dynamic Save Attendance ---

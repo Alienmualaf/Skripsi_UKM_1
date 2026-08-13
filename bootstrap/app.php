@@ -25,4 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->call(function () {
+            \App\Models\ActivityLog::where('created_at', '<', now()->subDays(7))->delete();
+            \App\Models\LoginHistory::where('created_at', '<', now()->subDays(7))->delete();
+        })->daily();
     })->create();

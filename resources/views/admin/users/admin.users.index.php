@@ -5,19 +5,108 @@
 
 @section('content')
 <style>
-@media (max-width: 768px) {
-  .table-responsive-compact th:nth-child(3),
-  .table-responsive-compact td:nth-child(3),
-  .table-responsive-compact th:nth-child(4),
-  .table-responsive-compact td:nth-child(4),
-  .table-responsive-compact th:nth-child(5),
-  .table-responsive-compact td:nth-child(5),
-  .table-responsive-compact th:nth-child(6),
-  .table-responsive-compact td:nth-child(6) {
-    display: none !important;
-  }
-}
+    /* Responsive Table Override for Mobile View */
+    @media (max-width: 768px) {
+        /* Reduce card padding on mobile for extra space */
+        .card {
+            padding: 1rem !important;
+        }
+
+        /* Force table elements to display as block */
+        .responsive-table, 
+        .responsive-table thead, 
+        .responsive-table tbody, 
+        .responsive-table th, 
+        .responsive-table td, 
+        .responsive-table tr { 
+            display: block !important; 
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box;
+        }
+        
+        /* Hide traditional table headers */
+        .responsive-table thead { 
+            display: none !important;
+        }
+        
+        /* Format rows as cards */
+        .responsive-table tr { 
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem 1rem !important;
+            background: var(--surface-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .responsive-table tr:hover td {
+            background-color: transparent !important;
+            color: inherit !important;
+        }
+        
+        /* Style individual data cells */
+        .responsive-table td { 
+            text-align: right !important;
+            padding: 0.6rem 0 !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            position: relative;
+            font-size: 0.85rem !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 1rem;
+            min-height: 2.5rem;
+            white-space: normal !important;
+        }
+        
+        /* Remove bottom border from last cell in row card */
+        .responsive-table td:last-child {
+            border-bottom: none !important;
+            padding-bottom: 0.25rem !important;
+            margin-top: 0.5rem;
+        }
+        
+        /* Display data-label as inline label on mobile */
+        .responsive-table td::before { 
+            content: attr(data-label);
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-align: left;
+            flex-shrink: 0;
+            max-width: 40%;
+        }
+
+        /* Value styling inside td for proper wrap */
+        .responsive-table td > span,
+        .responsive-table td > div {
+            text-align: right !important;
+            word-break: break-word;
+            max-width: 60%;
+            white-space: normal !important;
+            display: inline-block;
+        }
+
+        /* Center action buttons container */
+        .responsive-table td .btn-container {
+            width: 100%;
+            max-width: 100% !important;
+            justify-content: flex-end !important;
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        /* Hide the old inline badges inside Nama cell since they are dedicated rows now */
+        .show-mobile-inline {
+            display: none !important;
+        }
+    }
 </style>
+
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem 0;">Manajemen Pengguna</h3>
@@ -84,8 +173,8 @@
         </span>
     </div>
 
-    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none;">
-        <table class="table table-responsive-compact">
+    <div class="table-wrapper" style="margin-bottom: 0; border: none; padding: 0; box-shadow: none; overflow: visible;">
+        <table class="table responsive-table">
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -100,15 +189,15 @@
             <tbody>
                 @forelse($users as $user)
                 <tr>
-                    <td style="font-weight: 700; color: var(--text-primary);">
+                    <td data-label="Nama" style="font-weight: 700; color: var(--text-primary);">
                         <div style="display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;">
-                            {{ $user->name }}
+                            <span>{{ $user->name }}</span>
                             @if(auth()->id() == $user->id)
-                                <span style="font-size: 0.7rem; background: var(--accent-light); color: var(--accent-color); padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Saya</span>
+                                <span style="font-size: 0.7rem; background: var(--accent-light); color: var(--accent-color); padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.25rem; display: inline-block;">Saya</span>
                             @endif
                         </div>
                         
-                        <!-- Mobile-only badges to keep table compact -->
+                        <!-- Mobile-only badges (Fallback/deprecated, hidden by CSS when table is in card layout) -->
                         <div class="show-mobile-inline" style="gap: 0.35rem; margin-top: 0.35rem; flex-wrap: wrap;">
                             @if($user->isSuperAdmin())
                                 <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">{{ $user->role->display_name }}</span>
@@ -129,11 +218,13 @@
                             @endif
                         </div>
                     </td>
-                    <td>
-                        <div style="font-weight: 600; color: var(--text-primary);">{{ explode('@', $user->email)[0] }}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ $user->email }}</div>
+                    <td data-label="Email / Username">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">{{ explode('@', $user->email)[0] }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ $user->email }}</div>
+                        </div>
                     </td>
-                    <td>
+                    <td data-label="Peran">
                         @if($user->isSuperAdmin())
                             <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">{{ $user->role->display_name }}</span>
                         @elseif($user->isAdminUkm())
@@ -144,22 +235,16 @@
                             <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700;">{{ $user->role ? $user->role->display_name : 'Anggota' }}</span>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Status">
                         @if($user->status === 'active')
-                            <span style="color: var(--success-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                Aktif
-                            </span>
+                            <span class="badge" style="background: var(--success-light); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 700;">Aktif</span>
                         @elseif($user->status === 'suspended')
-                            <span style="color: var(--danger-color); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                Suspended
-                            </span>
+                            <span class="badge" style="background: var(--danger-light); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 700;">Suspended</span>
                         @else
-                            <span style="color: var(--text-muted); font-weight: bold; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.25rem;">
-                                Nonaktif
-                            </span>
+                            <span class="badge" style="background: #f1f5f9; color: var(--text-secondary); border: 1px solid var(--border-color); font-weight: 700;">Nonaktif</span>
                         @endif
                     </td>
-                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">
+                    <td data-label="Login Terakhir">
                         @php
                             $lastLogin = $user->loginHistories()->where('status', 'Success')->latest('login_at')->first();
                         @endphp
@@ -169,11 +254,11 @@
                             <span style="color: var(--text-muted);">Belum pernah login</span>
                         @endif
                     </td>
-                    <td style="color: var(--text-secondary); font-size: 0.8125rem;">
-                        {{ $user->created_at ? $user->created_at->format('d M Y H:i') : '-' }}
+                    <td data-label="Dibuat Pada">
+                        <span>{{ $user->created_at ? $user->created_at->format('d M Y H:i') : '-' }}</span>
                     </td>
-                    <td>
-                        <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <td data-label="Aksi">
+                        <div class="btn-container">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit Akun"><i class="ph ph-pencil-simple"></i> Edit</a>
                             
                             <!-- Force Reset Password -->

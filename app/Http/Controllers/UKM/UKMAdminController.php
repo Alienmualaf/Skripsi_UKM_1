@@ -96,9 +96,9 @@ class UKMAdminController extends Controller
             'recruitment_stages' => 'nullable|string',
 
             // Documents
-            'company_profile_pdf' => 'nullable|file|mimes:pdf|max:10240',
-            'sponsorship_proposal_pdf' => 'nullable|file|mimes:pdf|max:10240',
-            'media_kit_pdf' => 'nullable|file|mimes:pdf|max:10240',
+            'company_profile_pdf' => 'nullable|file|mimes:pdf|max:51200',
+            'sponsorship_proposal_pdf' => 'nullable|file|mimes:pdf|max:51200',
+            'media_kit_pdf' => 'nullable|file|mimes:pdf|max:51200',
         ]);
 
         $data['recruitment_active'] = $request->has('recruitment_active') ? true : false;

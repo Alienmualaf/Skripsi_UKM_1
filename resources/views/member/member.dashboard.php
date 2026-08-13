@@ -156,7 +156,7 @@
                         </div>
                     </div>
                 @empty
-                    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin: 2rem 0;">Belum ada penugasan penampilan mendatang.</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin: 2rem 0;">Belum ada riwayat penampilan yang diikuti.</p>
                 @endforelse
             </div>
         </div>

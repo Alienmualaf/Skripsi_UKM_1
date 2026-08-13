@@ -49,7 +49,6 @@
 
 <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
     <div>
-        <a href="{{ $backUrl }}" style="display:inline-flex;align-items:center;gap:0.35rem;color:var(--accent-color);text-decoration:none;font-weight:600;font-size:0.875rem;margin-bottom:0.25rem;"><i class="ph ph-arrow-left"></i> Kembali</a>
         <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin:0;">Pusat Latihan — {{ $classroomTitle }}</h3>
         <p style="margin:0.25rem 0 0;color:var(--text-secondary);font-size:0.875rem;"><i class="ph ph-map-pin"></i> {{ $classroomVenue }} &nbsp;|&nbsp; <i class="ph ph-calendar"></i> {{ date('d M Y', strtotime($classroomDate)) }}</p>
     </div>
@@ -138,7 +137,7 @@
 
 <!-- TAB: Materi -->
 <div id="panel-materials" class="tab-panel" style="display:none;">
-    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
+    <div class="{{ false ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ false ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Materi Pusat Latihan ({{ $classroom->materials->count() }})</h5>
             <table class="table" style="font-size:0.875rem;">
@@ -164,7 +163,7 @@
                 </tbody>
             </table>
         </div>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 0.5rem;font-size:1rem;">Tambah dari Materi Master</h5>
             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.5;margin:0 0 1.25rem 0;">Pilih berkas dari repositori Materi Master atau unggah berkas baru langsung ke dalam perpustakaan materi.</p>
@@ -176,7 +175,7 @@
 
 <!-- TAB: Absensi -->
 <div id="panel-attendance" class="tab-panel" style="display:none;">
-    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
+    <div class="{{ false ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ false ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Sesi Absensi</h5>
             <table class="table" style="font-size:0.875rem;">
@@ -188,7 +187,16 @@
                         <td class="hidden-mobile"><span class="badge">{{ $att->type }}</span></td>
                         <td class="hidden-mobile">{{ date('d M Y', strtotime($att->date)) }}</td>
                         <td>
-                            <a href="{{ route($routePrefix . '.attendance', array_merge($routeParams, [$att->id])) }}" class="btn" style="padding:0.3rem 0.75rem;font-size:0.75rem;font-weight:700;background:var(--accent-light);color:var(--accent-color);border-radius:6px;text-decoration:none;"><i class="ph ph-list-checks"></i> Isi</a>
+                            <div style="display:flex;gap:0.35rem;align-items:center;">
+                                <a href="{{ route($routePrefix . '.attendance', array_merge($routeParams, [$att->id])) }}" class="btn" style="padding:0.3rem 0.6rem;font-size:0.75rem;font-weight:700;background:var(--accent-light);color:var(--accent-color);border-radius:6px;text-decoration:none;"><i class="ph ph-list-checks"></i> Isi</a>
+                                @if(!false)
+                                <button type="button" onclick="editAttendance({{ $att->id }}, {{ json_encode($att->title) }}, {{ json_encode($att->type) }}, {{ json_encode($att->date) }})" class="btn" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;background:var(--bg-color);border:1px solid var(--border-color);"><i class="ph ph-pencil-simple"></i></button>
+                                <form action="{{ route($routePrefix . '.attendance.destroy', array_merge($routeParams, [$att->id])) }}" method="POST" onsubmit="return confirm('Hapus sesi absensi ini beserta semua data kehadirannya?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;"><i class="ph ph-trash"></i></button>
+                                </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -197,7 +205,7 @@
                 </tbody>
             </table>
         </div>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Buat Sesi Absensi</h5>
             <form action="{{ route($routePrefix . '.attendance.store', $routeParams) }}" method="POST">
@@ -316,7 +324,7 @@
 
 <!-- TAB: Jadwal -->
 <div id="panel-schedules" class="tab-panel" style="display:none;">
-    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
+    <div class="{{ false ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ false ? '1fr' : '1fr 340px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Jadwal Latihan</h5>
             <table class="table" style="font-size:0.875rem;">
@@ -329,10 +337,15 @@
                         <td class="hidden-mobile">{{ substr($sch->start_time,0,5) }}{{ $sch->end_time ? ' – '.substr($sch->end_time,0,5) : '' }}</td>
                         <td class="hidden-mobile">{{ $sch->location ?? '-' }}</td>
                         <td>
-                            <form action="{{ route($routePrefix . '.schedules.destroy', array_merge($routeParams, [$sch->id])) }}" method="POST" onsubmit="return confirm('Hapus?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;"><i class="ph ph-trash"></i></button>
-                            </form>
+                            <div style="display:flex;gap:0.35rem;">
+                                @if(!false)
+                                <button type="button" onclick="editSchedule({{ $sch->id }}, {{ json_encode($sch->title) }}, {{ json_encode($sch->date) }}, {{ json_encode(substr($sch->start_time,0,5)) }}, {{ json_encode($sch->end_time ? substr($sch->end_time,0,5) : '') }}, {{ json_encode($sch->location) }})" class="btn" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;background:var(--bg-color);border:1px solid var(--border-color);"><i class="ph ph-pencil-simple"></i></button>
+                                <form action="{{ route($routePrefix . '.schedules.destroy', array_merge($routeParams, [$sch->id])) }}" method="POST" onsubmit="return confirm('Hapus?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.75rem;border-radius:6px;"><i class="ph ph-trash"></i></button>
+                                </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -341,7 +354,7 @@
                 </tbody>
             </table>
         </div>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Tambah Jadwal</h5>
             <form action="{{ route($routePrefix . '.schedules.store', $routeParams) }}" method="POST">
@@ -362,7 +375,7 @@
 
 <!-- TAB: Target Lagu -->
 <div id="panel-songs" class="tab-panel" style="display:none;">
-    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
+    <div class="{{ false ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ false ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Target Lagu</h5>
             <table class="table" style="font-size:0.875rem;">
@@ -396,7 +409,7 @@
                 </tbody>
             </table>
         </div>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Tambah Target Lagu</h5>
             <form action="{{ route($routePrefix . '.songs.store', $routeParams) }}" method="POST">
@@ -423,7 +436,7 @@
 
 <!-- TAB: Pengumuman -->
 <div id="panel-announcements" class="tab-panel" style="display:none;">
-    <div class="{{ auth()->user()->isAdminUkm() ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ auth()->user()->isAdminUkm() ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
+    <div class="{{ false ? '' : 'grid-sidebar-layout' }}" style="display:grid;grid-template-columns:{{ false ? '1fr' : '1fr 360px' }};gap:1.5rem;align-items:start;">
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Pengumuman Classroom</h5>
             @forelse($classroom->announcements->sortByDesc('created_at') as $ann)
@@ -444,7 +457,7 @@
             <p style="text-align:center;color:var(--text-muted);padding:2rem 0;">Belum ada pengumuman.</p>
             @endforelse
         </div>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <div class="card" style="padding:1.25rem;">
             <h5 style="font-weight:800;margin:0 0 1rem;font-size:1rem;">Buat Pengumuman</h5>
             <form action="{{ route($routePrefix . '.announcements.store', $routeParams) }}" method="POST">
@@ -519,6 +532,82 @@ function toggleTitleInput(manual) {
     }
 }
 
+function toggleEditTitleInput(manual) {
+    const selectContainer = document.getElementById('editTitleSelectContainer');
+    const inputContainer = document.getElementById('editTitleInputContainer');
+    const selectEl = document.getElementById('editAttendanceTitleSelect');
+    const inputEl = document.getElementById('editAttendanceTitleInput');
+    
+    if (manual) {
+        selectContainer.style.display = 'none';
+        selectEl.removeAttribute('name');
+        selectEl.removeAttribute('required');
+        
+        inputContainer.style.display = 'block';
+        inputEl.setAttribute('name', 'title');
+        inputEl.setAttribute('required', 'required');
+        inputEl.focus();
+    } else {
+        selectContainer.style.display = 'block';
+        selectEl.setAttribute('name', 'title');
+        selectEl.setAttribute('required', 'required');
+        
+        inputContainer.style.display = 'none';
+        inputEl.removeAttribute('name');
+        inputEl.removeAttribute('required');
+    }
+}
+
+function editAttendance(id, title, type, date) {
+    const modal = document.getElementById('editAttendanceModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    let selectEl = document.getElementById('editAttendanceTitleSelect');
+    let optionExists = Array.from(selectEl.options).some(opt => opt.value === title);
+    
+    if (optionExists && title !== "") {
+        toggleEditTitleInput(false);
+        selectEl.value = title;
+    } else {
+        toggleEditTitleInput(true);
+        document.getElementById('editAttendanceTitleInput').value = title;
+    }
+    document.getElementById('editAttendanceType').value = type;
+    document.getElementById('editAttendanceDate').value = date;
+    
+    // Set form action dynamically
+    const baseUrl = "{{ route($routePrefix . '.attendance.update', array_merge($routeParams, [999999999])) }}".replace('999999999', id);
+    document.getElementById('editAttendanceForm').action = baseUrl;
+}
+
+function cancelEditAttendance() {
+    const modal = document.getElementById('editAttendanceModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function editSchedule(id, title, date, start, end, location) {
+    const modal = document.getElementById('editScheduleModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    document.getElementById('editScheduleTitle').value = title;
+    document.getElementById('editScheduleDate').value = date;
+    document.getElementById('editScheduleStart').value = start;
+    document.getElementById('editScheduleEnd').value = end;
+    document.getElementById('editScheduleLocation').value = location;
+    
+    const baseUrl = "{{ route($routePrefix . '.schedules.update', array_merge($routeParams, [999999999])) }}".replace('999999999', id);
+    document.getElementById('editScheduleForm').action = baseUrl;
+}
+
+function cancelEditSchedule() {
+    const modal = document.getElementById('editScheduleModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const selectEl = document.getElementById('attendanceTitleSelect');
     const dateInput = document.querySelector('input[name="date"]');
@@ -533,6 +622,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    const editSelectEl = document.getElementById('editAttendanceTitleSelect');
+    const editDateInput = document.getElementById('editAttendanceDate');
+    if (editSelectEl) {
+        editSelectEl.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const dateVal = selectedOption.getAttribute('data-date');
+            if (dateVal) {
+                editDateInput.value = dateVal;
+            }
+        });
+    }
+    
     @if($classroom->schedules->isEmpty())
         toggleTitleInput(true);
         const backBtn = document.querySelector('#titleInputContainer button');
@@ -543,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function openMaterialsModal() {
     const modal = document.getElementById('materialsModal');
     const iframe = document.getElementById('materialsIframe');
-    iframe.src = "{{ route('pengurus.materials.index', ['classroom_id' => $classroom->id, 'iframe' => 1]) }}";
+    iframe.src = "{!! route('pengurus.materials.index', ['classroom_id' => $classroom->id, 'iframe' => 1]) !!}";
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -576,6 +677,89 @@ function closeMaterialsModal() {
         <div style="flex: 1; position: relative; background: var(--surface-color);">
             <iframe id="materialsIframe" style="width: 100%; height: 100%; border: none;" src=""></iframe>
         </div>
+    </div>
+</div>
+<!-- Modal Edit Attendance -->
+<div id="editAttendanceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 1.5rem;">
+    <div class="card" style="width: 100%; max-width: 450px; padding: 1.5rem; position: relative; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); background: var(--surface-color); border-radius: 12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+            <h5 style="font-weight:800;margin:0;font-size:1.1rem;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-pencil-simple" style="color:var(--accent-color);"></i> Edit Sesi Absensi</h5>
+            <button type="button" onclick="cancelEditAttendance()" style="background:none;border:none;cursor:pointer;font-size:1.25rem;color:var(--text-secondary);"><i class="ph ph-x"></i></button>
+        </div>
+        <form id="editAttendanceForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div style="margin-bottom:1rem;" id="editTitleSelectContainer">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Judul Sesi</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select name="title" id="editAttendanceTitleSelect" class="form-control" style="flex: 1; padding:0.6rem;">
+                        <option value="">-- Pilih dari Jadwal --</option>
+                        @foreach($classroom->schedules as $sch)
+                            <option value="{{ $sch->title }}" data-date="{{ $sch->date }}">{{ $sch->title }} ({{ date('d-m-Y', strtotime($sch->date)) }})</option>
+                        @endforeach
+                    </select>
+                    <button type="button" class="btn btn-secondary" onclick="toggleEditTitleInput(true)" style="padding: 0.5rem; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex-shrink: 0;" title="Ketik Manual"><i class="ph ph-keyboard"></i></button>
+                </div>
+            </div>
+
+            <div style="margin-bottom:1rem; display: none;" id="editTitleInputContainer">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Judul Sesi</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="editAttendanceTitleInput" class="form-control" placeholder="Latihan #1" style="flex: 1; padding:0.6rem;">
+                    <button type="button" class="btn btn-secondary" onclick="toggleEditTitleInput(false)" style="padding: 0.5rem; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex-shrink: 0;" title="Pilih dari Jadwal"><i class="ph ph-list-bullets"></i></button>
+                </div>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Jenis</label>
+                <select name="type" id="editAttendanceType" class="form-control" required style="padding:0.6rem;">
+                    @foreach(['Latihan','Gladi Resik','Penampilan'] as $t)
+                    <option value="{{ $t }}">{{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Tanggal</label>
+                <input type="date" name="date" id="editAttendanceDate" class="form-control" required style="padding:0.6rem;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;font-weight:700;border-radius:8px;"><i class="ph ph-floppy-disk"></i> Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edit Schedule -->
+<div id="editScheduleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 1.5rem;">
+    <div class="card" style="width: 100%; max-width: 450px; padding: 1.5rem; position: relative; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); background: var(--surface-color); border-radius: 12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+            <h5 style="font-weight:800;margin:0;font-size:1.1rem;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-pencil-simple" style="color:var(--accent-color);"></i> Edit Jadwal</h5>
+            <button type="button" onclick="cancelEditSchedule()" style="background:none;border:none;cursor:pointer;font-size:1.25rem;color:var(--text-secondary);"><i class="ph ph-x"></i></button>
+        </div>
+        <form id="editScheduleForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div style="margin-bottom:1rem;">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Nama Kegiatan</label>
+                <input type="text" name="title" id="editScheduleTitle" class="form-control" required style="padding:0.6rem;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Tanggal</label>
+                <input type="date" name="date" id="editScheduleDate" class="form-control" required style="padding:0.6rem;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;">
+                <div>
+                    <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Mulai</label>
+                    <input type="time" name="start_time" id="editScheduleStart" class="form-control" required style="padding:0.6rem;">
+                </div>
+                <div>
+                    <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Selesai</label>
+                    <input type="time" name="end_time" id="editScheduleEnd" class="form-control" style="padding:0.6rem;">
+                </div>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Lokasi</label>
+                <input type="text" name="location" id="editScheduleLocation" class="form-control" style="padding:0.6rem;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;font-weight:700;border-radius:8px;"><i class="ph ph-floppy-disk"></i> Simpan Perubahan</button>
+        </form>
     </div>
 </div>
 @endsection

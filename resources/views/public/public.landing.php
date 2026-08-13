@@ -63,34 +63,87 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .bg-gradient-navy {
-            background: linear-gradient(135deg, #0A1128 0%, #00072D 100%);
-        }
-        .bg-gradient-gold {
-            background: linear-gradient(135deg, #D4AF37 0%, #F3D279 100%);
-        }
+        .bg-gradient-navy { background: linear-gradient(135deg, #0A1128 0%, #00072D 100%); }
+        .bg-gradient-gold  { background: linear-gradient(135deg, #D4AF37 0%, #F3D279 100%); }
         .music-wave {
-            background-image: radial-gradient(circle at 100% 150%, rgba(212, 175, 55, 0.04) 24%, white 24%, white 28%, rgba(10, 17, 40, 0.01) 28%, rgba(10, 17, 40, 0.01) 36%, white 36%, white 40%, rgba(212, 175, 55, 0.01) 40%);
+            background-image: radial-gradient(circle at 100% 150%, rgba(212,175,55,0.04) 24%, white 24%, white 28%, rgba(10,17,40,0.01) 28%, rgba(10,17,40,0.01) 36%, white 36%, white 40%, rgba(212,175,55,0.01) 40%);
         }
-        .border-gold-glow {
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+        .border-gold-glow { border:1px solid rgba(212,175,55,.4); box-shadow:0 0 25px rgba(212,175,55,.15); }
+        .card-hover-navy:hover { transform:translateY(-6px); border-color:rgba(212,175,55,.3); box-shadow:0 12px 30px rgba(10,17,40,.06); }
+        .reveal-element { opacity:0; transform:translateY(20px); transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1); will-change:transform,opacity; }
+        .reveal-element.revealed { opacity:1; transform:translateY(0); }
+
+        /* ── Mobile Drawer ─────────────────────────────────── */
+        #mob-drawer {
+            position: fixed; inset: 0; z-index: 200;
+            display: flex; flex-direction: column;
+            background: #00072D;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
         }
-        .card-hover-navy:hover {
-            transform: translateY(-6px);
-            border-color: rgba(212, 175, 55, 0.3);
-            box-shadow: 0 12px 30px rgba(10, 17, 40, 0.06);
+        #mob-drawer.open { transform: translateX(0); }
+        #mob-drawer .drawer-link {
+            display: flex; align-items: center; gap: 0.85rem;
+            padding: 1rem 1.75rem;
+            font-size: 0.8rem; font-weight: 800;
+            color: rgba(255,255,255,0.75);
+            text-transform: uppercase; letter-spacing: 0.12em;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: color 0.2s, background 0.2s;
         }
-        /* Scroll Reveal Animation Styles */
-        .reveal-element {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform, opacity;
+        #mob-drawer .drawer-link:hover { color: #D4AF37; background: rgba(255,255,255,0.04); }
+
+        /* ── Mobile Bottom Nav ─────────────────────────────── */
+        #mob-bottom-nav {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(0,7,45,0.97);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(212,175,55,0.2);
+            padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
         }
-        .reveal-element.revealed {
-            opacity: 1;
-            transform: translateY(0);
+        #mob-bottom-nav a {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0.2rem; flex: 1;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.55rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            text-decoration: none; transition: color 0.2s;
+        }
+        #mob-bottom-nav a i { font-size: 1.35rem; }
+        #mob-bottom-nav a:hover, #mob-bottom-nav a.active { color: #D4AF37; }
+
+        /* ── Mobile Global Fixes ───────────────────────────── */
+        @media (max-width: 640px) {
+
+            #mob-bottom-nav { display: flex; }
+
+            /* Hero text tighter */
+            .hero-title { font-size: 2.4rem !important; line-height: 1.15 !important; }
+
+            /* Section headings: scale down the huge serif titles */
+            .mob-heading-xl  { font-size: 2rem   !important; line-height: 1.2 !important; }
+            .mob-heading-lg  { font-size: 1.6rem !important; line-height: 1.25 !important; }
+
+            /* Section padding: less vertical breathing room */
+            .mob-section { padding-top: 3.5rem !important; padding-bottom: 3.5rem !important; }
+
+            /* Stats bar */
+            .mob-stat-num { font-size: 2rem !important; }
+
+            /* About logo: smaller on mobile */
+            .mob-logo-box { width: 10rem !important; height: 10rem !important; }
+
+            /* Why-us overlapping box: reset absolute */
+            .mob-why-box {
+                position: static !important;
+                transform: none !important;
+                width: 100% !important;
+                margin-top: 1rem !important;
+            }
+
+            /* Hide heavy backdrop blobs on mobile for perf */
+            .mob-blob { display: none !important; }
         }
     </style>
 </head>
@@ -111,8 +164,8 @@
                         <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo PSUP" class="w-full h-full object-contain p-1">
                     @endif
                 </div>
-                <div class="hidden sm:block">
-                    <h1 class="font-serif text-xs md:text-sm tracking-widest text-white leading-tight uppercase font-normal">
+                <div class="block">
+                    <h1 class="font-serif text-[9px] sm:text-xs md:text-sm tracking-widest text-white leading-tight uppercase font-normal">
                         @php
                             $name = trim($profile->name);
                             $line1 = $name;
@@ -146,27 +199,79 @@
                 <a href="#downloads" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">Berkas</a>
             </div>
 
-            <!-- CTA Actions -->
-            <div class="flex items-center space-x-5">
+            <!-- CTA Actions + Hamburger -->
+            <div class="flex items-center space-x-3 lg:space-x-5">
                 @auth
-                    <a href="/login" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-6 py-2.5 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
+                    <a href="/login" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-5 py-2 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
                         Dashboard
                     </a>
                 @else
-                    <a href="/login" class="text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">
+                    <a href="/login" class="hidden sm:block text-[11px] font-bold text-white hover:text-gold-400 transition-colors uppercase tracking-[0.15em]">
                         Masuk
                     </a>
                     @if($profile->recruitment_active)
-                        <a href="/daftar" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-6 py-2.5 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
+                        <a href="/daftar" class="bg-gold-500 hover:bg-gold-400 text-navy-950 px-5 py-2 rounded-none text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-200">
                             Daftar
                         </a>
                     @endif
                 @endauth
+
+                <!-- Hamburger (mobile only) -->
+                <button id="mob-menu-btn" class="lg:hidden flex flex-col justify-center items-center gap-1.5 w-9 h-9 rounded-lg" aria-label="Menu">
+                    <span class="ham-line block w-5 h-0.5 bg-white transition-all duration-300 origin-center"></span>
+                    <span class="ham-line block w-5 h-0.5 bg-white transition-all duration-300"></span>
+                    <span class="ham-line block w-5 h-0.5 bg-white transition-all duration-300 origin-center"></span>
+                </button>
             </div>
 
         </nav>
     </header>
 </div>
+
+<!-- ── Mobile Drawer Menu ─────────────────────────── -->
+<div id="mob-drawer" aria-hidden="true">
+    <!-- Header drawer -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.75rem; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid rgba(212,175,55,0.4);background:#fff;padding:2px;">
+                <img src="{{ asset('images/logo_PSUP.jpeg') }}" alt="Logo" style="width:100%;height:100%;object-fit:contain;">
+            </div>
+            <span style="font-size:0.65rem;font-weight:800;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.18em;">{{ $profile->alias }}</span>
+        </div>
+        <button id="mob-close-btn" style="color:rgba(255,255,255,0.5);font-size:1.5rem;background:none;border:none;cursor:pointer;" aria-label="Tutup">
+            <i class="ph ph-x"></i>
+        </button>
+    </div>
+    <!-- Nav links -->
+    <nav style="flex:1;overflow-y:auto;padding:0.5rem 0;">
+        <a href="#about"       class="drawer-link" onclick="closeDrawer()"><i class="ph ph-info" style="color:#D4AF37;font-size:1.1rem;"></i> Tentang</a>
+        <a href="#why-us"      class="drawer-link" onclick="closeDrawer()"><i class="ph ph-sparkle" style="color:#D4AF37;font-size:1.1rem;"></i> Bergabung</a>
+        <a href="#history"     class="drawer-link" onclick="closeDrawer()"><i class="ph ph-clock-clockwise" style="color:#D4AF37;font-size:1.1rem;"></i> Sejarah</a>
+        <a href="#structure"   class="drawer-link" onclick="closeDrawer()"><i class="ph ph-tree-structure" style="color:#D4AF37;font-size:1.1rem;"></i> Struktur</a>
+        <a href="#trainers"    class="drawer-link" onclick="closeDrawer()"><i class="ph ph-microphone-stage" style="color:#D4AF37;font-size:1.1rem;"></i> Pelatih</a>
+        <a href="#programs"    class="drawer-link" onclick="closeDrawer()"><i class="ph ph-calendar-check" style="color:#D4AF37;font-size:1.1rem;"></i> Program Kerja</a>
+        <a href="#achievements" class="drawer-link" onclick="closeDrawer()"><i class="ph ph-trophy" style="color:#D4AF37;font-size:1.1rem;"></i> Prestasi</a>
+        <a href="#events"      class="drawer-link" onclick="closeDrawer()"><i class="ph ph-music-notes" style="color:#D4AF37;font-size:1.1rem;"></i> Kegiatan</a>
+        <a href="#gallery"     class="drawer-link" onclick="closeDrawer()"><i class="ph ph-images" style="color:#D4AF37;font-size:1.1rem;"></i> Galeri</a>
+        <a href="#downloads"   class="drawer-link" onclick="closeDrawer()"><i class="ph ph-file-arrow-down" style="color:#D4AF37;font-size:1.1rem;"></i> Berkas</a>
+    </nav>
+    <!-- Drawer footer -->
+    <div style="padding:1.5rem 1.75rem; border-top:1px solid rgba(255,255,255,0.08); display:flex; gap:0.75rem;">
+        <a href="/login" style="flex:1;text-align:center;padding:0.75rem;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;text-decoration:none;border-radius:8px;">Masuk</a>
+        @if($profile->recruitment_active)
+        <a href="/daftar" style="flex:1;text-align:center;padding:0.75rem;background:#D4AF37;color:#00072D;font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;text-decoration:none;border-radius:8px;">Daftar Anggota</a>
+        @endif
+    </div>
+</div>
+
+<!-- ── Mobile Bottom Navigation ───────────────────── -->
+<nav id="mob-bottom-nav">
+    <a href="#about">      <i class="ph ph-info"></i>       Tentang</a>
+    <a href="#history">    <i class="ph ph-clock-clockwise"></i> Sejarah</a>
+    <a href="#programs">   <i class="ph ph-calendar-check"></i> Proker</a>
+    <a href="#achievements"><i class="ph ph-trophy"></i>       Prestasi</a>
+    <a href="#events">     <i class="ph ph-music-notes"></i>    Kegiatan</a>
+</nav>
 
 <!-- Header Scroll Hide Script -->
 <script>
@@ -184,29 +289,85 @@
     });
 </script>
 
-<!-- 🌟 HERO SECTION (CLASSIC CHOIR STYLE) -->
-<section class="relative min-h-[100vh] flex items-center justify-end overflow-hidden bg-navy-900 pt-20">
-    <!-- Background Image (Clear, no global overlay) -->
-    <div class="absolute inset-0 z-0">
+<!-- 🌟 HERO SECTION -->
+<section class="relative overflow-hidden bg-navy-900">
+
+    <!-- ── MOBILE HERO: full-screen, teks center-bottom ── -->
+    <div class="lg:hidden relative" style="height: 100dvh; min-height: 480px;">
+        <!-- Foto full background -->
         @if($profile->banner)
-            <img src="{{ asset('storage/' . $profile->banner) }}" alt="Hero Banner" class="w-full h-full object-cover">
+            <img src="{{ asset('storage/' . $profile->banner) }}" alt="Hero Banner"
+                 class="absolute inset-0 w-full h-full object-cover"
+                 style="object-position: center 20%;">
         @else
-            <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Choir Group" class="w-full h-full object-cover">
+            <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Choir Group"
+                 class="absolute inset-0 w-full h-full object-cover"
+                 style="object-position: center 20%;">
         @endif
+
+        <!-- Gradient: gelap di bawah untuk readability teks, transparan di atas -->
+        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,7,45,0.25) 0%, rgba(0,7,45,0.2) 40%, rgba(0,7,45,0.85) 75%, rgba(0,7,45,0.97) 100%);"></div>
+
+        <!-- Teks: center-bottom, tidak memotong foto -->
+        <div class="absolute bottom-0 left-0 right-0 px-6 pb-10 text-center">
+            <!-- Superjudul kecil di atas -->
+            <span style="font-size: 0.58rem; font-weight: 800; color: rgba(212,175,55,0.7); text-transform: uppercase; letter-spacing: 0.3em; display: block; margin-bottom: 0.6rem;">UKM {{ $profile->alias ?? 'PSUP' }}</span>
+            <!-- Judul utama besar -->
+            <h1 class="font-serif text-white font-normal leading-[1.1]"
+                style="font-size: clamp(2.1rem, 8.5vw, 2.8rem); text-shadow: 0 2px 24px rgba(0,0,0,0.6);">
+                @if($line2)
+                    {{ $line1 }}<br>
+                    <span class="text-gold-400">{{ $line2 }}</span>
+                @else
+                    {{ $name }}
+                @endif
+            </h1>
+            <!-- Garis dekoratif gold -->
+            <div style="width: 48px; height: 2px; background: #D4AF37; margin: 0.9rem auto 0.7rem;"></div>
+            <p style="font-size: 0.7rem; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; line-height: 1.6;">
+                {{ $profile->tagline ?? 'Harmoni Vokal · Prestasi · Dedikasi' }}
+            </p>
+            <!-- Scroll hint -->
+            <div class="mt-5 flex justify-center">
+                <a href="#about" class="flex flex-col items-center gap-1 text-white/35 hover:text-gold-400 transition-colors">
+                    <span style="font-size:0.52rem; font-weight:700; text-transform:uppercase; letter-spacing:0.2em;">Jelajahi</span>
+                    <i class="ph ph-caret-down text-base animate-bounce"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <!-- Text block completely flushed to the right edge -->
-    <div class="relative z-10 w-full lg:w-3/5 xl:w-1/2 ml-auto">
-        
-        <!-- Dark semi-transparent box (No blur) with left border -->
-        <div class="bg-navy-950/85 border-l-[6px] border-gold-500 py-16 px-10 md:px-16 lg:py-24 w-full text-left reveal-element">
-            <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[4.5rem] text-white leading-[1.1] font-normal">
-                Paduan Suara<br>
-                <span class="text-gold-400">Universitas Pancasila</span>
-            </h1>
+    <!-- ── DESKTOP HERO: layout asli ── -->
+    <div class="hidden lg:flex relative min-h-[100vh] items-center justify-end pt-20">
+        <div class="absolute inset-0 z-0">
+            @if($profile->banner)
+                <img src="{{ asset('storage/' . $profile->banner) }}" alt="Hero Banner" class="w-full h-full object-cover">
+            @else
+                <img src="{{ asset('images/REMINISCENTIA.jpeg') }}" alt="Choir Group" class="w-full h-full object-cover">
+            @endif
         </div>
-        
+        <div class="relative z-10 w-3/5 xl:w-1/2 ml-auto">
+            <div class="bg-navy-950/85 border-l-[6px] border-gold-500 py-24 px-16 w-full text-left reveal-element">
+                <span class="text-gold-400 font-sans text-xs tracking-[0.3em] uppercase block mb-3 font-bold">
+                    UKM {{ $profile->alias ?? 'PSUP' }}
+                </span>
+                <h1 class="font-serif text-[4.5rem] text-white leading-[1.1] font-normal">
+                    @if($line2)
+                        {{ $line1 }}<br>
+                        <span class="text-gold-400">{{ $line2 }}</span>
+                    @else
+                        {{ $name }}
+                    @endif
+                </h1>
+                @if($profile->tagline)
+                    <p class="text-white/60 font-sans text-sm tracking-widest uppercase mt-4">
+                        {{ $profile->tagline }}
+                    </p>
+                @endif
+            </div>
+        </div>
     </div>
+
 </section>
 
 <!-- Stats underneath hero section -->
@@ -396,8 +557,8 @@
                         <p class="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{{ $history->description }}</p>
                         
                         @if($history->photo)
-                            <div class="max-w-md rounded-2xl overflow-hidden border border-slate-100 cursor-pointer" onclick="zoomStructure('{{ asset('storage/' . $history->photo) }}')">
-                                <img src="{{ asset('storage/' . $history->photo) }}" alt="{{ $history->title }}" class="w-full h-auto object-cover hover:scale-[1.01] transition-transform duration-300">
+                            <div class="max-w-sm aspect-[16/9] rounded-xl overflow-hidden border border-slate-100 cursor-pointer group mt-2 shadow-sm" onclick="zoomStructure('{{ asset('storage/' . $history->photo) }}')">
+                                <img src="{{ asset('storage/' . $history->photo) }}" alt="{{ $history->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                             </div>
                         @endif
                     </div>
@@ -481,7 +642,7 @@
                         {{ $trainer->name }}
                     </h4>
                     <p class="text-slate-500 text-sm sm:text-base leading-relaxed max-w-xl">
-                        Berdedikasi tinggi dalam membimbing teknik vokal, pembawaan lagu, serta musikalitas Paduan Suara Universitas Pancasila untuk terus mengukir berbagai prestasi gemilang di tingkat nasional maupun internasional.
+                        {{ $trainer->description ?? 'Berdedikasi tinggi dalam membimbing teknik vokal, pembawaan lagu, serta musikalitas Paduan Suara Universitas Pancasila untuk terus mengukir berbagai prestasi gemilang di tingkat nasional maupun internasional.' }}
                     </p>
                 </div>
             </div>
@@ -501,13 +662,8 @@
                         <h4 class="font-serif font-normal text-base text-navy-900 mb-1 leading-tight">{{ $trainer->name }}</h4>
                         <span class="inline-block px-3 py-1 rounded-full text-[9px] font-bold bg-gold-50 text-gold-700 border border-gold-100/50 mb-4">{{ $trainer->specialty }}</span>
                         <p class="text-slate-400 text-[11px] leading-relaxed mb-6">
-                            Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.
+                            {{ $trainer->description ?? 'Berdedikasi untuk melatih teknik vokal, harmoni, dan interpretasi musik anggota PSUP.' }}
                         </p>
-                        @if($trainer->phone)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $trainer->phone) }}" target="_blank" class="text-xs text-navy-900 hover:text-gold-600 font-bold flex items-center gap-1.5 transition-colors">
-                                <i class="ph ph-whatsapp-logo text-base"></i> Hubungi WhatsApp
-                            </a>
-                        @endif
                     </div>
                 @empty
                     <div class="w-full text-center py-16 text-slate-400 text-xs">
@@ -540,12 +696,14 @@
                                     Kompetisi
                                 @endif
                             </span>
+                            @if($program->status !== 'Perencanaan')
                             <span class="inline-block px-3 py-1 rounded-full text-[9px] font-black 
                                 @if($program->status == 'Selesai') bg-emerald-50 text-emerald-800 border border-emerald-100
                                 @elseif($program->status == 'Berjalan') bg-blue-50 text-blue-800 border border-blue-100
                                 @else bg-amber-50 text-amber-800 border border-amber-100 @endif">
                                 {{ $program->status }}
                             </span>
+                            @endif
                         </div>
                         
                         <h4 class="font-serif font-normal text-lg text-navy-900 mb-3 leading-tight">{{ $program->name }}</h4>
@@ -970,7 +1128,7 @@
 </section>
 
 <!-- 🌟 FOOTER -->
-<footer class="py-16 bg-navy-950 text-white border-t border-slate-900">
+<footer class="py-16 pb-24 sm:pb-16 bg-navy-950 text-white border-t border-slate-900">
     <div class="max-w-[1240px] mx-auto px-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-12">
             
@@ -1045,24 +1203,63 @@
 </div>
 
 <script>
+    /* ── Zoom Modal ─────────────────────────────── */
     function zoomStructure(src) {
         const modal = document.getElementById('zoomModal');
-        const img = document.getElementById('zoomedImage');
-        img.src = src;
+        document.getElementById('zoomedImage').src = src;
         modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.style.opacity = '1';
-        }, 10);
+        setTimeout(() => modal.style.opacity = '1', 10);
     }
-
     function closeZoom() {
         const modal = document.getElementById('zoomModal');
         modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
+        setTimeout(() => modal.style.display = 'none', 300);
     }
 
+    /* ── Hamburger / Drawer ─────────────────────── */
+    const drawer  = document.getElementById('mob-drawer');
+    const openBtn = document.getElementById('mob-menu-btn');
+    const closeBtn= document.getElementById('mob-close-btn');
+    const hamLines= document.querySelectorAll('.ham-line');
+
+    function openDrawer() {
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        // Animate to X
+        hamLines[0].style.transform = 'translateY(8px) rotate(45deg)';
+        hamLines[1].style.opacity   = '0';
+        hamLines[2].style.transform = 'translateY(-8px) rotate(-45deg)';
+    }
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        // Restore hamburger
+        hamLines[0].style.transform = '';
+        hamLines[1].style.opacity   = '1';
+        hamLines[2].style.transform = '';
+    }
+    openBtn.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    // Close on backdrop click (swipe out of drawer area)
+    drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
+
+    /* ── Bottom Nav Active Highlight ──────────────── */
+    const sections = ['about','history','programs','achievements','events'];
+    const navLinks = document.querySelectorAll('#mob-bottom-nav a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.getBoundingClientRect().top < window.innerHeight * 0.5) current = id;
+        });
+        navLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    }, { passive: true });
+
+    /* ── Scroll Reveal ──────────────────────────── */
     document.addEventListener('DOMContentLoaded', function() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -1071,15 +1268,11 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, {
-            threshold: 0.05,
-            rootMargin: '0px 0px -30px 0px'
-        });
+        }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
-        document.querySelectorAll('.reveal-element').forEach(el => {
-            observer.observe(el);
-        });
-    });</script>
+        document.querySelectorAll('.reveal-element').forEach(el => observer.observe(el));
+    });
+</script>
 
 </body>
 </html>

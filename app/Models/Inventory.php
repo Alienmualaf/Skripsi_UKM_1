@@ -30,12 +30,12 @@ class Inventory extends Model
 
     public function getAvailableQtyAttribute(): int
     {
-        return $this->quantity;
+        $borrowed = $this->loans()->where('status', 'Dipinjam')->sum('quantity');
+        return $this->quantity - $borrowed;
     }
 
     public function getTotalQtyAttribute(): int
     {
-        $borrowed = $this->loans()->where('status', 'Dipinjam')->sum('quantity');
-        return $this->quantity + $borrowed;
+        return $this->quantity;
     }
 }

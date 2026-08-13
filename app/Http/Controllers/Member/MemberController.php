@@ -49,24 +49,15 @@ class MemberController extends Controller
 
         $announcements = Announcement::with('creator')->latest()->take(3)->get();
 
-        // Jobs assigned to this member (where classroom is active)
+        // Total performances participated by this member (including archived classrooms/past events)
         $activeJobs = $member->jobs()
-            ->whereHas('classroom', function ($q) {
-                $q->where('status', 'Aktif');
-            })
-            ->where('performance_date', '>=', date('Y-m-d'))
-            ->orderBy('performance_date', 'asc')
+            ->orderBy('performance_date', 'desc')
             ->get();
 
         // Stats calculations
         $totalPresent = \App\Models\AttendanceDetail::where('member_id', $member->id)->where('status', 'Hadir')->count();
         $totalAbsent = \App\Models\AttendanceDetail::where('member_id', $member->id)->whereIn('status', ['Alpha', 'Alfa', 'Tidak Hadir'])->count();
-        $activeJobsCount = $member->jobs()
-            ->whereHas('classroom', function ($q) {
-                $q->where('status', 'Aktif');
-            })
-            ->where('performance_date', '>=', date('Y-m-d'))
-            ->count();
+        $activeJobsCount = $activeJobs->count();
         $activeClassroomsCount = count($classroomIds);
 
         $stats = [
@@ -230,7 +221,7 @@ class MemberController extends Controller
             return redirect('/')->with('error', 'Profil anggota tidak ditemukan.');
         }
 
-        $classroomIds = $member->classrooms()->where('classrooms.status', 'Aktif')->pluck('classrooms.id')->toArray();
+        $classroomIds = $member->classrooms()->pluck('classrooms.id')->toArray();
 
         // Fetch schedules of classrooms the member belongs to
         $classroomSchedules = \App\Models\ClassroomSchedule::whereIn('classroom_id', $classroomIds)
@@ -245,11 +236,8 @@ class MemberController extends Controller
                 return $schedule;
             });
 
-        // Fetch performances/jobs assigned to this member (where classroom is active)
+        // Fetch performances/jobs assigned to this member (including archived classrooms)
         $performances = $member->jobs()
-            ->whereHas('classroom', function ($q) {
-                $q->where('status', 'Aktif');
-            })
             ->where('performance_date', '>=', now()->toDateString())
             ->orderBy('performance_date', 'asc')
             ->get()

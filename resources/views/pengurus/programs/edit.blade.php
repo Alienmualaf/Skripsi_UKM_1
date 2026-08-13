@@ -55,8 +55,8 @@
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-            <div><label style="font-weight:700;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;display:block;">Tanggal Mulai <span style="color:red">*</span></label><input type="date" name="start_date" class="form-control" required value="{{ old('start_date', $program->start_date) }}"></div>
-            <div><label style="font-weight:700;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;display:block;">Tanggal Selesai <span style="color:red">*</span></label><input type="date" name="end_date" class="form-control" required value="{{ old('end_date', $program->end_date) }}"></div>
+            <div><label style="font-weight:700;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;display:block;">Tanggal Mulai <span style="color:red">*</span></label><input type="date" id="start_date" name="start_date" class="form-control" required value="{{ old('start_date', $program->start_date) }}"></div>
+            <div><label style="font-weight:700;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;display:block;">Tanggal Selesai <span style="color:red">*</span></label><input type="date" id="end_date" name="end_date" class="form-control" required value="{{ old('end_date', $program->end_date) }}"></div>
         </div>
 
         <div id="performance-time-container" style="display: none; margin-bottom: 1.25rem;">
@@ -130,6 +130,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     toggleEventFields();
+
+    // Client-side date validation
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+
+    if (startDateInput && endDateInput) {
+        if (startDateInput.value) {
+            endDateInput.min = startDateInput.value;
+        }
+        startDateInput.addEventListener('change', () => {
+            endDateInput.min = startDateInput.value;
+            if (endDateInput.value && endDateInput.value < startDateInput.value) {
+                endDateInput.value = startDateInput.value;
+            }
+        });
+    }
 });
 </script>
 @endsection

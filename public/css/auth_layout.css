@@ -254,20 +254,99 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                background: #0a0b10;
+                background-image: none;
+                padding: 0;
+                align-items: flex-start;
+            }
+
             .auth-card-container {
                 flex-direction: column;
-                max-width: 440px;
-                min-height: auto;
+                max-width: 100%;
+                width: 100%;
+                min-height: 100dvh;
+                height: auto;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+                background: transparent;
             }
+
+            /* Hero banner — image tetap tampil di mobile */
             .auth-image-side {
-                display: none;
+                display: flex !important;
+                flex: none;
+                height: 240px;
+                min-height: 240px;
+                padding: 2rem 1.75rem 1.5rem;
+                justify-content: flex-end;
+                border-radius: 0;
             }
+
+            .auth-image-content {
+                text-align: left;
+            }
+
+            .welcome-text {
+                font-size: 0.7rem;
+                letter-spacing: 0.18em;
+            }
+
+            .academic-system-title {
+                font-size: 1.4rem;
+            }
+
+            .academic-univ-title {
+                font-size: 1.15rem;
+            }
+
+            /* Form card melayang di atas hero */
             .auth-form-side {
-                padding: 3rem 2rem;
+                flex: 1;
+                padding: 2rem 1.5rem 2.5rem;
+                background: #ffffff;
+                border-radius: 24px 24px 0 0;
+                margin-top: -28px;
+                position: relative;
+                z-index: 10;
+                box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+                justify-content: flex-start;
+                min-height: calc(100dvh - 212px);
             }
+
+            /* Kecilkan logo di mobile */
+            .auth-logo-container {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 0.85rem;
+            }
+
+            .auth-header {
+                margin-bottom: 1rem;
+            }
+
+            .auth-title {
+                font-size: 1.25rem;
+            }
+
+            .auth-subtitle {
+                font-size: 0.775rem;
+                max-width: 100%;
+            }
+
             .form-grid-2 {
                 grid-template-columns: 1fr;
-                gap: 1.25rem;
+                gap: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+
+            .btn-submit {
+                padding: 0.9rem 1.5rem;
+                font-size: 0.95rem;
             }
         }
     

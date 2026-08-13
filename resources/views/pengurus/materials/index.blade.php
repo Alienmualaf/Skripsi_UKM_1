@@ -100,7 +100,7 @@
 }
 </style>
 @php
-    $isIframe = request()->has('iframe') || request()->query('iframe') || request('iframe') || isset($_GET['iframe']) || strpos(request()->fullUrl(), 'iframe') !== false;
+    $isIframe = request()->has('iframe') || request()->has('amp;iframe') || request()->query('iframe') || request('iframe') || isset($_GET['iframe']) || isset($_GET['amp;iframe']) || strpos(request()->fullUrl(), 'iframe') !== false;
 @endphp
 
 @if(session('success'))
@@ -152,19 +152,19 @@
 <!-- Folder Breadcrumbs -->
 <div class="card mb-6" style="padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
     <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem;">
-        <a href="{{ route('pengurus.materials.index', array_merge($classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="color: var(--accent-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+        <a href="{{ route('pengurus.materials.index', array_merge($classroom ? ['classroom_id' => $classroomId] : [], $isIframe ? ['iframe' => 1] : [])) }}" style="color: var(--accent-color); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
             <i class="ph-fill ph-house" style="font-size: 1.15rem;"></i> Home
         </a>
         @foreach($breadcrumbs as $bc)
             <span style="color: var(--text-muted);">/</span>
-            <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $bc->id], $classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="color: var(--accent-color); text-decoration: none;">
+            <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $bc->id], $classroom ? ['classroom_id' => $classroomId] : [], $isIframe ? ['iframe' => 1] : [])) }}" style="color: var(--accent-color); text-decoration: none;">
                 {{ $bc->name }}
             </a>
         @endforeach
     </div>
 
     <!-- Actions to create Folder or Upload File in current directory -->
-    @if(!auth()->user()->isAdminUkm())
+    @if(!false)
     <div style="display: flex; gap: 0.75rem;">
         <!-- Add Folder Trigger -->
         <button onclick="document.getElementById('addFolderModal').style.display='flex'" class="btn" style="background: var(--accent-light); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem;">
@@ -190,7 +190,7 @@
         @if($classroom)
             <input type="hidden" name="classroom_id" value="{{ $classroomId }}">
         @endif
-        @if(request()->has('iframe'))
+        @if($isIframe)
             <input type="hidden" name="iframe" value="1">
         @endif
         <div style="flex: 1; min-width: 250px;">
@@ -206,7 +206,7 @@
         </div>
         <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: bold; border-radius: 8px;">Filter</button>
         @if(request()->anyFilled(['search', 'type']))
-            <a href="{{ route('pengurus.materials.index', array_merge(request()->has('folder_id') ? ['folder_id' => request('folder_id')] : [], $classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: bold; text-decoration: none; color: var(--text-primary); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;">Reset</a>
+            <a href="{{ route('pengurus.materials.index', array_merge(request()->has('folder_id') ? ['folder_id' => request('folder_id')] : [], $classroom ? ['classroom_id' => $classroomId] : [], $isIframe ? ['iframe' => 1] : [])) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: bold; text-decoration: none; color: var(--text-primary); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;">Reset</a>
         @endif
     </form>
 </div>
@@ -222,7 +222,7 @@
         @foreach($folders as $folder)
             <div class="fm-item">
                 <!-- Clickable Area -->
-                <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $folder->id], $classroom ? ['classroom_id' => $classroomId] : [], request()->has('iframe') ? ['iframe' => 1] : [])) }}" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; text-decoration: none; z-index: 1;">
+                <a href="{{ route('pengurus.materials.index', array_merge(['folder_id' => $folder->id], $classroom ? ['classroom_id' => $classroomId] : [], $isIframe ? ['iframe' => 1] : [])) }}" style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; text-decoration: none; z-index: 1;">
                     <div class="fm-icon-wrapper">
                         <i class="ph-fill ph-folder" style="font-size: 3.75rem; color: #FFCD0E;"></i>
                     </div>
@@ -282,7 +282,7 @@
                         @if($classroom->materials->contains($mat->id))
                             <span class="badge bg-success" style="font-size: 0.65rem; padding: 0.25rem 0.5rem; border-radius: 20px;">Terhubung</span>
                         @else
-                            @if(!auth()->user()->isAdminUkm())
+                            @if(!false)
                             @php
                                 $addRoute = $classroom->performance_id
                                     ? route('pengurus.programs.performance.classroom.materials.add', [$classroom->performance->program_id, $classroom->performance_id])
@@ -292,7 +292,7 @@
                                 @csrf
                                 <input type="hidden" name="material_id" value="{{ $mat->id }}">
                                 <input type="hidden" name="redirect_to_materials" value="1">
-                                @if(request()->has('iframe'))
+                                @if($isIframe)
                                     <input type="hidden" name="iframe" value="1">
                                 @endif
                                 <button type="submit" class="fm-action-btn" title="Pilih Berkas" style="border: none; background: var(--success-color); color: white;">

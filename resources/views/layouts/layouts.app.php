@@ -95,7 +95,7 @@
 <body>
     <div class="app-container">
         @php
-            $isIframe = request()->has('iframe') || request()->query('iframe') || request('iframe') || isset($_GET['iframe']) || strpos(request()->fullUrl(), 'iframe') !== false;
+            $isIframe = request()->has('iframe') || request()->has('amp;iframe') || request()->query('iframe') || request('iframe') || isset($_GET['iframe']) || isset($_GET['amp;iframe']) || strpos(request()->fullUrl(), 'iframe') !== false;
         @endphp
         <!-- Sidebar -->
         @if(!$isIframe)

@@ -1,0 +1,81 @@
+@startwbs
+skinparam defaultTextAlignment center
+skinparam backgroundColor white
+skinparam padding 8
+skinparam NodePadding 10
+skinparam Shadowing true
+skinparam RoundCorner 10
+
+<style>
+wbsDiagram {
+  .root {
+    BackgroundColor #F3F4F6
+    FontWeight bold
+    FontSize 16
+    LineColor #374151
+  }
+  .publik {
+    BackgroundColor #DBEAFE
+    LineColor #2563EB
+  }
+  .anggota {
+    BackgroundColor #D1FAE5
+    LineColor #059669
+  }
+  .pengurus {
+    BackgroundColor #FEF3C7
+    LineColor #D97706
+  }
+  .adminukm {
+    BackgroundColor #F3E8FF
+    LineColor #7E22CE
+  }
+  .superadmin {
+    BackgroundColor #F1F5F9
+    LineColor #475569
+  }
+  .item {
+    BackgroundColor #FFFFFF
+    LineColor #9CA3AF
+    FontSize 12
+  }
+}
+</style>
+
+* Sistem Informasi UKM\n(SI-UKM PSUP) <<root>>
+** 1. Menu Publik\n(Guest / Tanpa Login) <<publik>>
+*** Beranda & Profil UKM <<item>>
+*** Daftar Pelatih & Prestasi <<item>>
+*** Agenda & Galeri Kegiatan <<item>>
+*** Pendaftaran Calon Anggota <<item>>
+*** Halaman Login <<item>>
+
+** 2. Dashboard Anggota\n(Member) <<anggota>>
+*** Dashboard & Agenda Saya <<item>>
+*** Profil Saya <<item>>
+*** Materi Latihan <<item>>
+*** Pusat Latihan Saya <<item>>
+
+** 3. Dashboard Pengurus <<pengurus>>
+*** Menu Pengurus\n(Dashboard, Agenda, Kategori) <<item>>
+*** Sekretaris\n(Anggota, Persuratan) <<item>>
+*** Keuangan\n(Keuangan Kas) <<item>>
+*** Divisi Latihan\n(Pelatih, Materi Master, Pusat Latihan) <<item>>
+*** Humas & Program\n(Proker & Job, Pengumuman) <<item>>
+*** Perlengkapan\n(Inventaris) <<item>>
+*** Laporan\n(Pusat Laporan) <<item>>
+
+** 4. Dashboard Admin UKM <<adminukm>>
+*** Profil PSUP <<item>>
+*** Kelola Anggota & Pendaftaran Calon <<item>>
+*** Kelola Pelatih & Klasifikasi Suara <<item>>
+*** Galeri Kegiatan & Prestasi <<item>>
+*** Pusat Laporan <<item>>
+*** Akses Penuh ke Semua Menu\nDashboard Pengurus <<item>>
+
+** 5. Dashboard Administrator\n(Super Admin) <<superadmin>>
+*** Manajemen Pengguna <<item>>
+*** Monitoring Sistem\n(Activity Log, Login History) <<item>>
+*** Pengaturan Website & Backup <<item>>
+*** Akses Penuh ke Semua Menu\nAdmin UKM & Pengurus <<item>>
+@endwbs

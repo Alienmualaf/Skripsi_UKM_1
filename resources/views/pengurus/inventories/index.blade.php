@@ -109,7 +109,7 @@
         <a href="{{ route('pengurus.inventories.all_loans') }}" class="btn" style="background:var(--accent-light);color:var(--accent-color);padding:0.65rem 1.25rem;font-weight:700;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">
             <i class="ph ph-hand-holding-box"></i> Daftar Peminjaman
         </a>
-        @if(!auth()->user()->isAdminUkm())
+        @if(!false)
         <a href="{{ route('pengurus.inventories.create') }}" class="btn btn-primary" style="padding:0.65rem 1.25rem;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:0.35rem;text-decoration:none;">
             <i class="ph ph-plus"></i> Tambah Barang
         </a>
@@ -184,7 +184,7 @@
                         </td>
                         <td>
                             <div style="display:flex;gap:0.5rem;justify-content:center;">
-                                @if(!auth()->user()->isAdminUkm())
+                                @if(!false)
                                 <a href="{{ route('pengurus.inventories.loans', $inv->id) }}" class="btn" style="background:var(--accent-light);color:var(--accent-color);padding:0.4rem 0.8rem;font-size:0.8rem;font-weight:600;text-decoration:none;border-radius:6px;"><i class="ph ph-hand-holding-box"></i> Pinjam</a>
                                 @endif
                                 <a href="{{ route('pengurus.inventories.edit', $inv->id) }}" class="btn" style="background:var(--bg-color);border:1px solid var(--border-color);padding:0.4rem 0.8rem;font-size:0.8rem;font-weight:600;color:var(--text-primary);text-decoration:none;"><i class="ph ph-pencil-simple"></i> Edit</a>
@@ -234,7 +234,7 @@
             </div>
             {{-- Actions --}}
             <div class="inv-card-actions">
-                @if(!auth()->user()->isAdminUkm())
+                @if(!false)
                 <a href="{{ route('pengurus.inventories.loans', $inv->id) }}" class="inv-btn-loan">
                     <i class="ph ph-hand-holding-box"></i> Pinjam
                 </a>
@@ -242,7 +242,7 @@
                 <a href="{{ route('pengurus.inventories.edit', $inv->id) }}" class="inv-btn-edit" title="Edit">
                     <i class="ph ph-pencil-simple"></i>
                 </a>
-                @if(!auth()->user()->isAdminUkm())
+                @if(!false)
                 <form action="{{ route('pengurus.inventories.destroy', $inv->id) }}" method="POST" onsubmit="return confirm('Hapus barang ini?');" style="margin:0;">
                     @csrf @method('DELETE')
                     <button type="submit" class="inv-btn-del" title="Hapus"><i class="ph ph-trash"></i></button>

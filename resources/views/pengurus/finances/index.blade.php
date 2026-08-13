@@ -19,7 +19,7 @@
             Rp {{ number_format($netBalance, 0, ',', '.') }}
         </div>
     </div>
-    @if(!auth()->user()->isAdminUkm())
+    @if(!false)
     <a href="{{ route('pengurus.finances.create') }}" class="btn" style="background: white; color: var(--accent-color); padding: 0.65rem 1.25rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
         <i class="ph ph-plus"></i> Tambah Transaksi
     </a>
@@ -110,7 +110,7 @@
                             <a href="{{ route('pengurus.finances.edit', $fin->id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none;" title="Edit">
                                 <i class="ph ph-pencil-simple"></i><span class="fin-hide"> Edit</span>
                             </a>
-                            @if(!auth()->user()->isAdminUkm())
+                            @if(!false)
                             <form action="{{ route('pengurus.finances.destroy', $fin->id) }}" method="POST" onsubmit="return confirm('Hapus transaksi ini?');" style="margin: 0;">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger" title="Hapus">

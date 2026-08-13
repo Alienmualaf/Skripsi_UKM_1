@@ -13,7 +13,6 @@
 <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.85rem 1.25rem;border-radius:8px;font-weight:600;margin-bottom:1rem;"><i class="ph ph-check-circle"></i> {{ session('success') }}</div>
 @endif
 <div style="margin-bottom:1.5rem;">
-    <a href="{{ $backUrl }}" style="display:inline-flex;align-items:center;gap:0.35rem;color:var(--accent-color);text-decoration:none;font-weight:600;font-size:0.875rem;margin-bottom:0.25rem;"><i class="ph ph-arrow-left"></i> Kembali ke Pusat Latihan</a>
     <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin:0;">{{ $attendance->title }}</h3>
     <p style="margin:0.25rem 0 0;color:var(--text-secondary);font-size:0.875rem;">
         Jenis: <strong>{{ $attendance->type }}</strong> &nbsp;|&nbsp; Tanggal: <strong>{{ date('d M Y', strtotime($attendance->date)) }}</strong>

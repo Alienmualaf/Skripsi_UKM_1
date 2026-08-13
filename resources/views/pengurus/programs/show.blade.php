@@ -37,7 +37,7 @@
                 <i class="ph ph-file-text"></i> Lihat LPJ
             </a>
         @else
-            @if(!auth()->user()->isAdminUkm())
+            @if(!false)
             <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="padding: 0.65rem 1rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <i class="ph ph-file-text"></i> Buat LPJ
             </a>
@@ -101,18 +101,6 @@
             <i class="ph ph-file-text" style="color: var(--accent-color);"></i> Status LPJ
         </h4>
         @if($program->report)
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                @if($program->report->status === 'Approved')
-                    <span style="width: 8px; height: 8px; background: var(--success-color); border-radius: 50%; display: inline-block;"></span>
-                    <span style="font-weight: 700; color: var(--success-color);">Disetujui</span>
-                @elseif($program->report->status === 'Submitted')
-                    <span style="width: 8px; height: 8px; background: #0ea5e9; border-radius: 50%; display: inline-block;"></span>
-                    <span style="font-weight: 700; color: #0ea5e9;">Diajukan</span>
-                @else
-                    <span style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; display: inline-block;"></span>
-                    <span style="font-weight: 700; color: #f59e0b;">Draft</span>
-                @endif
-            </div>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">{{ $program->report->title }}</p>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
@@ -125,8 +113,8 @@
         @else
             <div style="text-align: center; padding: 1.5rem 0;">
                 <i class="ph ph-file-x" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
-                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: {{ auth()->user()->isAdminUkm() ? '0' : '1rem' }};">Laporan LPJ belum dibuat{{ auth()->user()->isAdminUkm() ? ' oleh Pengurus' : '' }}</p>
-                @if(!auth()->user()->isAdminUkm())
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: {{ false ? '0' : '1rem' }};">Laporan LPJ belum dibuat{{ false ? ' oleh Pengurus' : '' }}</p>
+                @if(!false)
                 <a href="{{ route('ukm.reports.kegiatan', $program->id) }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-radius: 8px;">
                     <i class="ph ph-plus"></i> Buat LPJ
                 </a>
@@ -230,7 +218,7 @@
 
     @else
         {{-- Create performance form --}}
-        @if(auth()->user()->isAdminUkm())
+        @if(false)
             <div style="text-align: center; padding: 1.5rem 0;">
                 <i class="ph ph-microphone-stage" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;"></i>
                 <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0;">Belum ada data penampilan / lomba. Data penampilan / lomba harus ditambahkan oleh Pengurus.</p>

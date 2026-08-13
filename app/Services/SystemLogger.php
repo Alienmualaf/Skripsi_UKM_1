@@ -23,6 +23,9 @@ class SystemLogger
             'ip_address' => Request::ip(),
             'browser' => Request::header('User-Agent'),
         ]);
+
+        // Keep only last 7 days of activity logs
+        ActivityLog::where('created_at', '<', now()->subDays(7))->delete();
     }
 
     public static function logLogin(?int $userId, string $username, string $status = 'Success')
@@ -36,6 +39,9 @@ class SystemLogger
             'browser' => self::getBrowser(),
             'status' => $status,
         ]);
+
+        // Keep only last 7 days of login histories
+        LoginHistory::where('created_at', '<', now()->subDays(7))->delete();
     }
 
     public static function logLogout(int $userId, string $username)
@@ -58,6 +64,9 @@ class SystemLogger
                 'status' => 'Logout',
             ]);
         }
+
+        // Keep only last 7 days of login histories
+        LoginHistory::where('created_at', '<', now()->subDays(7))->delete();
     }
 
     private static function getDevice(): string
