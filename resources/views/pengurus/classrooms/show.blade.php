@@ -129,7 +129,7 @@
                     </label>
                     @endforeach
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem;font-weight:700;border-radius:8px;">Simpan Peserta</button>
+                <button type="submit" class="btn btn-primary" style="width:100%;padding:0.65rem; color: #00ff2fff; font-weight:700;border-radius:8px;;">Simpan Peserta</button>
             </form>
         </div>
     </div>
@@ -721,7 +721,7 @@ function closeMaterialsModal() {
                 <label style="font-weight:700;font-size:0.8125rem;display:block;margin-bottom:0.35rem;color:var(--text-secondary);">Tanggal</label>
                 <input type="date" name="date" id="editAttendanceDate" class="form-control" required style="padding:0.6rem;">
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;font-weight:700;border-radius:8px;"><i class="ph ph-floppy-disk"></i> Simpan Perubahan</button>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;font-weight:700;border-radius:8px; color: green"><i class="ph ph-floppy-disk"></i> Simpan Perubahan</button>
         </form>
     </div>
 </div>
